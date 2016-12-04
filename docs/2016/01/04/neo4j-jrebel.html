@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <head>
+  <title>How to use JRebel with Neo4j</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Benoit Simard"/>
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop." />
+  <meta name="keywords" content="neo4j, jrebel" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+  <!-- RSS feed -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="/" title="Home">Home</a></li>
+                  <li><a href="/blog" title="Blog">Blog</a></li>
+                  <li><a href="/about-me.html" title="About me">About me</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> How to use JRebel with Neo4j</h1>
+            <meta itemprop="description" content=" In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.">
+            <img itemprop="image" src="/public/images/jrebel/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#installation">Installation</a>
+<ul class="sectlevel2">
+<li><a href="#step-1-download-licence">Step 1 : download &amp; licence</a></li>
+<li><a href="#step-2-installation">Step 2 : Installation</a></li>
+<li><a href="#step-3-activation">Step 3 : Activation</a></li>
+<li><a href="#configuration-for-neo4j">Configuration for Neo4j</a></li>
+</ul>
+</li>
+<li><a href="#neo4j-plugin">Neo4j plugin</a>
+<ul class="sectlevel2">
+<li><a href="#installation-2">Installation</a></li>
+</ul>
+</li>
+<li><a href="#the-magic-part">The magic part</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installation">Installation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="step-1-download-licence">Step 1 : download &amp; licence</h3>
+<div class="paragraph">
+<p>You have to download JRebel and to ask a trial code. For this, follow those instructions :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Got to the website and fullfill the form to get an activation code : <a href="https://zeroturnaround.com/software/jrebel/download/" class="bare">https://zeroturnaround.com/software/jrebel/download/</a></p>
+</li>
+<li>
+<p>Then download a stand alone version here : <a href="https://zeroturnaround.com/software/jrebel/download/#!/have-license" class="bare">https://zeroturnaround.com/software/jrebel/download/#!/have-license</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="step-2-installation">Step 2 : Installation</h3>
+<div class="paragraph">
+<p>Unzip the downloaded file somwhere in your computer. In my case : <code>$&gt; unzip jrebel-6.3.1-nosetup.zip -d ~/tmp/</code>. Now you should have a <strong>jrebel</strong> folder on your computer. In the rest of this tuto, I will use the var <code>JREBEL_HOME</code> for the path of this folder.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="step-3-activation">Step 3 : Activation</h3>
+<div class="paragraph">
+<p>We have to activate JRebel with the trial code that we have asked. To do this, we only have to execute this commande : <code>$&gt;JREBEL_HOME/bin/activate.sh &lt;ACTIVATION_CODE&gt;</code> (replace <code>&lt;ACTIVATION_CODE&gt;</code> with the one given at step 1)</p>
+</div>
+<div class="paragraph">
+<p>Now you have a trial version of JRebel installed on your computer</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-for-neo4j">Configuration for Neo4j</h3>
+<div class="paragraph">
+<p>Here, I’m assuming that you already have a neo4j instance installed on your computer in the folder <code>NEO4J_HOME</code></p>
+</div>
+<div class="paragraph">
+<p>So now we have to configure JRebel for Neo4j. JRebel works with a java agent, so we have to add it in the JVM argument of Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>To do this, follow those instructions :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Edit the file <code>NEO4J_HOME/conf/neo4j-wrapper.conf</code> : <code>$&gt; vi NEO4J_HOME/conf/neo4j-wrapper.conf</code></p>
+</li>
+<li>
+<p>Add this line in the JVM Parameters section : <code>wrapper.java.additional=-javaagent: JREBEL_HOME/jrebel.jar</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Now your configuration file should looks like this :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-property" data-lang="property">#********************************************************************
+# Property file references
+#********************************************************************
+
+wrapper.java.additional=-Dorg.neo4j.server.properties=conf/neo4j-server.properties
+wrapper.java.additional=-Dlog4j.configuration=file:conf/log4j.properties
+
+#********************************************************************
+# JVM Parameters
+#********************************************************************
+
+wrapper.java.additional=-XX:+UseG1GC
+wrapper.java.additional=-XX:-OmitStackTraceInFastThrow
+wrapper.java.additional=-XX:hashCode=5
+wrapper.java.additional=-javaagent:/home/bsimard/tmp/jrebel/jrebel.jar</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="neo4j-plugin">Neo4j plugin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I have created a simple Neo4j plugin at this url : <a href="https://github.com/sim51/neo4j-plugin-xml" class="bare">https://github.com/sim51/neo4j-plugin-xml</a> .
+It’s a simple plugin that translate a cypher query to an XML document. for our example it’s perfect.</p>
+</div>
+<div class="paragraph">
+<p>If you look at the <code>pom.xml</code> file, you will notice this following plugin :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+    &lt;groupId&gt;org.zeroturnaround&lt;/groupId&gt;
+    &lt;artifactId&gt;jrebel-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;${jrebel.version}&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;id&gt;generate-rebel-xml&lt;/id&gt;
+            &lt;phase&gt;process-resources&lt;/phase&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;generate&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is the only thing needed to a plugin to be compatible with JRebel. It will generate the JRebel configuration file for you during the maven process, and it’s working out-of-the-box with Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>In fact JRebel needs a <code>rebel.xml</code> file at the root of your jar, to know what to look (ie. your java classes).
+You will find all the information about how to configure JRebel at this url : <a href="http://manuals.zeroturnaround.com/jrebel/standalone/config.html" class="bare">http://manuals.zeroturnaround.com/jrebel/standalone/config.html</a></p>
+</div>
+<div class="sect2">
+<h3 id="installation-2">Installation</h3>
+<div class="sect3">
+<h4 id="step-1-compiling-the-code">Step 1 : Compiling the code</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Go to the project folder</p>
+</li>
+<li>
+<p>Just run <code>mvn package</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="step-2-installation-into-neo4j">Step 2 : installation into Neo4j</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Copy <code>neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar</code> from the target project folder to the plugins folder of Neo4j : <code>$&gt;cp target/neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar NEO4J_HOME/plugins</code></p>
+</li>
+<li>
+<p>Edit the file <code>NEO4J_HOME/conf/neo4j-server.properties</code></p>
+</li>
+<li>
+<p>Add / modify the following line : <code>org.neo4j.server.thirdparty_jaxrs_classes=org.neo4j.plugin.xml=/xml</code></p>
+</li>
+<li>
+<p>Restart the server</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+you have a to deploy your plugin a first time before the magic appears !
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-magic-part">The magic part</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At this point of the tutorial, you have :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>JRebel installed on your computer</p>
+</li>
+<li>
+<p>A working Neo4j server with the JRebel agent</p>
+</li>
+<li>
+<p>A working Neo4j plugin deploy into your server that is compatible with Jrebel</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So now, it’s time to see magic of JRebel !</p>
+</div>
+<div class="paragraph">
+<p>Firstly, we will see what the plugin endpoint ping respond to us :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt; curl -u neo4j:admin http://localhost:7474/xml/ping
+Pong</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we are going to change the source code, by changing the response of this endpoint in the file <code>org.neo4j.plugin.xml.PluginExtension</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@GET
+@Path("/ping")
+public Response ping() throws IOException {
+    return Response.ok("I'm here master", MediaType.TEXT_PLAIN).build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We have to compile the new code with maven <code>mvn compile</code>, for the classes to be generated into the <code>target/classes</code> folder. And now, let’s see the result :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt; curl -u neo4j:admin  http://localhost:7474/xml/ping
+I'm here master</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Yeah it’s working, our change is here without any Neo4j restart. Now you can concentrate on your code, so happy coding !</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If you use an IDE, JRebel has created various plugin and there is probably one for your favorite IDE. Those plugin permit to run/debug a class with JRebel.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If you want to save more time, you can let your IDE to compile (incrementaly!) your project automaticly. So each time you are saving a file, your IDE compile the java class into target/classes and JRebel reload it on the server.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  neo4j, jrebel
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2016-01-04">Jan 4, 2016</time>
+              </li>
+              <li><a href="" title="Permalien : How to use JRebel with Neo4j" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2015/11/05/les-icones-du-passee.html" title="Les icônes du passé">&lt; Les icônes du passé</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </main>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte Github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = 'How-to-use-JRebel-with-Neo4j';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</body>
+</html>

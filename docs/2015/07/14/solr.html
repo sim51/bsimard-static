@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <head>
+  <title>Comment SolR découpe vos phrases</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Benoit Simard"/>
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr" />
+  <meta name="keywords" content="solr, lucene, full text search" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+  <!-- RSS feed -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="/" title="Home">Home</a></li>
+                  <li><a href="/blog" title="Blog">Blog</a></li>
+                  <li><a href="/about-me.html" title="About me">About me</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Comment SolR découpe vos phrases</h1>
+            <meta itemprop="description" content=" Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr">
+            <img itemprop="image" src="/public/images/solr/banner.jpg"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#le-traitement-du-texte-et-des-mots">Le traitement du texte et des mots</a>
+<ul class="sectlevel2">
+<li><a href="#les-filtres">Les filtres</a></li>
+<li><a href="#les-tokenizers">Les tokenizers</a></li>
+</ul>
+</li>
+<li><a href="#la-définition-des-types">La définition des types</a>
+<ul class="sectlevel2">
+<li><a href="#texte-général">Texte Général</a></li>
+<li><a href="#texte-exact">Texte exact</a></li>
+</ul>
+</li>
+<li><a href="#la-recherche">La recherche</a>
+<ul class="sectlevel2">
+<li><a href="#les-types-de-recherche">Les types de recherche</a></li>
+<li><a href="#les-coefficients-boost">Les coefficients / boost</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="le-traitement-du-texte-et-des-mots">Le traitement du texte et des mots</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dans un moteur de recherche, le traitement du texte et des mots s’effectue à deux endroits :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>lors de l’indexation, pour la construction des ses indexes</p>
+</li>
+<li>
+<p>lors d’une requête, pour traiter les mots recherchés</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>INFO: Généralement on fait en sorte que le traitement effectué lors de l’indexation soit le même que celui de la requêtes, mais ce n’est pas une obligation.</p>
+</div>
+<div class="paragraph">
+<p>Il existe deux familles de traitement :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>les <strong>filters</strong> qui permettent de manipuler et modifier le texte. Exemple : supprimer tous les accent du texte.</p>
+</li>
+<li>
+<p>les <strong>tokenizers</strong> qui permettent de découper le texte en mot. Exemple : découper le texte selon les espaces et la ponctuation</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Lorsqu’on définit un champs dans Solr, on y définit la liste des filtres et des tokenizers qu’on veut utiliser, ainsi que l’ordre dans lequel ils vont être exécuté.</p>
+</div>
+<div class="sect2">
+<h3 id="les-filtres">Les filtres</h3>
+<div class="paragraph">
+<p>Dans cette section nous allons voir une série de filtres que SolR met à notre disposition.</p>
+</div>
+<div class="sect3">
+<h4 id="patternreplacecharfilterfactory">PatternReplaceCharFilterFactory</h4>
+<div class="paragraph">
+<p>Ce filtre nous permet de spécifier une liste de caractère afin de les supprimer du texte. Généralement on demande de supprimer les caractères spéciaux comme <code>()[]{}'|?!.</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>{Pomme} a des pépins !</code> devient <code>Pomme a des pépins</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="stopfilterfactory">StopFilterFactory</h4>
+<div class="paragraph">
+<p>Ce filtre permet de supprimer du texte ce qu’on nomme les stopwords, c’est à dire tous les mots usuels de la langue comme <code>de, le, la, les, dans, pour, …​</code></p>
+</div>
+<div class="paragraph">
+<p>Ces <strong>stopwords</strong> sont paramétrables via un fichier texte. Vous pouvez retrouver une liste de stopword pour la langue française à l’adresse suivante : <a href="http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt" class="bare">http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>{Pomme} a des pépins !</code> devient <code>{Pomme} pépins !</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="lowercasefilterfactory">LowerCaseFilterFactory</h4>
+<div class="paragraph">
+<p>Ce filtre permet de mettre tout le texte en minuscule.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="frenchlightstemfilterfactory">FrenchLightStemFilterFactory</h4>
+<div class="paragraph">
+<p>Ce filtre permet de trouver automatiquement la racine du mot. Il doit êre appliqué sur des mots et non des phrases entières. C’est pourquoi il est toujours positionné après un tokenizer. En outre, il supprime aussi tous les caractères accentués et spéciaux de la langue française.</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>planetarirum</code> devient <code>planet</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="asciifoldingfilterfactory">ASCIIFoldingFilterFactory</h4>
+<div class="paragraph">
+<p>Ce filtre permet de remplacer tous les caractères accentués et les caractères spécifiques de la langues française, par une représentation universelle (en ASCII) :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>é, ê, è → e</p>
+</li>
+<li>
+<p>ç → c</p>
+</li>
+<li>
+<p>ù → u</p>
+</li>
+<li>
+<p>…​</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Exemple : {Pomme} a des pépins ! devient {Pomme} a des pepins !</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="les-tokenizers">Les tokenizers</h3>
+<div class="paragraph">
+<p>Dans cette section nous allons voir la liste des tokenizers que SolR met a notre disposition.</p>
+</div>
+<div class="sect3">
+<h4 id="standardtokenizerfactory">StandardTokenizerFactory</h4>
+<div class="paragraph">
+<p>Ce tokernizer sépare le texte en fonction des espaces et de la ponctuation (qu’il supprime).</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>{Pomme} a des pépins !</code> devient <code>{Pomme}, a, des, pépins</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="keywordtokenizerfactory">KeywordTokenizerFactory</h4>
+<div class="paragraph">
+<p>Ce tokenizer ne fait rien, puisqu’il renvoie le texte qu’on lui donne tel quel. Il sert surtout lorsqu’on veut faire de la recherche exact.</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>{Pomme} a des pépins !</code> devient <code>{Pomme} a des pépins !</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="whitespacetokenizerfactory">WhitespaceTokenizerFactory</h4>
+<div class="paragraph">
+<p>Ce tokernizer sépare le texte uniquement en fonction des espaces, il ne prend pas en compte la ponctuation.</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>{Pomme} a des pépins, et c’est pas marrant.</code> devient <code>{Pomme}, a, des, pépins,, et, c’est, pas, marrant.</code></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="la-définition-des-types">La définition des types</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dans tous mes projets, il y a deux types qui reviennent régulièrement.</p>
+</div>
+<div class="sect2">
+<h3 id="texte-général">Texte Général</h3>
+<div class="paragraph">
+<p>Ce type permet de stocker dans les indexes, la racine des mots sans accent et en minuscule.</p>
+</div>
+<div class="paragraph">
+<p>Voici la liste des filtres/tokenizers utilisés pour ce champ :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PatternReplaceCharFilterFactory</p>
+</li>
+<li>
+<p>StandardTokenizerFactory</p>
+</li>
+<li>
+<p>LowerCaseFilterFactory</p>
+</li>
+<li>
+<p>FrenchLightStemFilterFactory</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="texte-exact">Texte exact</h3>
+<div class="paragraph">
+<p>Ce type permet de stocker dans les indexes les mots exacts mais sans accent et en minuscule.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>PatternReplaceCharFilterFactory</p>
+</li>
+<li>
+<p>StandardTokenizerFactory</p>
+</li>
+<li>
+<p>LowerCaseFilterFactory</p>
+</li>
+<li>
+<p>ASCIIFoldingFilterFactory</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="la-recherche">La recherche</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Lorsqu’on effectue une recherche, il est possible de spécifier un algorithme de recherche.
+Nous allons détailler dans les paragraphes à quoi cela correspond.</p>
+</div>
+<div class="sect2">
+<h3 id="les-types-de-recherche">Les types de recherche</h3>
+<div class="sect3">
+<h4 id="la-recherche-standard">La recherche standard</h4>
+<div class="paragraph">
+<p>La recherche standard est simple, elle correspond à la recherche du terme exact (après son traitement comme vu précédemment).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="la-recherche-wildcard">La recherche wildcard</h4>
+<div class="paragraph">
+<p>Avec un wildcard, on recherche dans les indexes tout les mots commençant par le pattern de la recherche.</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>plan*</code> permet de trouver <code>plan, planète, planétarium, …​</code></p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="la-recherche-floue">La recherche floue</h4>
+<div class="paragraph">
+<p>Avec une recherche floue, on recherche dans les indexes tous les mots qui sont proches du pattern de la recherche.
+Derrière la notion de proche/voisin se trouve un algorithme basé sur la distance de Levenshtein.</p>
+</div>
+<div class="paragraph">
+<p>Ce type de recherche permet d’être tolérant aux fautes orthographiques / frappes</p>
+</div>
+<div class="paragraph">
+<p><strong>Exemple :</strong> <code>cosmik~</code> permet de trouver <code>cosmique</code> | <code>plannette</code> permet de trouver <code>planète</code> | <code>renconrte~</code> permet de trouver <code>rencontre</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Il est possible de définir le taux de similarité minimum, compris entre 0 &amp; 1 (1 étant le plus proche possible): <code>comisk~0.8</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="les-coefficients-boost">Les coefficients / boost</h3>
+<div class="paragraph">
+<p>Lorsqu’on effectue une recherche sur plusieurs critères, il est possible de définir pour chaque critère quel est son incidence sur le resultat de recherche.
+C’est ce que l’on nomme les <strong>boost</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Par exemple cela permet de donner un score plus élévé aux documents possédant le pattern de recherche dans le titre que dans la description.</p>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  solr, lucene, full text search
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2015-07-14">Jul 14, 2015</time>
+              </li>
+              <li><a href="" title="Permalien : Comment SolR découpe vos phrases" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2015/06/04/neo4j-pg-fdw.html" title="Connecting Neo4j to any SQL tool with the power of Postgresql">&lt; Connecting Neo4j to any SQL tool with the power of Postgresql</a>
+            </li>
+            
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2015/10/05/neo4j-gatling.html" title="Stresser facilement votre base Neo4j avec gatling">Stresser facilement votre base Neo4j avec gatling &gt;</a>
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </main>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte Github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = 'Comment-SolR-decoupe-vos-phrases';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</body>
+</html>

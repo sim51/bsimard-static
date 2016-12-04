@@ -10,6 +10,8 @@ discuss_shortname: bsimard
 
 paginate_path: /blog/page:num
 
+destination: docs
+
 ############################################################
 # Site configuration for the Jekyll 3 Pagination Plugin
 # The values here represent the defaults if nothing is set

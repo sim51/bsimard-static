@@ -1,0 +1,1860 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Benoit Simard</title>
+    <description>Site de Benoit Simard</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 04 Dec 2016 18:07:52 +0100</pubDate>
+    <lastBuildDate>Sun, 04 Dec 2016 18:07:52 +0100</lastBuildDate>
+    <generator>Jekyll v3.3.1</generator>
+    
+      <item>
+        <title>How to use JRebel with Neo4j</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#step-1-download-licence&quot;&gt;Step 1 : download &amp;amp; licence&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#step-2-installation&quot;&gt;Step 2 : Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#step-3-activation&quot;&gt;Step 3 : Activation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#configuration-for-neo4j&quot;&gt;Configuration for Neo4j&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-plugin&quot;&gt;Neo4j plugin&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#installation-2&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-magic-part&quot;&gt;The magic part&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;step-1-download-licence&quot;&gt;Step 1 : download &amp;amp; licence&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You have to download JRebel and to ask a trial code. For this, follow those instructions :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Got to the website and fullfill the form to get an activation code : &lt;a href=&quot;https://zeroturnaround.com/software/jrebel/download/&quot; class=&quot;bare&quot;&gt;https://zeroturnaround.com/software/jrebel/download/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Then download a stand alone version here : &lt;a href=&quot;https://zeroturnaround.com/software/jrebel/download/#!/have-license&quot; class=&quot;bare&quot;&gt;https://zeroturnaround.com/software/jrebel/download/#!/have-license&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;step-2-installation&quot;&gt;Step 2 : Installation&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Unzip the downloaded file somwhere in your computer. In my case : &lt;code&gt;$&amp;gt; unzip jrebel-6.3.1-nosetup.zip -d ~/tmp/&lt;/code&gt;. Now you should have a &lt;strong&gt;jrebel&lt;/strong&gt; folder on your computer. In the rest of this tuto, I will use the var &lt;code&gt;JREBEL_HOME&lt;/code&gt; for the path of this folder.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;step-3-activation&quot;&gt;Step 3 : Activation&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We have to activate JRebel with the trial code that we have asked. To do this, we only have to execute this commande : &lt;code&gt;$&amp;gt;JREBEL_HOME/bin/activate.sh &amp;lt;ACTIVATION_CODE&amp;gt;&lt;/code&gt; (replace &lt;code&gt;&amp;lt;ACTIVATION_CODE&amp;gt;&lt;/code&gt; with the one given at step 1)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now you have a trial version of JRebel installed on your computer&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;configuration-for-neo4j&quot;&gt;Configuration for Neo4j&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here, I’m assuming that you already have a neo4j instance installed on your computer in the folder &lt;code&gt;NEO4J_HOME&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So now we have to configure JRebel for Neo4j. JRebel works with a java agent, so we have to add it in the JVM argument of Neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To do this, follow those instructions :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Edit the file &lt;code&gt;NEO4J_HOME/conf/neo4j-wrapper.conf&lt;/code&gt; : &lt;code&gt;$&amp;gt; vi NEO4J_HOME/conf/neo4j-wrapper.conf&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add this line in the JVM Parameters section : &lt;code&gt;wrapper.java.additional=-javaagent: JREBEL_HOME/jrebel.jar&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now your configuration file should looks like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-property&quot; data-lang=&quot;property&quot;&gt;#********************************************************************
+# Property file references
+#********************************************************************
+
+wrapper.java.additional=-Dorg.neo4j.server.properties=conf/neo4j-server.properties
+wrapper.java.additional=-Dlog4j.configuration=file:conf/log4j.properties
+
+#********************************************************************
+# JVM Parameters
+#********************************************************************
+
+wrapper.java.additional=-XX:+UseG1GC
+wrapper.java.additional=-XX:-OmitStackTraceInFastThrow
+wrapper.java.additional=-XX:hashCode=5
+wrapper.java.additional=-javaagent:/home/bsimard/tmp/jrebel/jrebel.jar&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;neo4j-plugin&quot;&gt;Neo4j plugin&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I have created a simple Neo4j plugin at this url : &lt;a href=&quot;https://github.com/sim51/neo4j-plugin-xml&quot; class=&quot;bare&quot;&gt;https://github.com/sim51/neo4j-plugin-xml&lt;/a&gt; .
+It’s a simple plugin that translate a cypher query to an XML document. for our example it’s perfect.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you look at the &lt;code&gt;pom.xml&lt;/code&gt; file, you will notice this following plugin :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;plugin&amp;gt;
+    &amp;lt;groupId&amp;gt;org.zeroturnaround&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;jrebel-maven-plugin&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;${jrebel.version}&amp;lt;/version&amp;gt;
+    &amp;lt;executions&amp;gt;
+        &amp;lt;execution&amp;gt;
+            &amp;lt;id&amp;gt;generate-rebel-xml&amp;lt;/id&amp;gt;
+            &amp;lt;phase&amp;gt;process-resources&amp;lt;/phase&amp;gt;
+            &amp;lt;goals&amp;gt;
+                &amp;lt;goal&amp;gt;generate&amp;lt;/goal&amp;gt;
+            &amp;lt;/goals&amp;gt;
+        &amp;lt;/execution&amp;gt;
+    &amp;lt;/executions&amp;gt;
+&amp;lt;/plugin&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the only thing needed to a plugin to be compatible with JRebel. It will generate the JRebel configuration file for you during the maven process, and it’s working out-of-the-box with Neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In fact JRebel needs a &lt;code&gt;rebel.xml&lt;/code&gt; file at the root of your jar, to know what to look (ie. your java classes).
+You will find all the information about how to configure JRebel at this url : &lt;a href=&quot;http://manuals.zeroturnaround.com/jrebel/standalone/config.html&quot; class=&quot;bare&quot;&gt;http://manuals.zeroturnaround.com/jrebel/standalone/config.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;installation-2&quot;&gt;Installation&lt;/h3&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;step-1-compiling-the-code&quot;&gt;Step 1 : Compiling the code&lt;/h4&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to the project folder&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Just run &lt;code&gt;mvn package&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;step-2-installation-into-neo4j&quot;&gt;Step 2 : installation into Neo4j&lt;/h4&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Copy &lt;code&gt;neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar&lt;/code&gt; from the target project folder to the plugins folder of Neo4j : &lt;code&gt;$&amp;gt;cp target/neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar NEO4J_HOME/plugins&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Edit the file &lt;code&gt;NEO4J_HOME/conf/neo4j-server.properties&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add / modify the following line : &lt;code&gt;org.neo4j.server.thirdparty_jaxrs_classes=org.neo4j.plugin.xml=/xml&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Restart the server&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+you have a to deploy your plugin a first time before the magic appears !
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-magic-part&quot;&gt;The magic part&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At this point of the tutorial, you have :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;JRebel installed on your computer&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A working Neo4j server with the JRebel agent&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A working Neo4j plugin deploy into your server that is compatible with Jrebel&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So now, it’s time to see magic of JRebel !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Firstly, we will see what the plugin endpoint ping respond to us :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; curl -u neo4j:admin http://localhost:7474/xml/ping
+Pong&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now we are going to change the source code, by changing the response of this endpoint in the file &lt;code&gt;org.neo4j.plugin.xml.PluginExtension&lt;/code&gt; :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@GET
+@Path(&quot;/ping&quot;)
+public Response ping() throws IOException {
+    return Response.ok(&quot;I'm here master&quot;, MediaType.TEXT_PLAIN).build();
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We have to compile the new code with maven &lt;code&gt;mvn compile&lt;/code&gt;, for the classes to be generated into the &lt;code&gt;target/classes&lt;/code&gt; folder. And now, let’s see the result :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; curl -u neo4j:admin  http://localhost:7474/xml/ping
+I'm here master&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Yeah it’s working, our change is here without any Neo4j restart. Now you can concentrate on your code, so happy coding !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+If you use an IDE, JRebel has created various plugin and there is probably one for your favorite IDE. Those plugin permit to run/debug a class with JRebel.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+If you want to save more time, you can let your IDE to compile (incrementaly!) your project automaticly. So each time you are saving a file, your IDE compile the java class into target/classes and JRebel reload it on the server.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2016/01/04/neo4j-jrebel.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/01/04/neo4j-jrebel.html</guid>
+        
+        <category>neo4j, jrebel</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Les icônes du passé</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-top-5-des-icônes-du-passé&quot;&gt;Le top 5 des icônes du passé&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#enregistrer&quot;&gt;Enregistrer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-téléphone&quot;&gt;Le téléphone&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-touche-répondeur&quot;&gt;La touche répondeur&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-télévision&quot;&gt;La télévision&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-touche-vérouiller&quot;&gt;La touche vérouiller&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#et-bien-d-autres&quot;&gt;Et bien d&amp;#8217;autres &amp;#8230;&amp;#8203;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#en-résumé&quot;&gt;En résumé&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#coup-de-gueule-perso&quot;&gt;Coup de gueule perso&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Non ce n&amp;#8217;est pas un post sur les stars de mon enfance.
+Dans mon travail je fais de plus en plus d&amp;#8217;ergonomie, et lorsque je vois un graphiste mettre une &quot;disquette&quot; à coté du bouton &quot;save&quot; cela me fait toujours sourire&amp;#8230;&amp;#8203;
+J&amp;#8217;ai donc décidé de faire un petit florilège des icônes obsolètes qu&amp;#8217;on utilise toujours et qui ne parle plus aux nouvelles générations, mais qu&amp;#8217;on utilise toujours un peu partout.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-top-5-des-icônes-du-passé&quot;&gt;Le top 5 des icônes du passé&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;enregistrer&quot;&gt;Enregistrer&lt;/h3&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/icones/floppy.png&quot; alt=&quot;floppy&quot; width=&quot;100&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Mais pourquoi c&amp;#8217;est encore une disquette !
+Cela fait 10 ans que je n&amp;#8217;ai même plus un lecteur de disquette sur mon ordinateur, et au moins 15 que je les utilise plus.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;le-téléphone&quot;&gt;Le téléphone&lt;/h3&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/icones/phone.jpg&quot; alt=&quot;phone&quot; width=&quot;200&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Là on retrouve plusieurs variantes :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Le téléphone avec le cadran qu&amp;#8217;on tourne. Cela date quand même de l&amp;#8217;époque de ma grand-mère, faudrait penser à passer à autre chose.
+Le combiné de téléphone qu&amp;#8217;on retrouvait dans les cabines téléphoniques. Depuis combien de temps vous n&amp;#8217;avez pas utilisé voir croisé une cabine téléphonique ?
+Le téléphone portable avec l&amp;#8217;antenne qui dépasse en haut à gauche. Là aussi cela à plus de dix ans &amp;#8230;&amp;#8203; (coucou itinéris, hola, &amp;#8230;&amp;#8203;)
+Bon après représenter une brique noire sans touche, c&amp;#8217;est pas simple &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;la-touche-répondeur&quot;&gt;La touche répondeur&lt;/h3&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/icones/repondeur.png&quot; alt=&quot;repondeur&quot; width=&quot;100&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Qui a connu les répondeurs à cassettes ? Il n&amp;#8217;y a que dans les films des années 80 qu&amp;#8217;on voit ça.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;la-télévision&quot;&gt;La télévision&lt;/h3&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/icones/television.jpg&quot; alt=&quot;television&quot; width=&quot;500&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Vous avez toujours une antenne sur votre télévision ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;la-touche-vérouiller&quot;&gt;La touche vérouiller&lt;/h3&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/icones/key.png&quot; alt=&quot;key&quot; width=&quot;100&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On voit encore souvent une bonne clef à l&amp;#8217;ancienne comme symbole pour vérouiller le clavier de son téléphone ou autre.
+Personnellement j&amp;#8217;en ai plus des comme ça depuis longtemps. Toutefois, je pense que ce symbole peut encore marcher, même s&amp;#8217;il est voué à disparaitre. Il vaut mieux préférer un cadena ou prendre une clef récente.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;et-bien-d-autres&quot;&gt;Et bien d&amp;#8217;autres &amp;#8230;&amp;#8203;&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Que dire du &quot;porte document&quot;, des banettes pour les dossiers,  de la caméra/pellicule pour les films, du micro datant d&amp;#8217;une autre époque, du presse-papier, du termomètre à mercure pour la température &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;en-résumé&quot;&gt;En résumé&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je sais bien que réaliser des icônes n&amp;#8217;est pas chose aisé, il faut qu&amp;#8217;elles soient épurées et reconnaissables du premier coup.
+Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour que cela représente la réalité. Sinon cela n&amp;#8217;est plus une icône, c&amp;#8217;est à dire  une représentation de quelque chose, mais tout simplement un symbole, qui n&amp;#8217;a que de sens que celui qu&amp;#8217;on veut bien lui donner.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;coup-de-gueule-perso&quot;&gt;Coup de gueule perso&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans le même genre, si un jour je tiens celui qui a créé l&amp;#8217;icône &quot;wifi&quot;, il passera un mauvais 1/4 d&amp;#8217;heure. C&amp;#8217;est quasiment la même que celle pour le volume, mais à la verticale. Il est fréquent que je me trompe, d&amp;#8217;autant plus que j&amp;#8217;ai aussi une icône RSS dans mon systemtray &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2015/11/05/les-icones-du-passee.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/05/les-icones-du-passee.html</guid>
+        
+        <category>ergonomie</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Stresser facilement votre base Neo4j avec gatling</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#la-création-des-scenarii&quot;&gt;La création des scenarii&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#configuration-de-neo4j-pour-le-query-log&quot;&gt;Configuration de Neo4j pour le query-log&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#gatling&quot;&gt;Gatling&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#création-du-scenario&quot;&gt;Création du scenario&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#lancement-des-tests&quot;&gt;Lancement des tests&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;la-création-des-scenarii&quot;&gt;La création des scenarii&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;La chose la plus fastidieuse sur les tests de monté en charge, c’est la création des scenarii qui seront utilisés lors des tests.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lorsqu’on veut tester une application web, c’est assez simple puisque tous les outils possèdent un recorder permettant d’enregistrer vos actions de votre navigateur par l’intermédiaire d’un proxy. Et gatling ne déroge pas à la règle !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Mais comment faire pour une base de données ? Et bien avec le journal des requêtes pardi !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Attention&lt;/strong&gt;, même si cette méthode est efficace et très simple à mettre en place, généralement on préfère écrire nos scenarii de manière à ce qu’ils soient reproductibles (ie. idempotent).
+Or les query-log ne le sont pas !
+Et oui on ne peut faire deux fois la même requête d’insertion si celle-ci tombe sous le joug d’une contrainte d’unicité.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Bref, cette méthode est simple &amp;amp; rapide, mais &lt;strong&gt;criticable&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;configuration-de-neo4j-pour-le-query-log&quot;&gt;Configuration de Neo4j pour le query-log&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Neo4j vous permet de logger toutes les requêtes HTTP qui lui sont envoyées.
+Vous pouvez retrouver la documentation ici : &lt;a href=&quot;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&quot; class=&quot;bare&quot;&gt;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici la liste des actions à réaliser :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Editer le fichier &lt;code&gt;neo4j-server.properties&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Activer ou ajouter les lignes suivantes :&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;org.neo4j.server.http.log.enabled=true
+org.neo4j.server.http.log.config=conf/neo4j-http-logging.xml
+Editer le fichier neo4j-http-logging.xml&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Remplacer la ligne pattern par celle-ci : &lt;code&gt;&amp;lt;pattern&amp;gt;%t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'&quot;', '\\&quot;'};%s&amp;lt;/pattern&amp;gt;`&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%t{dd/MMM/yyyy:HH:mm:ss Z} :&lt;/strong&gt; la date de la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%h :&lt;/strong&gt; l’hote d’où provient la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%m :&lt;/strong&gt; le verbe HTTP utilisé&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%r :&lt;/strong&gt; l’url de la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%replace(%replace(%requestContent){'\', '\\'}){';', '\;'} :&lt;/strong&gt; le contenu de la requête où on echappe les caractères '\', ';' &amp;amp; '&quot;'&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%s :&lt;/strong&gt; le code HTTP de réponse&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Si vous voulez avoir plus de détail sur ces varaibles, c’est par ici : &lt;a href=&quot;http://logback.qos.ch/manual/layouts.html#AccessPatternLayout&quot; class=&quot;bare&quot;&gt;http://logback.qos.ch/manual/layouts.html#AccessPatternLayout&lt;/a&gt; &amp;amp; &lt;a href=&quot;http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html&quot; class=&quot;bare&quot;&gt;http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A présent, toutes les requêtes HTTP envoyés à Neo4j seront tracées dans un fichier selon le shema suivant : &lt;code&gt;date;hote;method;url;content;code&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;gatling&quot;&gt;Gatling&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;installation&quot;&gt;Installation&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Vous pouvez télécharger le bundle Gatling ici : &lt;a href=&quot;http://gatling.io/#/download&quot; class=&quot;bare&quot;&gt;http://gatling.io/#/download&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Pour son installation, il suffit de le dézipper dans le répertoire de votre choix et d’avoir un JDK7 sur votre ordinateur.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et c’est tout, on ne peut pas faire plus simple non ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;création-du-scenario&quot;&gt;Création du scenario&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Les scenarii dans Gatling sont du code écrit en Scala avec un DSL simple à prendre en main.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici celui-ci que je vous propose :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;package neo4j
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+/**
+ * Simple simulation that take the neo4j query file with this :
+ * * Pattern : %t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'&quot;', '\\&quot;'};%s
+ * * Header : date;hote;method;url;content;code
+ */
+class HttpLogReplaySimulation extends Simulation {
+
+  val httpConf = http
+    .baseURL(&quot;http://localhost:7474&quot;)
+    .acceptHeader(&quot;application/json, text/plain, */*&quot;)
+    .basicAuth(&quot;neo4j&quot;, &quot;admin&quot;)
+
+  val queryFeeder = ssv(&quot;http.log&quot;).convert {
+    case (&quot;code&quot;, string) =&amp;gt; string.toInt // transform response code to an int
+    case (&quot;url&quot;, string) =&amp;gt; {
+      // we only take the uri
+      val uri :String = string.replaceFirst(&quot;(GET|POST|PUT|DELETE|OPTIONS) (.*) HTTP(.*)&quot;, &quot;$2&quot;)
+
+      // we make serial transaction query as unique transaction query
+      uri.matches(&quot;/db/data/transaction.*&quot;) match {
+        case true =&amp;gt;  &quot;/db/data/transaction/commit&quot;
+        case false =&amp;gt; uri
+      }
+    }
+  }.circular
+
+  val scn = scenario(&quot;query-log&quot;)
+    .feed(queryFeeder)
+    .doSwitch(&quot;${method}&quot;) (
+      &quot;GET&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+                .get(&quot;${url}&quot;)
+                .body(StringBody(&quot;${content}&quot;))
+                .asJSON
+                .check(status.is(&quot;${code}&quot;))),
+      &quot;POST&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .post(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;PUT&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .put(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;DELETE&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .delete(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;OPTIONS&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .options(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;)))
+    )
+
+  setUp(
+    scn
+      .inject(
+        rampUsers(100) over (10) // making 100 queries on 10 sec
+      )
+      .protocols(httpConf)
+  )
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Pour installer ce scenario, il vous suffit d’enregistrer le code dans le fichier &lt;code&gt;HttpLogReplaySimulation.scala&lt;/code&gt; dans le répertoire &lt;code&gt;$GATLING_HOME/user_files/simulations/neo4j&lt;/code&gt; (créer le fichier et les répertoires).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Son comportement est simple, il vient lire un fichier de log http, et exécute les requêtes une à une. Par contre il faut que le fichier de log :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;soit dans le répertoire &lt;code&gt;$GATLING_HOME/user_files/data&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;possède en-tête le header suivant : &lt;code&gt;date;hote;method;url;content;code&lt;/code&gt;. Ceci peut être fait simplement avec la commande unix sed : &lt;code&gt;sed -i -e &quot;1i\date;hote;method;url;content;code&quot; http.log&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ne comporte pas de ligne vide à la fin du fichier&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Il est à noter que ce scenario &lt;strong&gt;transforme toutes les transactions multi-requêtes en multiple transactions&lt;/strong&gt;, et donc &lt;strong&gt;les rollbacks ne sont pas pris en compte&lt;/strong&gt;. Bref il n’est pas parfait, mais comme évoqué précécemment il est préférable de faire ses propres scenarii si vous voulez quelques de choses aux petits oignons.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;lancement-des-tests&quot;&gt;Lancement des tests&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A présent, dans le répertoire &lt;code&gt;$GATLING_HOME/user_files&lt;/code&gt; vous devez avoir la structure suivante :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;├── data
+│   └── http.log
+└── simulations
+    └── neo4j
+        └── HttpLogReplaySimulation.scala&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Maintenant il ne vous reste plus qu’à lancer Gatling vi la commande suivante : &lt;code&gt;bin/gatling.sh&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;L’outil va vous poser trois questions :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;le numéro du scenario a exécuter. Choississez celui avec le nom &lt;code&gt;neo4j.HttpLogReplaySimulation&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;le nom de la simulation, celui-ci servira pour la génération du rapport. Laissez le par défaut.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;la description du tir au besoin. Laissez la vide.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Une fois ce questionnaire remplie, Gatling va exécuter son tir.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A la fin, vous obtenez un rapport en html dans le répertoire &lt;code&gt;$GATLING_HOME/results/httplogreplaysimulation-*&lt;/code&gt;, contenant toutes les résultats du tests :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;le nombre de requête simultanée&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;les différents percentiles, avec la moyenne, le min le max et l’écart-type&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;la distribution des temps de réponse&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-gatling/gatling-report.png&quot; alt=&quot;gatling report&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2015/10/05/neo4j-gatling.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/10/05/neo4j-gatling.html</guid>
+        
+        <category>neo4j, gatling, stress-tool</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Comment SolR découpe vos phrases</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#le-traitement-du-texte-et-des-mots&quot;&gt;Le traitement du texte et des mots&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#les-filtres&quot;&gt;Les filtres&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#les-tokenizers&quot;&gt;Les tokenizers&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-définition-des-types&quot;&gt;La définition des types&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#texte-général&quot;&gt;Texte Général&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#texte-exact&quot;&gt;Texte exact&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-recherche&quot;&gt;La recherche&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#les-types-de-recherche&quot;&gt;Les types de recherche&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#les-coefficients-boost&quot;&gt;Les coefficients / boost&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-traitement-du-texte-et-des-mots&quot;&gt;Le traitement du texte et des mots&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans un moteur de recherche, le traitement du texte et des mots s’effectue à deux endroits :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;lors de l’indexation, pour la construction des ses indexes&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;lors d’une requête, pour traiter les mots recherchés&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;INFO: Généralement on fait en sorte que le traitement effectué lors de l’indexation soit le même que celui de la requêtes, mais ce n’est pas une obligation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Il existe deux familles de traitement :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;les &lt;strong&gt;filters&lt;/strong&gt; qui permettent de manipuler et modifier le texte. Exemple : supprimer tous les accent du texte.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;les &lt;strong&gt;tokenizers&lt;/strong&gt; qui permettent de découper le texte en mot. Exemple : découper le texte selon les espaces et la ponctuation&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lorsqu’on définit un champs dans Solr, on y définit la liste des filtres et des tokenizers qu’on veut utiliser, ainsi que l’ordre dans lequel ils vont être exécuté.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;les-filtres&quot;&gt;Les filtres&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans cette section nous allons voir une série de filtres que SolR met à notre disposition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;patternreplacecharfilterfactory&quot;&gt;PatternReplaceCharFilterFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce filtre nous permet de spécifier une liste de caractère afin de les supprimer du texte. Généralement on demande de supprimer les caractères spéciaux comme &lt;code&gt;()[]{}'|?!.&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;Pomme a des pépins&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;stopfilterfactory&quot;&gt;StopFilterFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce filtre permet de supprimer du texte ce qu’on nomme les stopwords, c’est à dire tous les mots usuels de la langue comme &lt;code&gt;de, le, la, les, dans, pour, …​&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ces &lt;strong&gt;stopwords&lt;/strong&gt; sont paramétrables via un fichier texte. Vous pouvez retrouver une liste de stopword pour la langue française à l’adresse suivante : &lt;a href=&quot;http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt&quot; class=&quot;bare&quot;&gt;http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme} pépins !&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;lowercasefilterfactory&quot;&gt;LowerCaseFilterFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce filtre permet de mettre tout le texte en minuscule.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;frenchlightstemfilterfactory&quot;&gt;FrenchLightStemFilterFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce filtre permet de trouver automatiquement la racine du mot. Il doit êre appliqué sur des mots et non des phrases entières. C’est pourquoi il est toujours positionné après un tokenizer. En outre, il supprime aussi tous les caractères accentués et spéciaux de la langue française.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;planetarirum&lt;/code&gt; devient &lt;code&gt;planet&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;asciifoldingfilterfactory&quot;&gt;ASCIIFoldingFilterFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce filtre permet de remplacer tous les caractères accentués et les caractères spécifiques de la langues française, par une représentation universelle (en ASCII) :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;é, ê, è → e&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ç → c&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ù → u&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;…​&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Exemple : {Pomme} a des pépins ! devient {Pomme} a des pepins !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;les-tokenizers&quot;&gt;Les tokenizers&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans cette section nous allons voir la liste des tokenizers que SolR met a notre disposition.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;standardtokenizerfactory&quot;&gt;StandardTokenizerFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce tokernizer sépare le texte en fonction des espaces et de la ponctuation (qu’il supprime).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme}, a, des, pépins&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;keywordtokenizerfactory&quot;&gt;KeywordTokenizerFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce tokenizer ne fait rien, puisqu’il renvoie le texte qu’on lui donne tel quel. Il sert surtout lorsqu’on veut faire de la recherche exact.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;whitespacetokenizerfactory&quot;&gt;WhitespaceTokenizerFactory&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce tokernizer sépare le texte uniquement en fonction des espaces, il ne prend pas en compte la ponctuation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins, et c’est pas marrant.&lt;/code&gt; devient &lt;code&gt;{Pomme}, a, des, pépins,, et, c’est, pas, marrant.&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;la-définition-des-types&quot;&gt;La définition des types&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans tous mes projets, il y a deux types qui reviennent régulièrement.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;texte-général&quot;&gt;Texte Général&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce type permet de stocker dans les indexes, la racine des mots sans accent et en minuscule.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici la liste des filtres/tokenizers utilisés pour ce champ :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;PatternReplaceCharFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;StandardTokenizerFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LowerCaseFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;FrenchLightStemFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;texte-exact&quot;&gt;Texte exact&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce type permet de stocker dans les indexes les mots exacts mais sans accent et en minuscule.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;PatternReplaceCharFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;StandardTokenizerFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LowerCaseFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ASCIIFoldingFilterFactory&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;la-recherche&quot;&gt;La recherche&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lorsqu’on effectue une recherche, il est possible de spécifier un algorithme de recherche.
+Nous allons détailler dans les paragraphes à quoi cela correspond.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;les-types-de-recherche&quot;&gt;Les types de recherche&lt;/h3&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;la-recherche-standard&quot;&gt;La recherche standard&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;La recherche standard est simple, elle correspond à la recherche du terme exact (après son traitement comme vu précédemment).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;la-recherche-wildcard&quot;&gt;La recherche wildcard&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Avec un wildcard, on recherche dans les indexes tout les mots commençant par le pattern de la recherche.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;plan*&lt;/code&gt; permet de trouver &lt;code&gt;plan, planète, planétarium, …​&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;la-recherche-floue&quot;&gt;La recherche floue&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Avec une recherche floue, on recherche dans les indexes tous les mots qui sont proches du pattern de la recherche.
+Derrière la notion de proche/voisin se trouve un algorithme basé sur la distance de Levenshtein.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce type de recherche permet d’être tolérant aux fautes orthographiques / frappes&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;cosmik~&lt;/code&gt; permet de trouver &lt;code&gt;cosmique&lt;/code&gt; | &lt;code&gt;plannette&lt;/code&gt; permet de trouver &lt;code&gt;planète&lt;/code&gt; | &lt;code&gt;renconrte~&lt;/code&gt; permet de trouver &lt;code&gt;rencontre&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+Il est possible de définir le taux de similarité minimum, compris entre 0 &amp;amp; 1 (1 étant le plus proche possible): &lt;code&gt;comisk~0.8&lt;/code&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;les-coefficients-boost&quot;&gt;Les coefficients / boost&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lorsqu’on effectue une recherche sur plusieurs critères, il est possible de définir pour chaque critère quel est son incidence sur le resultat de recherche.
+C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Par exemple cela permet de donner un score plus élévé aux documents possédant le pattern de recherche dans le titre que dans la description.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2015/07/14/solr.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/07/14/solr.html</guid>
+        
+        <category>solr, lucene, full text search</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Connecting Neo4j to any SQL tool with the power of Postgresql</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#install-multicorn&quot;&gt;Install Multicorn&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#requirements&quot;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#installing-multicorn-from-source&quot;&gt;Installing Multicorn from source&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-fwd&quot;&gt;Neo4j FWD&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-use-neo4j-foreign-data-wrapper&quot;&gt;How to use Neo4j Foreign Data Wrapper&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#make-cypher-query-into-a-sql-select&quot;&gt;Make cypher query into a sql select&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#create-the-function-into-your-database&quot;&gt;Create the function into your database&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-use-it&quot;&gt;How to use it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-power-of-pg-json&quot;&gt;The power of PG &amp;amp; JSON&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#annexe&quot;&gt;Annexe&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#some-usefull-links&quot;&gt;Some usefull links&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#install-postgresql-9-4-for-wheezy&quot;&gt;Install postgresql 9.4 for wheezy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To produce a FDW, there is two possibilities :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Writing a pure postgresql extension in C&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Uinge Multicorn extension that make FDW develompent easy by giving us a Python wrapper to implement it&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For this tutorial, I have choose to use Multicorn, because I prefer Python rather than C.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;install-multicorn&quot;&gt;Install Multicorn&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;requirements&quot;&gt;Requirements&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There is some Postgresql &amp;amp; Python requirements to use Multicorn :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Postgresql &amp;gt;= 9.1&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Postgresql development packages&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Python development packages&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;python 2.7 or &amp;gt;= python 3.3 as your default python with pip&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On a debian system, you can directly type this command :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; apt-get install build-essential postgresql-server-dev-9.4 python-dev python-setuptools python-pip postgresql-plpython-9.4&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;installing-multicorn-from-source&quot;&gt;Installing Multicorn from source&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first step is to compile and install Multicorn on our server.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+If you are using PG 9.1, you should use version 0.9.X version (&lt;code&gt;git checkout v0.9.3&lt;/code&gt;) NOTE: If you are using PG 9.2, you should use version 1.0.X version (&lt;code&gt;git checkout v01.0.4&lt;/code&gt;)
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; cd /tmp
+$&amp;gt; git clone git://github.com/Kozea/Multicorn.git
+$&amp;gt; cd Multicorn
+$&amp;gt; make &amp;amp;&amp;amp; make install&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now Multicorn is operational on our PG instance.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-fwd&quot;&gt;Neo4j FWD&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can find my Neo4j FDW here : &lt;a href=&quot;https://github.com/Progsima/neo4j-fwd&quot; class=&quot;bare&quot;&gt;https://github.com/Progsima/neo4j-fwd&lt;/a&gt; It’s based on py2neo for the Neo4j communication.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Clone the repository&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; git clone https://github.com/sim51/neo4j-fwd
+Install project dependencies : py2neo
+$&amp;gt; pip install py2neo&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Install the FDW&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; cd neo4j-fdw
+$&amp;gt; python setup.py install&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now, you have a Postgresql server with the Multicorn extension, and neo4j FDW.
+At this point, everything is done to use Neo4j in Postgresql !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;how-to-use-neo4j-foreign-data-wrapper&quot;&gt;How to use Neo4j Foreign Data Wrapper&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;First step, it’s to create a database for testing&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; su - postgres
+$&amp;gt; psql
+postgres=# CREATE DATABASE fdw;
+postgres=# \connect fdw
+fdw=#&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We can now enable the extension in our PG instance&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; su - postgres
+$&amp;gt; psql
+postgres=# CREATE EXTENSION multicorn;
+CREATE EXTENSION
+postgres=# \q&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;After we must define a Neo4j server&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# CREATE SERVER multicorn_neo4j FOREIGN DATA WRAPPER multicorn
+  OPTIONS (
+      wrapper  'neo4jPg.neo4jfdw.Neo4jForeignDataWrapper',
+      server   'localhost',
+      port     '7474',
+      user     'neo4j',
+      password 'admin'
+  );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Then, declare a Neo4j foreign table into Postgresql :&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# CREATE FOREIGN TABLE neo4j_movie (
+    movie varchar
+) SERVER multicorn_neo4j OPTIONS (
+    cypher 'MATCH (n:Movie) RETURN n.title as movie'
+);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, you can do some SQL query on the neo4j_movie table&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# SELECT * FROM neo4j_movie;
+fdw=# SELECT count(*) FROM neo4j_movie;
+fdw=# SELECT count(*) FROM neo4j_movie WHERE movie LIKE '%Matrix%';&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;make-cypher-query-into-a-sql-select&quot;&gt;Make cypher query into a sql select&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This project also define a cool postgres function &lt;code&gt;cypher&lt;/code&gt;, that allow you to make some directly a cypher query into a select.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Example : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10')&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Select return a &lt;code&gt;cypher&lt;/code&gt; attribute that is a typed as a postgres JSON and represent the result of your query&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;create-the-function-into-your-database&quot;&gt;Create the function into your database&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You have to declare those functions into your database, before to use it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
+CREATE EXTENSION plpythonu;
+
+mydatabase=#
+CREATE OR REPLACE FUNCTION cypher(query text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher_default_server(plpy, query):
+    yield result
+$$;
+CREATE OR REPLACE FUNCTION cypher(query text, server text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher_with_server(plpy, query, server):
+    yield result
+$$;
+CREATE OR REPLACE FUNCTION cypher(query text, server text, port text, login text, password text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher(plpy, query, server, port, login, password):
+    yield result
+$$;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This define three functions :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;cypher(query, server, port, login, password) :&lt;/strong&gt; make a cypher query on the specify server : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin')&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;cypher(query, server) :&lt;/strong&gt; make a cypher query on the foreign server specify (server is the name of the foreign server. Example multicorn_neo4j) : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10', 'multicorn_neo4j')&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;cypher(query) :&lt;/strong&gt; make a cypher query on the first foreign server define : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10')&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to-use-it&quot;&gt;How to use it&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The JSON produced follow your cypher return statement : the key of the first json level correspond to you the name of yours returns, and the value to json serialisation fo the object.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If the return object is a Node, it’s serialize as a JSON object like this : &lt;code&gt;&lt;code&gt;{ labels : [], properties: { object } }&lt;/code&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Example :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
+SELECT cypher  FROM cypher('MATCH (n:Location) RETURN n LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                                                            cypher
+------------------------------------------------------------------------------------------------------------------------------
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1906520.0, &quot;x&quot;: 1158953.0, &quot;name&quot;: &quot;025XX W AUGUSTA BLVD&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1842294.0, &quot;x&quot;: 1175702.0, &quot;name&quot;: &quot;094XX S HARVARD AVE&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1931163.0, &quot;x&quot;: 1152905.0, &quot;name&quot;: &quot;047XX N KIMBALL AVE&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1887355.0, &quot;x&quot;: 1149049.0, &quot;name&quot;: &quot;041XX W 24TH PL&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1869892.0, &quot;x&quot;: 1176061.0, &quot;name&quot;: &quot;001XX W 53RD ST&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1862782.0, &quot;x&quot;: 1180056.0, &quot;name&quot;: &quot;063XX S DR MARTIN LUTHER KING JR DR&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1908312.0, &quot;x&quot;: 1175281.0, &quot;name&quot;: &quot;001XX W DIVISION ST&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1899998.0, &quot;x&quot;: 1139456.0, &quot;name&quot;: &quot;0000X N PINE AVE&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1908407.0, &quot;x&quot;: 1176113.0, &quot;name&quot;: &quot;012XX N STATE PKWY&quot;}}}
+ {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1888098.0, &quot;x&quot;: 1148713.0, &quot;name&quot;: &quot;023XX S KEELER AVE&quot;}}}
+(10 lignes)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If the return object is a relation, it’s serialize as a JSON object like this : &lt;code&gt;{ type : &quot;MY_TYPE&quot;, properties: { object } }&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Example :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
+SELECT cypher  FROM cypher('MATCH (n)-[r]-&amp;gt;(m) RETURN r AS relation LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                          cypher
+-----------------------------------------------------------
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_LOCALIZED_AT&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;HAS_ARREST&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_DOMESTIC&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_IN_CATEGORY&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
+ {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
+(10 lignes)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Of course, primitive types are also supported, and you can mix all of this : &lt;code&gt;SELECT cypher FROM cypher(MATCH (y:Year)-[r]→(m) RETURN y.value AS year, r, mLIMIT 10, localhost, 7474, neo4j, admin);&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
+SELECT cypher  FROM cypher('MATCH (y:Year)-[r]-&amp;gt;(m) RETURN y.value AS year, r, m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                                                      cypher
+-------------------------------------------------------------------------------------------------------------------
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10016718&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017521&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10018383&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10087834&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017190&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017379&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017246&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017248&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017208&quot;}}}
+ {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017211&quot;}}}
+(10 lignes)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;the-power-of-pg-json&quot;&gt;The power of PG &amp;amp; JSON&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;PG 9.4 have a function name json_to_record, that convert our json into a collection of typed tuple !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
+SELECT year, id  FROM cypher('MATCH (y:Year)&amp;lt;-[r]-(m) RETURN y.value AS year, m.id AS id LIMIT 10', 'localhost', '7474', 'neo4j', 'admin') , json_to_record(cypher) as x(year int, id varchar)
+ year |    id
+------+----------
+ 2015 | 10016718
+ 2015 | 10017521
+ 2015 | 10018383
+ 2015 | 10087834
+ 2015 | 10017190
+ 2015 | 10017379
+ 2015 | 10017246
+ 2015 | 10017248
+ 2015 | 10017208
+ 2015 | 10017211
+(10 lignes)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;annexe&quot;&gt;Annexe&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;some-usefull-links&quot;&gt;Some usefull links&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.postgresql.org/download/linux/debian/&quot; class=&quot;bare&quot;&gt;http://www.postgresql.org/download/linux/debian/&lt;/a&gt; : How to install Postgresql 9.4 with apt&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://wiki.postgresql.org/wiki/Foreign_data_wrappers&quot; class=&quot;bare&quot;&gt;https://wiki.postgresql.org/wiki/Foreign_data_wrappers&lt;/a&gt; : Postgresql wiki page about foreign data wrapper&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://multicorn.readthedocs.org/en/latest/implementing-tutorial.html&quot; class=&quot;bare&quot;&gt;http://multicorn.readthedocs.org/en/latest/implementing-tutorial.html&lt;/a&gt; : How to write a FDW with multicorn&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://leopard.in.ua/2013/09/28/postgresql-multicorn/&quot; class=&quot;bare&quot;&gt;http://leopard.in.ua/2013/09/28/postgresql-multicorn/&lt;/a&gt; : Good article on how to use FDW&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;install-postgresql-9-4-for-wheezy&quot;&gt;Install postgresql 9.4 for wheezy&lt;/h3&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; echo &quot;deb http://apt.postgresql.org/pub/repos/apt/ wheezy-pgdg main&quot; &amp;gt; /etc/apt/sources.list.d/pgdg.list
+$&amp;lt; wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+$&amp;gt; apt-get update
+$&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2015/06/04/neo4j-pg-fdw.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-pg-fdw.html</guid>
+        
+        <category>neo4j, postgresql, foreign data wrapper</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>How to communicate with Neo4j through ODBC</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#market-solutions&quot;&gt;Market solutions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#easysoft&quot;&gt;Easysoft&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#jvm-configuration&quot;&gt;JVM Configuration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-jdbc-configuration&quot;&gt;NEO4J JDBC Configuration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#annexe&quot;&gt;Annexe&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-enabled-log-for-odbc&quot;&gt;How to enabled log for ODBC&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#some-usefull-links&quot;&gt;Some usefull links&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;market-solutions&quot;&gt;Market solutions&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are two market solutions to make an ODBC-JDBC bridge :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Easysoft with their ODBC-JDBC Gateway&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Openlink with thier Single/Multi Tier ODBC-JDBC bridge&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this documentation, we will only talk about &lt;strong&gt;easysoft&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;easysoft&quot;&gt;Easysoft&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Easysoft&lt;/strong&gt; is a solution that make an ODBC-JDBC bridge on your computer.
+So you have to install it on each machine.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/odbc/easysoft-diag.png&quot; alt=&quot;easysoft diag&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It costs &lt;strong&gt;375 GBD / year&lt;/strong&gt;, but prices depend on the number of machines where we install software.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to download trial version : &lt;a href=&quot;http://www.easysoft.com/cgi-bin/productdownload.cgi?p=26&quot; class=&quot;bare&quot;&gt;http://www.easysoft.com/cgi-bin/productdownload.cgi?p=26&lt;/a&gt; (you must create an account)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download the windows version&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run the executable and follow the wizard. For more information, read the installation guide of easysoft&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jvm-configuration&quot;&gt;JVM Configuration&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to Programs &amp;gt; Easysoft &amp;gt;ODBC-JDBC Gateway &amp;gt; Configure Java Interface&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure where is your JDK&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click on Test and Save if OK&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;neo4j-jdbc-configuration&quot;&gt;NEO4J JDBC Configuration&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to the Control Panel&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Then in Administrative Tools&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click on Data Sources (ODBC)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Check if Easysoft driver is really installed&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/odbc/check-driver.png&quot; alt=&quot;check driver&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the neo4j jdbc driver (with all its dependencies) here : &lt;a href=&quot;https://m2.neo4j.org/content/groups/public/org/neo4j/neo4j-jdbc/2.1.4/&quot; class=&quot;bare&quot;&gt;https://m2.neo4j.org/content/groups/public/org/neo4j/neo4j-jdbc/2.1.4/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new ODBC connection, and select Easysoft ODBC-JDBC Gateway&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/odbc/create-connection.png&quot; alt=&quot;create connection&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Configure the connection where :&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;DSN :&lt;/strong&gt; The name of your new database, for example NEO4J&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Description :&lt;/strong&gt; you can put here the description of your connection&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;User name :&lt;/strong&gt; The login of the neo4j user&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Password :&lt;/strong&gt; the password of the neo4j user&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Driver Class :&lt;/strong&gt; org.neo4j.jdbc.Driver&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Class Path :&lt;/strong&gt; Click on the Add button, and select the jar you have download at step 5&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;URL :&lt;/strong&gt; The JDBC connection URL for neo4j : jdbc:neo4j://localhost:7474 (if you server is on your local machine)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/odbc/configuration.png&quot; alt=&quot;configuration&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;When you have fullfil this form, you can click on the &lt;code&gt;Test&lt;/code&gt;, to check that is everyting is good (your neo4j server must running of course).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Well done, you  have your ODBC-JDBC Bridge installed for neo4j !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;annexe&quot;&gt;Annexe&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to-enabled-log-for-odbc&quot;&gt;How to enabled log for ODBC&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This feature can be (very) usefull for debugging purpose, but it (really) slowing the ODBC connection.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to the &lt;code&gt;Control Panel&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Then in &lt;code&gt;Administrative Tools&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click on &lt;code&gt;Data Sources (ODBC)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click on the &lt;code&gt;Tracing&lt;/code&gt; tab&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click on &lt;code&gt;Start Tracing Now&lt;/code&gt;. You can also configure where the log file is generated with the &lt;code&gt;Log File Path&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/odbc/enable-log.png&quot; alt=&quot;enable log&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;some-usefull-links&quot;&gt;Some usefull links&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/5352956/odbc-jdbc-bridge-that-maps-its-own-calls-to-jdbc-driver&quot; class=&quot;bare&quot;&gt;http://stackoverflow.com/questions/5352956/odbc-jdbc-bridge-that-maps-its-own-calls-to-jdbc-driver&lt;/a&gt; : Stackoverflow threadabout ODBC/JDBC bridge&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.4d.com/4d_docstatic/4D%20ODBC%20Pro/12/ODBC-Results.201-371921.en.html&quot; class=&quot;bare&quot;&gt;http://www.4d.com/4d_docstatic/4D%20ODBC%20Pro/12/ODBC-Results.201-371921.en.html&lt;/a&gt; : Explain each ODBC operation&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.gpoulose.com/&quot; class=&quot;bare&quot;&gt;http://www.gpoulose.com/&lt;/a&gt; : To download a Query Tool that use ODBC&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&quot; class=&quot;bare&quot;&gt;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&lt;/a&gt; : How to enable neo4j HTTP log file (usefull to debug REST query)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
+        
+        <category>neo4j, odbc, jdbc</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>A la recherche des points de collecte pour recycler</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#le-site-de-la-ville-de-nantes&quot;&gt;Le site de la ville de Nantes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-site-de-nantes-métropole&quot;&gt;Le site de Nantes Métropole&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-site-opendata&quot;&gt;Le site opendata&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#open-street-map&quot;&gt;Open Street Map&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Depuis plusieurs années, je travaille quasiment uniquement pour la ville de Nantes et Nantes Métropole. Ainsi lorsque mes collègues cherchent une réponse à une problématique sur Nantes, ils me demandent si je sais où trouver l&amp;#8217;information.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ce midi, la question était très simple : &lt;strong&gt;où peut-on trouver le point de collecte pour recycler le plus proche de chez moi ?&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-site-de-la-ville-de-nantes&quot;&gt;Le site de la ville de Nantes&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Naturellement, je me dirige sur le site de la ville de Nantes et j&amp;#8217;effectue une recherche globale sur &quot;recyclage verre&quot;. Aucun résultat &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je m&amp;#8217;obstine un peu, en effectuant d&amp;#8217;autres recherches avec des synonymes, en élargissant ma recherche, en testant par exemple &quot;verre&quot; ou &quot;recyclage&quot;.
+J&amp;#8217;obtiens quelque fois des résultats, mais cela ne correspond pas du tout à ce que je veux.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Là je vois une rubrique &quot;A votre service&quot; avec un formulaire plus détaillé et surtout un champ &quot;votre recherche concerne&quot; avec un item &quot;déchets/propreté&quot;. Je lance alors ma recherche avec cet unique critère.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je vois des résultats avec comme titre &quot;Ecopoint&quot; !  &amp;#8230;&amp;#8203; mais ce sont des déchetteries, alors que je veux connaître les points de collecte !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-site-de-nantes-métropole&quot;&gt;Le site de Nantes Métropole&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Bon si cela se trouve, ces points de collecte sont sous la responsabilité de la métropole et pas de la ville.
+Je m&amp;#8217;en vais donc pour le site de Nantes Métropole.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;En parcourant le menu, je vois rapidement qu&amp;#8217;il existe une rubrique &quot;Pratique&quot; avec une entrée &quot;Déchets&quot;.
+Vais-je enfin trouver ma réponse ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et ba non &amp;#8230;&amp;#8203;  je retrouve encore une fois mes écopoints, mais aussi tout un tas d&amp;#8217;informations générale sur le recyclage (ce qui est intéressant en soi).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je trouve quand même un numéro vert ( 0 800 344 000 ) qui est &quot;dédié aux questions de collecte&quot;.
+Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essayerai demain !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-site-opendata&quot;&gt;Le site opendata&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Après avoir fait ce que chaque citoyen aurait fait,  je me décide de pencher sur l&amp;#8217;opendata en allant sur le site &lt;a href=&quot;http://data.nantes.fr&quot; class=&quot;bare&quot;&gt;http://data.nantes.fr&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Donc me voilà reparti à lancer des recherches.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Il y a 37 jeux de données sur la thématique &quot;Environnement&quot;, et en y associant le mot &quot;déchet&quot;, j&amp;#8217;en obtiens plus que 8.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;En les parcourant je tombe sur les jours de collecte, le tonnage des déchets en 2012, la fréquentation des déchetteries et encore la liste des écopoints, mais toujours pas ce que je veux.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je commence à être désespéré &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;open-street-map&quot;&gt;Open Street Map&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Bon, là je sors l&amp;#8217;artillerie lourde, mais je suis sûr d&amp;#8217;y trouver ma donnée, enfin j&amp;#8217;espère &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Première chose à faire, une requête dans le wiki d&amp;#8217;OSM pour trouver le bon tag pour les points de collecte : &lt;a href=&quot;http://wiki.openstreetmap.org/w/index.php?search=recyclage&amp;amp;title=Special%3ASearch&quot; class=&quot;bare&quot;&gt;http://wiki.openstreetmap.org/w/index.php?search=recyclage&amp;amp;title=Special%3ASearch&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Bingo, en regardant le 7ème résultat, je trouve le nom du tag et sa valeur : &lt;code&gt;amenity=recycling&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dernier pas, se rendre sur le site &lt;a href=&quot;http://overpass-turbo.eu&quot; class=&quot;bare&quot;&gt;http://overpass-turbo.eu&lt;/a&gt; pour y faire ma requête sur Nantes :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;osm-script&amp;gt;
+    &amp;lt;!-- query part for: “amenity=recycling” --&amp;gt;
+    &amp;lt;query type=&quot;node&quot;&amp;gt;
+      &amp;lt;has-kv k=&quot;amenity&quot; v=&quot;recycling&quot;/&amp;gt;
+      &amp;lt;bbox-query {{bbox}}/&amp;gt;
+    &amp;lt;/query&amp;gt;
+  &amp;lt;!-- print results --&amp;gt;
+  &amp;lt;print mode=&quot;body&quot;/&amp;gt;
+&amp;lt;/osm-script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et voilà, j&amp;#8217;ai enfin mes données, et en plus sur une carte ! Vous pouvez voir le résultat en suivant ce lien : &lt;a href=&quot;http://overpass-turbo.eu/s/2z2&quot; class=&quot;bare&quot;&gt;http://overpass-turbo.eu/s/2z2&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Temps passé : &lt;strong&gt;environ 5 minutes&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;De nos jours où on nous dit qu&amp;#8217;il faut trier, faire attention à la planète et être écolo, je trouve dommage qu&amp;#8217;à l&amp;#8217;heure du numérique et de l&amp;#8217;opendata il soit aussi difficile de trouver une information simple et pratique.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Si je n&amp;#8217;étais pas informaticien, geek et passionné par l&amp;#8217;opendata, je n&amp;#8217;aurais sans doute jamais trouvé la réponse à ma question.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Si l&amp;#8217;information c&amp;#8217;est le pouvoir, alors les data geek ont une bonne longueur d&amp;#8217;avance&amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2014/02/18/point-collecte.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/02/18/point-collecte.html</guid>
+        
+        <category>opendata, osm</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <head>
+  <title>Stresser facilement votre base Neo4j avec gatling</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Benoit Simard"/>
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Dans cet article nous allons voir comment créer simplement des tests de performance sur Neo4j en utilisant Gatling et les logs HTTP." />
+  <meta name="keywords" content="neo4j, gatling, stress-tool" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+  <!-- RSS feed -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="/" title="Home">Home</a></li>
+                  <li><a href="/blog" title="Blog">Blog</a></li>
+                  <li><a href="/about-me.html" title="About me">About me</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Stresser facilement votre base Neo4j avec gatling</h1>
+            <meta itemprop="description" content=" Dans cet article nous allons voir comment créer simplement des tests de performance sur Neo4j en utilisant Gatling et les logs HTTP.">
+            <img itemprop="image" src="/public/images/neo4j-gatling/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#la-création-des-scenarii">La création des scenarii</a>
+<ul class="sectlevel2">
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#configuration-de-neo4j-pour-le-query-log">Configuration de Neo4j pour le query-log</a></li>
+</ul>
+</li>
+<li><a href="#gatling">Gatling</a>
+<ul class="sectlevel2">
+<li><a href="#installation">Installation</a></li>
+<li><a href="#création-du-scenario">Création du scenario</a></li>
+<li><a href="#lancement-des-tests">Lancement des tests</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="la-création-des-scenarii">La création des scenarii</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="introduction">Introduction</h3>
+<div class="paragraph">
+<p>La chose la plus fastidieuse sur les tests de monté en charge, c’est la création des scenarii qui seront utilisés lors des tests.</p>
+</div>
+<div class="paragraph">
+<p>Lorsqu’on veut tester une application web, c’est assez simple puisque tous les outils possèdent un recorder permettant d’enregistrer vos actions de votre navigateur par l’intermédiaire d’un proxy. Et gatling ne déroge pas à la règle !</p>
+</div>
+<div class="paragraph">
+<p>Mais comment faire pour une base de données ? Et bien avec le journal des requêtes pardi !</p>
+</div>
+<div class="paragraph">
+<p><strong>Attention</strong>, même si cette méthode est efficace et très simple à mettre en place, généralement on préfère écrire nos scenarii de manière à ce qu’ils soient reproductibles (ie. idempotent).
+Or les query-log ne le sont pas !
+Et oui on ne peut faire deux fois la même requête d’insertion si celle-ci tombe sous le joug d’une contrainte d’unicité.</p>
+</div>
+<div class="paragraph">
+<p>Bref, cette méthode est simple &amp; rapide, mais <strong>criticable</strong>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="configuration-de-neo4j-pour-le-query-log">Configuration de Neo4j pour le query-log</h3>
+<div class="paragraph">
+<p>Neo4j vous permet de logger toutes les requêtes HTTP qui lui sont envoyées.
+Vous pouvez retrouver la documentation ici : <a href="http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration" class="bare">http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration</a></p>
+</div>
+<div class="paragraph">
+<p>Voici la liste des actions à réaliser :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>neo4j-server.properties</code></p>
+</li>
+<li>
+<p>Activer ou ajouter les lignes suivantes :</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>org.neo4j.server.http.log.enabled=true
+org.neo4j.server.http.log.config=conf/neo4j-http-logging.xml
+Editer le fichier neo4j-http-logging.xml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remplacer la ligne pattern par celle-ci : <code>&lt;pattern&gt;%t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'"', '\\"'};%s&lt;/pattern&gt;`</code></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>%t{dd/MMM/yyyy:HH:mm:ss Z} :</strong> la date de la requête</p>
+</li>
+<li>
+<p><strong>%h :</strong> l’hote d’où provient la requête</p>
+</li>
+<li>
+<p><strong>%m :</strong> le verbe HTTP utilisé</p>
+</li>
+<li>
+<p><strong>%r :</strong> l’url de la requête</p>
+</li>
+<li>
+<p><strong>%replace(%replace(%requestContent){'\', '\\'}){';', '\;'} :</strong> le contenu de la requête où on echappe les caractères '\', ';' &amp; '"'</p>
+</li>
+<li>
+<p><strong>%s :</strong> le code HTTP de réponse</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Si vous voulez avoir plus de détail sur ces varaibles, c’est par ici : <a href="http://logback.qos.ch/manual/layouts.html#AccessPatternLayout" class="bare">http://logback.qos.ch/manual/layouts.html#AccessPatternLayout</a> &amp; <a href="http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html" class="bare">http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html</a></p>
+</div>
+<div class="paragraph">
+<p>A présent, toutes les requêtes HTTP envoyés à Neo4j seront tracées dans un fichier selon le shema suivant : <code>date;hote;method;url;content;code</code></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="gatling">Gatling</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="installation">Installation</h3>
+<div class="paragraph">
+<p>Vous pouvez télécharger le bundle Gatling ici : <a href="http://gatling.io/#/download" class="bare">http://gatling.io/#/download</a></p>
+</div>
+<div class="paragraph">
+<p>Pour son installation, il suffit de le dézipper dans le répertoire de votre choix et d’avoir un JDK7 sur votre ordinateur.</p>
+</div>
+<div class="paragraph">
+<p>Et c’est tout, on ne peut pas faire plus simple non ?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="création-du-scenario">Création du scenario</h3>
+<div class="paragraph">
+<p>Les scenarii dans Gatling sont du code écrit en Scala avec un DSL simple à prendre en main.</p>
+</div>
+<div class="paragraph">
+<p>Voici celui-ci que je vous propose :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-scala" data-lang="scala">package neo4j
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+/**
+ * Simple simulation that take the neo4j query file with this :
+ * * Pattern : %t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'"', '\\"'};%s
+ * * Header : date;hote;method;url;content;code
+ */
+class HttpLogReplaySimulation extends Simulation {
+
+  val httpConf = http
+    .baseURL("http://localhost:7474")
+    .acceptHeader("application/json, text/plain, */*")
+    .basicAuth("neo4j", "admin")
+
+  val queryFeeder = ssv("http.log").convert {
+    case ("code", string) =&gt; string.toInt // transform response code to an int
+    case ("url", string) =&gt; {
+      // we only take the uri
+      val uri :String = string.replaceFirst("(GET|POST|PUT|DELETE|OPTIONS) (.*) HTTP(.*)", "$2")
+
+      // we make serial transaction query as unique transaction query
+      uri.matches("/db/data/transaction.*") match {
+        case true =&gt;  "/db/data/transaction/commit"
+        case false =&gt; uri
+      }
+    }
+  }.circular
+
+  val scn = scenario("query-log")
+    .feed(queryFeeder)
+    .doSwitch("${method}") (
+      "GET" -&gt; exec(http("Query-log")
+                .get("${url}")
+                .body(StringBody("${content}"))
+                .asJSON
+                .check(status.is("${code}"))),
+      "POST" -&gt; exec(http("Query-log")
+        .post("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "PUT" -&gt; exec(http("Query-log")
+        .put("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "DELETE" -&gt; exec(http("Query-log")
+        .delete("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "OPTIONS" -&gt; exec(http("Query-log")
+        .options("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}")))
+    )
+
+  setUp(
+    scn
+      .inject(
+        rampUsers(100) over (10) // making 100 queries on 10 sec
+      )
+      .protocols(httpConf)
+  )
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pour installer ce scenario, il vous suffit d’enregistrer le code dans le fichier <code>HttpLogReplaySimulation.scala</code> dans le répertoire <code>$GATLING_HOME/user_files/simulations/neo4j</code> (créer le fichier et les répertoires).</p>
+</div>
+<div class="paragraph">
+<p>Son comportement est simple, il vient lire un fichier de log http, et exécute les requêtes une à une. Par contre il faut que le fichier de log :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>soit dans le répertoire <code>$GATLING_HOME/user_files/data</code></p>
+</li>
+<li>
+<p>possède en-tête le header suivant : <code>date;hote;method;url;content;code</code>. Ceci peut être fait simplement avec la commande unix sed : <code>sed -i -e "1i\date;hote;method;url;content;code" http.log</code></p>
+</li>
+<li>
+<p>ne comporte pas de ligne vide à la fin du fichier</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Il est à noter que ce scenario <strong>transforme toutes les transactions multi-requêtes en multiple transactions</strong>, et donc <strong>les rollbacks ne sont pas pris en compte</strong>. Bref il n’est pas parfait, mais comme évoqué précécemment il est préférable de faire ses propres scenarii si vous voulez quelques de choses aux petits oignons.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lancement-des-tests">Lancement des tests</h3>
+<div class="paragraph">
+<p>A présent, dans le répertoire <code>$GATLING_HOME/user_files</code> vous devez avoir la structure suivante :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>├── data
+│   └── http.log
+└── simulations
+    └── neo4j
+        └── HttpLogReplaySimulation.scala</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Maintenant il ne vous reste plus qu’à lancer Gatling vi la commande suivante : <code>bin/gatling.sh</code></p>
+</div>
+<div class="paragraph">
+<p>L’outil va vous poser trois questions :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>le numéro du scenario a exécuter. Choississez celui avec le nom <code>neo4j.HttpLogReplaySimulation</code></p>
+</li>
+<li>
+<p>le nom de la simulation, celui-ci servira pour la génération du rapport. Laissez le par défaut.</p>
+</li>
+<li>
+<p>la description du tir au besoin. Laissez la vide.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Une fois ce questionnaire remplie, Gatling va exécuter son tir.</p>
+</div>
+<div class="paragraph">
+<p>A la fin, vous obtenez un rapport en html dans le répertoire <code>$GATLING_HOME/results/httplogreplaysimulation-*</code>, contenant toutes les résultats du tests :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>le nombre de requête simultanée</p>
+</li>
+<li>
+<p>les différents percentiles, avec la moyenne, le min le max et l’écart-type</p>
+</li>
+<li>
+<p>la distribution des temps de réponse</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/neo4j-gatling/gatling-report.png" alt="gatling report">
+</div>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  neo4j, gatling, stress-tool
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2015-10-05">Oct 5, 2015</time>
+              </li>
+              <li><a href="" title="Permalien : Stresser facilement votre base Neo4j avec gatling" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2015/07/14/solr.html" title="Comment SolR découpe vos phrases">&lt; Comment SolR découpe vos phrases</a>
+            </li>
+            
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2015/11/05/les-icones-du-passee.html" title="Les icônes du passé">Les icônes du passé &gt;</a>
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </main>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte Github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2015/10/05/neo4j-gatling';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</body>
+</html>
