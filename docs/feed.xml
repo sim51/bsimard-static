@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com//</link>
-    <atom:link href="http://www.bsimard.com//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 04 Dec 2016 19:09:59 +0100</pubDate>
-    <lastBuildDate>Sun, 04 Dec 2016 19:09:59 +0100</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 04 Dec 2016 19:13:48 +0100</pubDate>
+    <lastBuildDate>Sun, 04 Dec 2016 19:13:48 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -481,8 +481,8 @@ WITH s,
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2016/12/04/lego-project.html</guid>
+        <link>http://localhost:4000/2016/12/04/lego-project.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/12/04/lego-project.html</guid>
         
         <category>neo4j, load csv, lego</category>
         
@@ -763,8 +763,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2016/01/04/neo4j-jrebel.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2016/01/04/neo4j-jrebel.html</guid>
+        <link>http://localhost:4000/2016/01/04/neo4j-jrebel.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/01/04/neo4j-jrebel.html</guid>
         
         <category>neo4j, jrebel</category>
         
@@ -894,8 +894,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2015/11/05/les-icones-du-passee.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/11/05/les-icones-du-passee.html</guid>
+        <link>http://localhost:4000/2015/11/05/les-icones-du-passee.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/11/05/les-icones-du-passee.html</guid>
         
         <category>ergonomie</category>
         
@@ -1185,8 +1185,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/10/05/neo4j-gatling.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/10/05/neo4j-gatling.html</guid>
+        <link>http://localhost:4000/2015/10/05/neo4j-gatling.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/10/05/neo4j-gatling.html</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
@@ -1497,8 +1497,8 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/07/14/solr.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/07/14/solr.html</guid>
+        <link>http://localhost:4000/2015/07/14/solr.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/07/14/solr.html</guid>
         
         <category>solr, lucene, full text search</category>
         
@@ -1932,8 +1932,8 @@ $&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/06/04/neo4j-pg-fdw.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-pg-fdw.html</guid>
+        <link>http://localhost:4000/2015/06/04/neo4j-pg-fdw.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-pg-fdw.html</guid>
         
         
       </item>
@@ -2173,8 +2173,8 @@ So you have to install it on each machine.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/06/04/neo4j-odbc.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-odbc.html</guid>
+        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
         
         <category>neo4j, odbc, jdbc</category>
         
@@ -2312,8 +2312,8 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essaye
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2014/02/18/point-collecte.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2014/02/18/point-collecte.html</guid>
+        <link>http://localhost:4000/2014/02/18/point-collecte.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2014/02/18/point-collecte.html</guid>
         
         <category>opendata, osm</category>
         
