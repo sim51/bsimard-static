@@ -1,0 +1,205 @@
+// some default style
+html {
+  height: 100%;
+}
+
+body {
+  background-color: @background;
+  font-family: @ftPrimary;
+  height: 100%;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: @ftSecondary;
+  color: @quaternary;
+}
+
+h1, h2 {
+  font-weight: normal;
+}
+
+h1 {
+  margin: 30px 0 50px 0;
+}
+
+h2 {
+  text-transform: uppercase;
+  margin-top: 20px;
+  font-weight: normal;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+a {
+  color: @primary;
+}
+
+// MENU
+.navbar {
+
+  .navbar-inner {
+    background-color: @white;
+    background-image: none;
+    border-color: @greyLight;
+
+    .container {
+      padding: 0;
+      height: 50px;
+
+      // Style for the logo
+      .brand {
+        height: 100%;
+        padding: 0 20px;
+        img {
+          height: 100%;
+        }
+      }
+
+      .btn-navbar {
+        .buttonBackground(@secondary, darken(@secondary, 5%));
+      }
+
+      // Style for the navigation menu
+      ul.nav {
+        right: -10px;
+        float: left;
+        margin: 0;
+
+        li > a {
+          color: @secondary;
+          font-size: 15px;
+          font-weight: bold;
+          line-height: 26px;
+          text-transform: uppercase;
+          text-shadow: 1px 0 rgba(0, 0, 0, 0.25);
+          padding: 12px;
+          &:hover {
+            color: @white;
+            background-color: @secondary;
+            transition: background-color 700ms, color 700ms;
+          }
+          & i {
+            color: @grey;
+            font-size: 150%;
+          }
+        }
+
+        li.breaker {
+          padding: 12px;
+        }
+
+        li.icone {
+          padding: 11px 0 11px 5px;
+          a {
+            padding: 0;
+          }
+        }
+      }
+
+      .form-search {
+        form {
+          line-height: 50px;
+          margin: 0;
+
+          label {
+            display: none;
+          }
+
+          button.btn {
+            margin-top: 10px;
+            background-color: @white;
+            background-image: none;
+          }
+
+          input#search:focus + button {
+            .transition(~"border linear .2s, box-shadow linear .2s, background-color linear .2s, background-image linear .2s");
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px @secondary;
+            border: 1px solid @secondary;
+            border-left: none;
+          }
+          input#search:focus {
+            border-right: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+//HEADER
+#overview {
+  border-bottom: 1px solid @grey;
+  .container {
+    text-align: center;
+  }
+}
+
+.adminContainer {
+  margin-top: 50px;
+}
+
+// footer
+footer#footer {
+  border-top: 1px solid @grey;
+  margin-top: 80px;
+
+  .blockOdd {
+
+    ul {
+      margin-bottom: 0;
+      &.pull-left {
+        li {
+          font-family: @ftSecondary;
+          font-style: 11px;
+          &#mentions {
+            font-style: italic;
+          }
+          img {
+            height: 20px;
+          }
+
+          a {
+            padding: 5px 10px;
+            display: inline-block;
+          }
+          &:first-child {
+            padding-left: 0;
+          }
+        }
+      }
+      &.pull-right {
+        li {
+          a {
+            text-transform: uppercase;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            padding: 5px 5px;
+            width: 25px;
+            i {
+              font-size: 20px;
+            }
+
+            &:hover {
+              .circle;
+              background-color: @quaternary;
+            }
+          }
+          &:last-child {
+            padding-right: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// CMS tool bar
+#cmsbar {
+  position: fixed;
+  top: 11px;
+  right: 10px;
+  z-index: 9999;
+}

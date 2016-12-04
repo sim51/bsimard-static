@@ -1,0 +1,41 @@
+//
+// Responsive: Tablet to desktop
+// --------------------------------------------------
+@media (min-width: 768px) and (max-width: 979px) {
+  .navbar {
+    .navbar-inner {
+      padding: 5px 0;
+      .container {
+        height: 45px !important;
+      }
+      .nav-collapse {
+        ul.nav {
+          margin-top: 5px !important;
+          width: 100%;
+          z-index: 999;
+          background-color: @white;
+          border-bottom: 1px solid @greyLight;
+          li {
+            a {
+              text-align: center;
+            }
+          }
+        }
+
+      }
+      .form-search {
+        position: absolute;
+        top: 0;
+        right: 80px;
+      }
+    }
+  }
+
+  #realisation {
+    div.span4 {
+      width: 100%;
+      margin-left: 0;
+      height: auto !important;
+    }
+  }
+}

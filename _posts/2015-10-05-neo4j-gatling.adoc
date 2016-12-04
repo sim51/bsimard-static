@@ -1,0 +1,182 @@
+= Stresser facilement votre base Neo4j avec gatling
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: fr
+:page-description: Dans cet article nous allons voir comment créer simplement des tests de performance sur Neo4j en utilisant Gatling et les logs HTTP.
+:page-image: /public/images/neo4j-gatling/banner.png
+:page-tags: neo4j, gatling, stress-tool
+:toc: right
+
+
+== La création des scenarii
+
+=== Introduction
+
+La chose la plus fastidieuse sur les tests de monté en charge, c’est la création des scenarii qui seront utilisés lors des tests.
+
+Lorsqu’on veut tester une application web, c’est assez simple puisque tous les outils possèdent un recorder permettant d’enregistrer vos actions de votre navigateur par l’intermédiaire d’un proxy. Et gatling ne déroge pas à la règle !
+
+Mais comment faire pour une base de données ? Et bien avec le journal des requêtes pardi !
+
+*Attention*, même si cette méthode est efficace et très simple à mettre en place, généralement on préfère écrire nos scenarii de manière à ce qu’ils soient reproductibles (ie. idempotent).
+Or les query-log ne le sont pas !
+Et oui on ne peut faire deux fois la même requête d’insertion si celle-ci tombe sous le joug d’une contrainte d’unicité.
+
+Bref, cette méthode est simple & rapide, mais *criticable*.
+
+=== Configuration de Neo4j pour le query-log
+
+Neo4j vous permet de logger toutes les requêtes HTTP qui lui sont envoyées.
+Vous pouvez retrouver la documentation ici : http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration
+
+Voici la liste des actions à réaliser :
+
+* Editer le fichier `neo4j-server.properties`
+* Activer ou ajouter les lignes suivantes :
+----
+org.neo4j.server.http.log.enabled=true
+org.neo4j.server.http.log.config=conf/neo4j-http-logging.xml
+Editer le fichier neo4j-http-logging.xml
+----
+
+Remplacer la ligne pattern par celle-ci : `<pattern>%t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'"', '\\"'};%s</pattern>``
+
+* *%t{dd/MMM/yyyy:HH:mm:ss Z} :* la date de la requête
+* *%h :* l’hote d’où provient la requête
+* *%m :* le verbe HTTP utilisé
+* *%r :* l’url de la requête
+* *%replace(%replace(%requestContent){'\', '\\'}){';', '\;'} :* le contenu de la requête où on echappe les caractères '\', ';' & '"'
+* *%s :* le code HTTP de réponse
+
+Si vous voulez avoir plus de détail sur ces varaibles, c’est par ici : http://logback.qos.ch/manual/layouts.html#AccessPatternLayout & http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html
+
+A présent, toutes les requêtes HTTP envoyés à Neo4j seront tracées dans un fichier selon le shema suivant : `date;hote;method;url;content;code`
+
+== Gatling
+
+=== Installation
+
+Vous pouvez télécharger le bundle Gatling ici : http://gatling.io/#/download
+
+Pour son installation, il suffit de le dézipper dans le répertoire de votre choix et d’avoir un JDK7 sur votre ordinateur.
+
+Et c’est tout, on ne peut pas faire plus simple non ?
+
+=== Création du scenario
+
+Les scenarii dans Gatling sont du code écrit en Scala avec un DSL simple à prendre en main.
+
+Voici celui-ci que je vous propose :
+
+[source,scala]
+----
+package neo4j
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+/**
+ * Simple simulation that take the neo4j query file with this :
+ * * Pattern : %t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'"', '\\"'};%s
+ * * Header : date;hote;method;url;content;code
+ */
+class HttpLogReplaySimulation extends Simulation {
+
+  val httpConf = http
+    .baseURL("http://localhost:7474")
+    .acceptHeader("application/json, text/plain, */*")
+    .basicAuth("neo4j", "admin")
+
+  val queryFeeder = ssv("http.log").convert {
+    case ("code", string) => string.toInt // transform response code to an int
+    case ("url", string) => {
+      // we only take the uri
+      val uri :String = string.replaceFirst("(GET|POST|PUT|DELETE|OPTIONS) (.*) HTTP(.*)", "$2")
+
+      // we make serial transaction query as unique transaction query
+      uri.matches("/db/data/transaction.*") match {
+        case true =>  "/db/data/transaction/commit"
+        case false => uri
+      }
+    }
+  }.circular
+
+  val scn = scenario("query-log")
+    .feed(queryFeeder)
+    .doSwitch("${method}") (
+      "GET" -> exec(http("Query-log")
+                .get("${url}")
+                .body(StringBody("${content}"))
+                .asJSON
+                .check(status.is("${code}"))),
+      "POST" -> exec(http("Query-log")
+        .post("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "PUT" -> exec(http("Query-log")
+        .put("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "DELETE" -> exec(http("Query-log")
+        .delete("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}"))),
+      "OPTIONS" -> exec(http("Query-log")
+        .options("${url}")
+        .body(StringBody("${content}"))
+        .asJSON
+        .check(status.is("${code}")))
+    )
+
+  setUp(
+    scn
+      .inject(
+        rampUsers(100) over (10) // making 100 queries on 10 sec
+      )
+      .protocols(httpConf)
+  )
+}
+----
+
+Pour installer ce scenario, il vous suffit d’enregistrer le code dans le fichier `HttpLogReplaySimulation.scala` dans le répertoire `$GATLING_HOME/user_files/simulations/neo4j` (créer le fichier et les répertoires).
+
+Son comportement est simple, il vient lire un fichier de log http, et exécute les requêtes une à une. Par contre il faut que le fichier de log :
+
+* soit dans le répertoire `$GATLING_HOME/user_files/data`
+* possède en-tête le header suivant : `date;hote;method;url;content;code`. Ceci peut être fait simplement avec la commande unix sed : `sed -i -e "1i\date;hote;method;url;content;code" http.log`
+* ne comporte pas de ligne vide à la fin du fichier
+
+Il est à noter que ce scenario *transforme toutes les transactions multi-requêtes en multiple transactions*, et donc *les rollbacks ne sont pas pris en compte*. Bref il n’est pas parfait, mais comme évoqué précécemment il est préférable de faire ses propres scenarii si vous voulez quelques de choses aux petits oignons.
+
+=== Lancement des tests
+
+A présent, dans le répertoire `$GATLING_HOME/user_files` vous devez avoir la structure suivante :
+
+----
+├── data
+│   └── http.log
+└── simulations
+    └── neo4j
+        └── HttpLogReplaySimulation.scala
+----
+
+Maintenant il ne vous reste plus qu’à lancer Gatling vi la commande suivante : `bin/gatling.sh`
+
+L’outil va vous poser trois questions :
+
+* le numéro du scenario a exécuter. Choississez celui avec le nom `neo4j.HttpLogReplaySimulation`
+* le nom de la simulation, celui-ci servira pour la génération du rapport. Laissez le par défaut.
+* la description du tir au besoin. Laissez la vide.
+
+Une fois ce questionnaire remplie, Gatling va exécuter son tir.
+
+A la fin, vous obtenez un rapport en html dans le répertoire `$GATLING_HOME/results/httplogreplaysimulation-*`, contenant toutes les résultats du tests :
+
+* le nombre de requête simultanée
+* les différents percentiles, avec la moyenne, le min le max et l’écart-type
+* la distribution des temps de réponse
+
+image::/public/images/neo4j-gatling/gatling-report.png[]

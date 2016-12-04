@@ -1,0 +1,110 @@
+//
+// Responsive: Landscape phone to desktop/tablet
+// --------------------------------------------------
+@media (max-width: 480px) {
+  .navbar {
+    .btn-navbar {
+      margin-right: 20px;
+    }
+    .form-search {
+      position: absolute;
+      top: 0;
+      right: 80px;
+      width: 40%;
+    }
+  }
+
+  footer {
+    .row-fluid {
+      .span4 {
+        display: none;
+      }
+      .span8 {
+        text-align: center;
+        width: 100%;
+        ul {
+          float: none;
+        }
+      }
+    }
+  }
+
+  body.home {
+
+    #valeurs {
+      margin: 0 !important;
+      li {
+        width: 100%;
+        float: left;
+        margin-bottom: 50px;
+        a {
+          width: 100%;
+        }
+      }
+    }
+
+    #follow {
+      .container {
+        .row-fluid {
+          .span6 {
+            &:first-child {
+              display: none;
+            }
+
+            ul {
+              li {
+                margin: 10px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  body.page {
+    #my-card {
+      text-align: center;
+      > .span8 {
+        margin: 0 auto;
+        width: auto;
+      }
+      .span8 .row-fluid .span4 {
+        width: 100%;
+      }
+      .span8 .row-fluid .span8 {
+        width: 100%;
+      }
+    }
+
+    section.cv > div {
+      padding:0 10px;
+    }
+
+    nav.blog {
+      li {
+        width: 100%;
+        a {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .mainContainer {
+    margin: 0 10px;
+  }
+
+  form.form-horizontal {
+    .control-label {
+      width: 100%;
+    }
+    .controls {
+      width: 100%;
+      margin-left: 0;
+    }
+    .form-actions {
+      margin: 0;
+    }
+  }
+}

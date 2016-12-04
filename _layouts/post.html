@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  {% include head.html description=page.description tags=page.tags author=page.author %}
+</head>
+<body class="page">
+
+  {% include header.html %}
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> {{ page.title}}</h1>
+            <meta itemprop="description" content=" {{ page.description }}">
+            <img itemprop="image" src="{{ page.image}}"/>
+          </header>
+          <section itemprop="articleBody">
+            {{content}}
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  {{page.tags}}
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">{{page.author}}</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="{{page.date | date: '%Y-%m-%d'}}">{{ page.date | date: "%b %-d, %Y" }}</time>
+              </li>
+              <li><a href="{{page.parmalink}}" title="Permalien : {{page.title}}" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            {% if page.previous %}
+            <li class="pull-left">
+              <a class="btn btn-primary" href="{{ page.previous.url }}" title="{{ page.previous.title }}">&lt; {{ page.previous.title }}</a>
+            </li>
+            {% endif %}
+            {% if page.next %}
+            <li class="pull-right">
+              <a class="btn btn-primary" href="{{ page.next.url }}" title="{{ page.next.title }}">{{page.next.title}} &gt;</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </main>
+
+  {% include footer.html %}
+</body>
+</html>

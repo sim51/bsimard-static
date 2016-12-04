@@ -1,0 +1,84 @@
+= A la recherche des points de collecte pour recycler
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: fr
+:page-description: Ce midi on m'a pose une question simple : ou je peux trouver le point de recyclage de verre le plus proche de chez moi ? Question simple, mais pas evident de trouver la donnee...
+:page-disqusid: A-la-recherche-des-points-de-collecte-pour-recycler
+:page-image: /public/images/opendata-collect/banner.png
+:page-tags: opendata, osm
+:toc:
+
+Depuis plusieurs années, je travaille quasiment uniquement pour la ville de Nantes et Nantes Métropole. Ainsi lorsque mes collègues cherchent une réponse à une problématique sur Nantes, ils me demandent si je sais où trouver l'information.
+
+Ce midi, la question était très simple : *où peut-on trouver le point de collecte pour recycler le plus proche de chez moi ?*
+
+== Le site de la ville de Nantes
+
+Naturellement, je me dirige sur le site de la ville de Nantes et j'effectue une recherche globale sur "recyclage verre". Aucun résultat ...
+
+Je m'obstine un peu, en effectuant d'autres recherches avec des synonymes, en élargissant ma recherche, en testant par exemple "verre" ou "recyclage".
+J'obtiens quelque fois des résultats, mais cela ne correspond pas du tout à ce que je veux.
+
+Là je vois une rubrique "A votre service" avec un formulaire plus détaillé et surtout un champ "votre recherche concerne" avec un item "déchets/propreté". Je lance alors ma recherche avec cet unique critère.
+
+Je vois des résultats avec comme titre "Ecopoint" !  ... mais ce sont des déchetteries, alors que je veux connaître les points de collecte !
+
+== Le site de Nantes Métropole
+
+Bon si cela se trouve, ces points de collecte sont sous la responsabilité de la métropole et pas de la ville.
+Je m'en vais donc pour le site de Nantes Métropole.
+
+En parcourant le menu, je vois rapidement qu'il existe une rubrique "Pratique" avec une entrée "Déchets".
+Vais-je enfin trouver ma réponse ?
+
+Et ba non ...  je retrouve encore une fois mes écopoints, mais aussi tout un tas d'informations générale sur le recyclage (ce qui est intéressant en soi).
+
+Je trouve quand même un numéro vert ( 0 800 344 000 ) qui est "dédié aux questions de collecte".
+Je me demande si ce numéro pourrait répondre à ma demande. J'essayerai demain !
+
+== Le site opendata
+
+Après avoir fait ce que chaque citoyen aurait fait,  je me décide de pencher sur l'opendata en allant sur le site http://data.nantes.fr
+
+Donc me voilà reparti à lancer des recherches.
+
+Il y a 37 jeux de données sur la thématique "Environnement", et en y associant le mot "déchet", j'en obtiens plus que 8.
+
+En les parcourant je tombe sur les jours de collecte, le tonnage des déchets en 2012, la fréquentation des déchetteries et encore la liste des écopoints, mais toujours pas ce que je veux.
+
+Je commence à être désespéré ...
+
+== Open Street Map
+
+Bon, là je sors l'artillerie lourde, mais je suis sûr d'y trouver ma donnée, enfin j'espère ...
+
+Première chose à faire, une requête dans le wiki d'OSM pour trouver le bon tag pour les points de collecte : http://wiki.openstreetmap.org/w/index.php?search=recyclage&title=Special%3ASearch
+
+Bingo, en regardant le 7ème résultat, je trouve le nom du tag et sa valeur : `amenity=recycling`
+
+Dernier pas, se rendre sur le site http://overpass-turbo.eu pour y faire ma requête sur Nantes :
+
+[source,xml]
+----
+<osm-script>
+    <!-- query part for: “amenity=recycling” -->
+    <query type="node">
+      <has-kv k="amenity" v="recycling"/>
+      <bbox-query {{bbox}}/>
+    </query>
+  <!-- print results -->
+  <print mode="body"/>
+</osm-script>
+----
+
+Et voilà, j'ai enfin mes données, et en plus sur une carte ! Vous pouvez voir le résultat en suivant ce lien : http://overpass-turbo.eu/s/2z2
+
+Temps passé : **environ 5 minutes**
+
+== Conclusion
+
+De nos jours où on nous dit qu'il faut trier, faire attention à la planète et être écolo, je trouve dommage qu'à l'heure du numérique et de l'opendata il soit aussi difficile de trouver une information simple et pratique.
+
+Si je n'étais pas informaticien, geek et passionné par l'opendata, je n'aurais sans doute jamais trouvé la réponse à ma question.
+
+Si l'information c'est le pouvoir, alors les data geek ont une bonne longueur d'avance...

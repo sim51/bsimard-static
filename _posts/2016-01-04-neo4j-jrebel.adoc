@@ -1,0 +1,151 @@
+= How to use JRebel with Neo4j
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: en
+:page-description: In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.
+:page-image: /public/images/jrebel/banner.png
+:page-disqusid: How-to-use-JRebel-with-Neo4j
+:page-tags: neo4j, jrebel
+:toc: right
+
+In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.
+
+== Installation
+
+=== Step 1 : download & licence
+
+You have to download JRebel and to ask a trial code. For this, follow those instructions :
+
+* Got to the website and fullfill the form to get an activation code : https://zeroturnaround.com/software/jrebel/download/
+* Then download a stand alone version here : https://zeroturnaround.com/software/jrebel/download/#!/have-license
+
+=== Step 2 : Installation
+
+Unzip the downloaded file somwhere in your computer. In my case : `$> unzip jrebel-6.3.1-nosetup.zip -d ~/tmp/`. Now you should have a *jrebel* folder on your computer. In the rest of this tuto, I will use the var `JREBEL_HOME` for the path of this folder.
+
+=== Step 3 : Activation
+
+We have to activate JRebel with the trial code that we have asked. To do this, we only have to execute this commande : `$>JREBEL_HOME/bin/activate.sh <ACTIVATION_CODE>` (replace `<ACTIVATION_CODE>` with the one given at step 1)
+
+Now you have a trial version of JRebel installed on your computer
+
+=== Configuration for Neo4j
+
+Here, I’m assuming that you already have a neo4j instance installed on your computer in the folder `NEO4J_HOME`
+
+So now we have to configure JRebel for Neo4j. JRebel works with a java agent, so we have to add it in the JVM argument of Neo4j.
+
+To do this, follow those instructions :
+
+* Edit the file `NEO4J_HOME/conf/neo4j-wrapper.conf` : `$> vi NEO4J_HOME/conf/neo4j-wrapper.conf`
+* Add this line in the JVM Parameters section : `wrapper.java.additional=-javaagent: JREBEL_HOME/jrebel.jar`
+
+Now your configuration file should looks like this :
+
+[source,property]
+----
+#********************************************************************
+# Property file references
+#********************************************************************
+
+wrapper.java.additional=-Dorg.neo4j.server.properties=conf/neo4j-server.properties
+wrapper.java.additional=-Dlog4j.configuration=file:conf/log4j.properties
+
+#********************************************************************
+# JVM Parameters
+#********************************************************************
+
+wrapper.java.additional=-XX:+UseG1GC
+wrapper.java.additional=-XX:-OmitStackTraceInFastThrow
+wrapper.java.additional=-XX:hashCode=5
+wrapper.java.additional=-javaagent:/home/bsimard/tmp/jrebel/jrebel.jar
+----
+
+== Neo4j plugin
+
+I have created a simple Neo4j plugin at this url : https://github.com/sim51/neo4j-plugin-xml .
+It’s a simple plugin that translate a cypher query to an XML document. for our example it’s perfect.
+
+If you look at the `pom.xml` file, you will notice this following plugin :
+
+[source,xml]
+----
+<plugin>
+    <groupId>org.zeroturnaround</groupId>
+    <artifactId>jrebel-maven-plugin</artifactId>
+    <version>${jrebel.version}</version>
+    <executions>
+        <execution>
+            <id>generate-rebel-xml</id>
+            <phase>process-resources</phase>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+----
+
+This is the only thing needed to a plugin to be compatible with JRebel. It will generate the JRebel configuration file for you during the maven process, and it’s working out-of-the-box with Neo4j.
+
+In fact JRebel needs a `rebel.xml` file at the root of your jar, to know what to look (ie. your java classes).
+You will find all the information about how to configure JRebel at this url : http://manuals.zeroturnaround.com/jrebel/standalone/config.html
+
+=== Installation
+
+==== Step 1 : Compiling the code
+
+* Go to the project folder
+* Just run `mvn package`
+
+==== Step 2 : installation into Neo4j
+
+* Copy `neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar` from the target project folder to the plugins folder of Neo4j : `$>cp target/neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar NEO4J_HOME/plugins`
+* Edit the file `NEO4J_HOME/conf/neo4j-server.properties`
+* Add / modify the following line : `org.neo4j.server.thirdparty_jaxrs_classes=org.neo4j.plugin.xml=/xml`
+* Restart the server
+
+IMPORTANT: you have a to deploy your plugin a first time before the magic appears !
+
+== The magic part
+
+At this point of the tutorial, you have :
+
+* JRebel installed on your computer
+* A working Neo4j server with the JRebel agent
+* A working Neo4j plugin deploy into your server that is compatible with Jrebel
+
+So now, it’s time to see magic of JRebel !
+
+Firstly, we will see what the plugin endpoint ping respond to us :
+
+[source,bash]
+----
+$> curl -u neo4j:admin http://localhost:7474/xml/ping
+Pong
+----
+
+Now we are going to change the source code, by changing the response of this endpoint in the file `org.neo4j.plugin.xml.PluginExtension` :
+
+[source,java]
+----
+@GET
+@Path("/ping")
+public Response ping() throws IOException {
+    return Response.ok("I'm here master", MediaType.TEXT_PLAIN).build();
+}
+----
+
+We have to compile the new code with maven `mvn compile`, for the classes to be generated into the `target/classes` folder. And now, let’s see the result :
+
+[source,bash]
+----
+$> curl -u neo4j:admin  http://localhost:7474/xml/ping
+I'm here master
+----
+
+Yeah it’s working, our change is here without any Neo4j restart. Now you can concentrate on your code, so happy coding !
+
+NOTE: If you use an IDE, JRebel has created various plugin and there is probably one for your favorite IDE. Those plugin permit to run/debug a class with JRebel.
+
+NOTE: If you want to save more time, you can let your IDE to compile (incrementaly!) your project automaticly. So each time you are saving a file, your IDE compile the java class into target/classes and JRebel reload it on the server.

@@ -1,0 +1,193 @@
+.admin {
+  color: @black;
+
+  .blockDefault {
+    color: @black;
+
+    h1, h2, h3 {
+      color: @grey;
+    }
+  }
+
+  form.form-horizontal .controls input, form.form-horizontal .controls textarea, form.form-horizontal .controls select {
+     width: 95%;
+  }
+
+  form .form-actions {
+    width: 80%;
+  }
+
+  /* On/Off CMSPage */
+  .btn-group {
+    margin-top: 5px;
+    text-align: center;
+    width: 100%;
+
+    .btn.btn-success, .btn.btn-danger {
+      .btn;
+    }
+    .btn.btn-success.active {
+      background-color: @btnSuccessBackground;
+      color: @white;
+    }
+    .btn.btn-danger.active {
+      background-color: @btnDangerBackground;
+      color: @white;
+    }
+    & > .btn:first-child {
+      border-bottom-left-radius: 4px;
+      border-top-left-radius: 4px;
+      border-bottom-right-radius: 0px;
+      border-top-right-radius: 0px;
+      margin-left: 0;
+    }
+    & > .btn:last-child {
+      border-bottom-left-radius: 0px;
+      border-top-left-radius: 0px;
+      border-bottom-right-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+  }
+
+
+  /* Sidenav */
+  .bs-docs-sidenav {
+    width: 200px;
+    margin: 30px 0 0;
+    padding: 0;
+    background-color: #fff;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+
+    li {
+      float: none;
+    }
+  }
+
+  .bs-docs-sidenav > li > a {
+    display: block;
+    width: 190px   \9;
+    margin: 0 0 -1px;
+    padding: 8px 14px;
+    border: 1px solid #e5e5e5;
+  }
+
+  .bs-docs-sidenav > li:first-child > a {
+    -webkit-border-radius: 6px 6px 0 0;
+    -moz-border-radius: 6px 6px 0 0;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .bs-docs-sidenav > li:last-child > a {
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+  }
+
+  .bs-docs-sidenav > .active > a {
+    position: relative;
+    z-index: 2;
+    padding: 9px 15px;
+    border: 0;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .15);
+    -webkit-box-shadow: inset 1px 0 0 @secondary, inset -1px 0 0 @secondary;
+    -moz-box-shadow: inset 1px 0 0 @secondary, inset -1px 0 0 @secondary;
+    box-shadow: inset 1px 0 0 @secondary, inset -1px 0 0 @secondary;
+    background-color: @secondary;
+    font-weight: bold;
+
+    &:hover {
+      background-color: @quaternary;
+    }
+  }
+
+  /* Chevrons */
+  .bs-docs-sidenav .icon-chevron-right {
+    float: right;
+    margin-top: 2px;
+    margin-right: -6px;
+    opacity: .25;
+  }
+
+  .bs-docs-sidenav > li > a:hover {
+    background-color: @quaternary;
+  }
+
+  .bs-docs-sidenav a:hover .icon-chevron-right {
+    opacity: .5;
+  }
+
+  .bs-docs-sidenav .active .icon-chevron-right,
+  .bs-docs-sidenav .active a:hover .icon-chevron-right {
+    opacity: 1;
+  }
+
+  .bs-docs-sidenav.affix {
+    top: 110px;
+  }
+
+  .bs-docs-sidenav.affix-bottom {
+    position: absolute;
+    top: auto;
+    bottom: 270px;
+  }
+
+  /* sortbale table */
+  table.sortable span.arrow {
+    border-style: solid;
+    border-width: 5px;
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    font-size: 0;
+    border-color: #ccc transparent transparent transparent;
+    line-height: 0;
+    height: 0;
+    width: 0;
+    margin-top: -2px;
+  }
+
+  table.sortable span.arrow.up {
+    border-color: transparent transparent #ccc transparent
+  ;
+    margin-top: -7px;
+  }
+
+  table.sortable thead th {
+    cursor: pointer;
+    position: relative;
+    top: 0;
+    left: 0;
+  }
+
+  table.sortable thead th:hover {
+    background: #efefef;
+  }
+
+  table.sortable thead th div.mozilla {
+    position: relative;
+  }
+  
+  /* Compare organisme */
+  #compare {
+    form {
+      label {
+        width: 100%;
+        padding : 0 10px;
+        text-align: left;
+      }
+      .controls {
+        margin-left: 0;
+        width: 100%;
+        padding : 0 10px;
+      }
+    }
+  }
+
+}
+

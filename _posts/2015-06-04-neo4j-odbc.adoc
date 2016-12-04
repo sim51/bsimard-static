@@ -1,0 +1,89 @@
+= How to communicate with Neo4j through ODBC
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: en
+:page-description: Lorsque je vois un graphiste mettre une disquette a cote du bouton save cela me fait toujours rire ! J'ai donc deide de faire un petit florilege des icones obsoletes.
+:page-disqusid: How-to-communicate-with-Neo4j-throw-ODBC
+:page-image: /public/images/odbc/banner.png
+:page-tags: neo4j, odbc, jdbc
+:toc: right
+
+== Market solutions
+
+There are two market solutions to make an ODBC-JDBC bridge :
+
+* Easysoft with their ODBC-JDBC Gateway
+* Openlink with thier Single/Multi Tier ODBC-JDBC bridge
+
+In this documentation, we will only talk about *easysoft*.
+
+== Easysoft
+
+*Easysoft* is a solution that make an ODBC-JDBC bridge on your computer.
+So you have to install it on each machine.
+
+image::/public/images/odbc/easysoft-diag.png[]
+
+It costs *375 GBD / year*, but prices depend on the number of machines where we install software.
+
+== Installation
+
+* Go to download trial version : http://www.easysoft.com/cgi-bin/productdownload.cgi?p=26 (you must create an account)
+* Download the windows version
+* Run the executable and follow the wizard. For more information, read the installation guide of easysoft
+
+== JVM Configuration
+
+* Go to Programs > Easysoft >ODBC-JDBC Gateway > Configure Java Interface
+* Configure where is your JDK
+* Click on Test and Save if OK
+
+== NEO4J JDBC Configuration
+
+* Go to the Control Panel
+* Then in Administrative Tools
+* Click on Data Sources (ODBC)
+* Check if Easysoft driver is really installed
+
+image::/public/images/odbc/check-driver.png[]
+
+* Download the neo4j jdbc driver (with all its dependencies) here : https://m2.neo4j.org/content/groups/public/org/neo4j/neo4j-jdbc/2.1.4/
+* Create a new ODBC connection, and select Easysoft ODBC-JDBC Gateway
+
+image::/public/images/odbc/create-connection.png[]
+
+* Configure the connection where :
+** *DSN :* The name of your new database, for example NEO4J
+** *Description :* you can put here the description of your connection
+** *User name :* The login of the neo4j user
+** *Password :* the password of the neo4j user
+** *Driver Class :* org.neo4j.jdbc.Driver
+** *Class Path :* Click on the Add button, and select the jar you have download at step 5
+** *URL :* The JDBC connection URL for neo4j : jdbc:neo4j://localhost:7474 (if you server is on your local machine)
+
+image::/public/images/odbc/configuration.png[]
+
+* When you have fullfil this form, you can click on the `Test`, to check that is everyting is good (your neo4j server must running of course).
+
+Well done, you  have your ODBC-JDBC Bridge installed for neo4j !
+
+== Annexe
+
+=== How to enabled log for ODBC
+
+This feature can be (very) usefull for debugging purpose, but it (really) slowing the ODBC connection.
+
+* Go to the `Control Panel`
+* Then in `Administrative Tools`
+* Click on `Data Sources (ODBC)`
+* Click on the `Tracing` tab
+* Click on `Start Tracing Now`. You can also configure where the log file is generated with the `Log File Path`.
+
+image::/public/images/odbc/enable-log.png[]
+
+=== Some usefull links
+
+* http://stackoverflow.com/questions/5352956/odbc-jdbc-bridge-that-maps-its-own-calls-to-jdbc-driver : Stackoverflow threadabout ODBC/JDBC bridge
+* http://www.4d.com/4d_docstatic/4D%20ODBC%20Pro/12/ODBC-Results.201-371921.en.html : Explain each ODBC operation
+* http://www.gpoulose.com/ : To download a Query Tool that use ODBC
+* http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration : How to enable neo4j HTTP log file (usefull to debug REST query)

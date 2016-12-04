@@ -1,0 +1,133 @@
+//
+// Responsive: Landscape phone to desktop/tablet
+// --------------------------------------------------
+@media (max-width: 767px) {
+  body {
+    padding: 0;
+  }
+
+  .navbar {
+    margin-left: 0;
+    margin-right: 0;
+
+    .navbar-inner {
+      padding: 5px 0;
+      .container {
+        height: 45px !important;
+      }
+      .btn-navbar {
+        margin-right: 30px;
+      }
+      a.brand {
+        margin-left: 10px;
+      }
+      .nav-collapse {
+        ul.nav {
+          margin-top: 5px !important;
+          width: 100%;
+          z-index: 999;
+          background-color: @white;
+          border-bottom: 1px solid @greyLight;
+          li {
+            a {
+              text-align: center;
+            }
+          }
+        }
+
+      }
+      .form-search {
+        position: absolute;
+        top: 0;
+        right: 80px;
+      }
+    }
+  }
+
+  footer {
+    .row-fluid {
+      .span4 {
+        float: left;
+        width: 31%;
+      }
+      .span8 {
+        float: left;
+        width: 65%;
+      }
+    }
+  }
+
+  body.home {
+    #valeurs {
+      margin: 0 !important;
+
+      .tooltip {
+        opacity: 1;
+      }
+
+      li {
+        width: 50%;
+        float: left;
+        margin-bottom: 50px;
+        a {
+          width: 50%;
+        }
+      }
+    }
+
+    #follow {
+      height: auto !important;
+      .span6 {
+        text-align: center;
+        h2 {
+          line-break: 50px;
+        }
+        ul {
+          float: none;
+          padding: 15px 0;
+        }
+      }
+    }
+
+    #realisation {
+      margin-top: 0 !important;
+      .title {
+        margin-bottom: 70px;
+      }
+
+      div.span4 {
+        width: 100%;
+        margin-left: 0;
+        height: auto !important;
+      }
+    }
+
+    #blog {
+      padding: 0 20px;
+    }
+  }
+
+  body.page {
+    .affix-top {
+      position: relative;
+      height: inherit;
+    }
+
+    #my-card {
+      > .span8 {
+        width: 450px;
+        margin: 0 auto;
+      }
+      .span8 .row-fluid {
+        .span4 {
+          float: left;
+          width: 30%;
+        }
+        .span8 {
+          float: left;
+          width: 70%;
+        }
+      }
+    }
+  }
+}

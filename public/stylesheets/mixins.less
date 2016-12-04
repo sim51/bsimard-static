@@ -1,0 +1,162 @@
+// circle mixin
+.circle{
+  border-radius: 70px 70px 70px 70px;
+}
+
+// triangle mixin
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 50px solid red;
+  border-top: 50px solid transparent;
+  border-bottom: 50px solid transparent;
+}
+
+// Different blocks
+.firstBlock {
+  margin-top: 50px;
+}
+.container {
+  padding : 20px 0;
+}
+.block {
+  //border-bottom: 1px solid @grey;
+}
+.blockEven {
+  color : @white;
+  background-color: @primary;
+  .block;
+}
+.blockOdd {
+  color : @white;
+  background-color: @secondary;
+  a{
+    color: @white;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .block;
+}
+.blockDefault {
+  color : @grey;
+  background-color: @white;
+  .block;
+}
+.blockLight {
+  color : @black;
+  background-color: @greyLight;
+  .block;
+}
+.blockDark {
+  color : @black;
+  background-color: @grey;
+  .block;
+}
+.mainContainer {
+  border: none;
+}
+
+// for images in a link with a text
+img.baseline {
+  vertical-align: baseline;
+}
+img.middle {
+  vertical-align: middle;
+}
+
+// list inline for first & last element
+ul.inline > li.first, ol.inline > li.first {
+  padding-left: 0 !important;
+}
+ul.inline > li.last, ol.inline > li.last {
+  padding-right: 0 !important;
+}
+
+// forms
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"] {
+  &:focus {
+    border-color: @secondary;
+    box-shadow:  0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px @secondary;
+  }
+}
+form.form-horizontal {
+
+  fieldset {
+    margin: 15px 0;
+
+    > label {
+      font-family: @ftSecondary;
+      font-size: 25px;
+      color: @grey;
+      margin: 20px 0 20px 20%;
+      padding-left: 20px;
+    }
+  }
+
+  .control-label {
+    width : 20%;
+    padding-right: 20px;
+  }
+
+  .controls {
+    margin-left: 20%;
+    width : 80%;
+
+    input, textarea, select {
+      width: 70%;
+      margin: 0;
+    }
+    select {
+      width:72%;
+    }
+    input[type="checkbox"]{
+      vertical-align: top;
+    }
+  }
+
+  .control-group.errorBlock {
+    border-radius: 4px 4px 4px 4px;
+    border: 1px solid @red;
+    padding:5px;
+    label {
+      color: @red;
+    }
+  }
+
+  .form-actions {
+    margin: 0;
+    padding:0;
+    background-color: transparent;
+    border: none;
+    margin-left: 20%;
+    width : 60%;
+
+  }
+}
+
+.btn-primary {
+  .buttonBackground(@quaternary, darken(@quaternary, 5%));
+}
+
+.required {
+  color: @secondary;
+  font-size: 25px;
+  vertical-align: text-top;
+  font-weight: bold;
+}

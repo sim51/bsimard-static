@@ -1,0 +1,23 @@
+title: Benoit Simard
+email: contact@bsimard.com
+description: Site de Benoit Simard
+keywords:
+baseurl: ""
+url: "http://www.bsimard.com/"
+twitter_username: logisima
+github_username:  sim51
+discuss_shortname: bsimard
+
+paginate_path: /blog/page:num
+
+############################################################
+# Site configuration for the Jekyll 3 Pagination Plugin
+# The values here represent the defaults if nothing is set
+pagination:
+  # Site-wide kill switch, disabled here it doesn't run at all
+  enabled: true
+  # The default document collection to paginate if nothing is specified ('posts' is default)
+  collection: 'posts'
+  # How many objects per paginated page, used to be `paginate` (default: 0, means all)
+  per_page: 5
+############################################################

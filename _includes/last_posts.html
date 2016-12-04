@@ -1,0 +1,16 @@
+<section id="blog" class="block">
+  <div class="container">
+    <h2>
+      <a href="/feed.xml" title="Flux RSS">
+        <i class="icon-rss"></i>
+      </a>
+      Mes derniers tickets
+    </h2>
+    <div class="row-fluid">
+      <!-- This loops through the paginated posts -->
+      {% for post in paginator.posts%}
+        {% include inline_post.html post=post %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

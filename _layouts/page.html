@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include head.html description=page.description tags=page.tags author=page.author %}
+</head>
+<body class="page">
+
+  {% include header.html %}
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <div class="span12">
+        {{content}}
+      </div>
+    </section>
+  </main>
+
+  {% include footer.html %}
+</body>
+</html>

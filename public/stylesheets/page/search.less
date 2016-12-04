@@ -1,0 +1,48 @@
+body.search {
+  h2 {
+    text-transform: none;
+  }
+
+  .resultItem {
+    margin-bottom: 40px;
+    a:hover {
+      text-decoration: none;
+      h2 {
+        color: @primary;
+      }
+      div {
+        color: @black;
+      }
+    }
+
+    div {
+      color: @grey;
+    }
+  }
+
+  #pagination {
+    div.pagination {
+      text-align: center;
+
+      ul {
+        li {
+          a {
+            color: @black;
+            padding: 10px 20px;
+
+            &.current {
+              color: @white;
+              font-weight: bold;
+              background-color: @quaternary;
+            }
+
+            &:hover {
+              color: @white;
+              background-color: @primary;
+            }
+          }
+        }
+      }
+    }
+  }
+}

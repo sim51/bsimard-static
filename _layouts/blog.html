@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include head.html description=site.description tags=site.keywords author=site.author %}
+</head>
+<body class="search">
+
+  {% include header.html %}
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <div class="span12">
+        <h1 itemprop="name">Blog posts</h1>
+
+        <!-- This loops through the paginated posts -->
+        {% for post in paginator.posts %}
+          {% include inline_post.html post=post %}
+        {% endfor %}
+
+        {% if paginator.total_pages > 1 %}
+        <nav id="pagination" class="blockDefault">
+          <div class="span12 pagination">
+            <ul>
+              {% if paginator.previous_page %}
+                <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&lt;</a></li>
+              {% endif %}
+
+              {% for page in (1..paginator.total_pages) %}
+                {% if page == paginator.page %}
+                  <li><a class="current" href="#" title="Page n° {{ page }}">{{ page }}</a></li>
+                {% elsif page == 1 %}
+                  <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" title="Page n° {{ page }}">{{ page }}</a></li>
+                {% else %}
+                  <li><a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}" title="Page n° {{ page }}">{{ page }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if paginator.next_page %}
+                <li><a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">&gt;</a></li>
+              {% endif %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </main>
+    {% include footer.html %}
+  </body>
+  </html>

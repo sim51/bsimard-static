@@ -1,0 +1,294 @@
+= Connecting Neo4j to any SQL tool with the power of Postgresql
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: en
+:page-description: Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.
+:page-disqusid: Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
+:page-image: /public/images/pg-fdw/banner.png
+:page-tags: neo4j, postgresql, foreign data wrapper
+:toc: right
+
+== Implement A neo4j foreign data wrapper
+
+To produce a FDW, there is two possibilities :
+
+* Writing a pure postgresql extension in C
+* Uinge Multicorn extension that make FDW develompent easy by giving us a Python wrapper to implement it
+
+For this tutorial, I have choose to use Multicorn, because I prefer Python rather than C.
+
+== Install Multicorn
+
+=== Requirements
+
+There is some Postgresql & Python requirements to use Multicorn :
+
+* Postgresql >= 9.1
+* Postgresql development packages
+* Python development packages
+* python 2.7 or >= python 3.3 as your default python with pip
+
+On a debian system, you can directly type this command :
+
+[source,bash]
+----
+$> apt-get install build-essential postgresql-server-dev-9.4 python-dev python-setuptools python-pip postgresql-plpython-9.4
+----
+
+=== Installing Multicorn from source
+
+The first step is to compile and install Multicorn on our server.
+
+NOTE: If you are using PG 9.1, you should use version 0.9.X version (`git checkout v0.9.3`) NOTE: If you are using PG 9.2, you should use version 1.0.X version (`git checkout v01.0.4`)
+
+[source,bash]
+----
+$> cd /tmp
+$> git clone git://github.com/Kozea/Multicorn.git
+$> cd Multicorn
+$> make && make install
+----
+
+Now Multicorn is operational on our PG instance.
+
+=== Neo4j FWD
+
+You can find my Neo4j FDW here : https://github.com/Progsima/neo4j-fwd It’s based on py2neo for the Neo4j communication.
+
+* Clone the repository
+
+[source,bash]
+----
+$> git clone https://github.com/sim51/neo4j-fwd
+Install project dependencies : py2neo
+$> pip install py2neo
+----
+
+* Install the FDW
+
+[source,bash]
+----
+$> cd neo4j-fdw
+$> python setup.py install
+----
+
+Now, you have a Postgresql server with the Multicorn extension, and neo4j FDW.
+At this point, everything is done to use Neo4j in Postgresql !
+
+== How to use Neo4j Foreign Data Wrapper
+
+* First step, it’s to create a database for testing
+
+[source,bash]
+----
+$> su - postgres
+$> psql
+postgres=# CREATE DATABASE fdw;
+postgres=# \connect fdw
+fdw=#
+----
+
+* We can now enable the extension in our PG instance
+
+[source,bash]
+----
+$> su - postgres
+$> psql
+postgres=# CREATE EXTENSION multicorn;
+CREATE EXTENSION
+postgres=# \q
+----
+
+* After we must define a Neo4j server
+
+[source,bash]
+----
+fdw=# CREATE SERVER multicorn_neo4j FOREIGN DATA WRAPPER multicorn
+  OPTIONS (
+      wrapper  'neo4jPg.neo4jfdw.Neo4jForeignDataWrapper',
+      server   'localhost',
+      port     '7474',
+      user     'neo4j',
+      password 'admin'
+  );
+----
+
+* Then, declare a Neo4j foreign table into Postgresql :
+
+[source,bash]
+----
+fdw=# CREATE FOREIGN TABLE neo4j_movie (
+    movie varchar
+) SERVER multicorn_neo4j OPTIONS (
+    cypher 'MATCH (n:Movie) RETURN n.title as movie'
+);
+----
+
+* Finally, you can do some SQL query on the neo4j_movie table
+
+[source,bash]
+----
+fdw=# SELECT * FROM neo4j_movie;
+fdw=# SELECT count(*) FROM neo4j_movie;
+fdw=# SELECT count(*) FROM neo4j_movie WHERE movie LIKE '%Matrix%';
+----
+
+== Make cypher query into a sql select
+
+This project also define a cool postgres function `cypher`, that allow you to make some directly a cypher query into a select.
+
+Example : `SELECT * FROM cypher('MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 10')`
+
+Select return a `cypher` attribute that is a typed as a postgres JSON and represent the result of your query
+
+=== Create the function into your database
+
+You have to declare those functions into your database, before to use it.
+
+[source,bash]
+----
+mydatabase=#
+CREATE EXTENSION plpythonu;
+
+mydatabase=#
+CREATE OR REPLACE FUNCTION cypher(query text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher_default_server(plpy, query):
+    yield result
+$$;
+CREATE OR REPLACE FUNCTION cypher(query text, server text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher_with_server(plpy, query, server):
+    yield result
+$$;
+CREATE OR REPLACE FUNCTION cypher(query text, server text, port text, login text, password text) RETURNS SETOF json
+LANGUAGE plpythonu
+AS $$
+from neo4jPg import neo4jPGFunction
+for result in neo4jPGFunction.cypher(plpy, query, server, port, login, password):
+    yield result
+$$;
+----
+
+This define three functions :
+
+* *cypher(query, server, port, login, password) :* make a cypher query on the specify server : `SELECT * FROM cypher('MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin')`
+* *cypher(query, server) :* make a cypher query on the foreign server specify (server is the name of the foreign server. Example multicorn_neo4j) : `SELECT * FROM cypher('MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 10', 'multicorn_neo4j')`
+* *cypher(query) :* make a cypher query on the first foreign server define : `SELECT * FROM cypher('MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 10')`
+
+=== How to use it
+
+The JSON produced follow your cypher return statement : the key of the first json level correspond to you the name of yours returns, and the value to json serialisation fo the object.
+
+If the return object is a Node, it’s serialize as a JSON object like this : ```{ labels : [], properties: { object } }```
+
+Example :
+
+[source,bash]
+----
+mydatabase=#
+SELECT cypher  FROM cypher('MATCH (n:Location) RETURN n LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                                                            cypher
+------------------------------------------------------------------------------------------------------------------------------
+ {"n":{"labels": ["Location"],"properties": {"y": 1906520.0, "x": 1158953.0, "name": "025XX W AUGUSTA BLVD"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1842294.0, "x": 1175702.0, "name": "094XX S HARVARD AVE"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1931163.0, "x": 1152905.0, "name": "047XX N KIMBALL AVE"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1887355.0, "x": 1149049.0, "name": "041XX W 24TH PL"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1869892.0, "x": 1176061.0, "name": "001XX W 53RD ST"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1862782.0, "x": 1180056.0, "name": "063XX S DR MARTIN LUTHER KING JR DR"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1908312.0, "x": 1175281.0, "name": "001XX W DIVISION ST"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1899998.0, "x": 1139456.0, "name": "0000X N PINE AVE"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1908407.0, "x": 1176113.0, "name": "012XX N STATE PKWY"}}}
+ {"n":{"labels": ["Location"],"properties": {"y": 1888098.0, "x": 1148713.0, "name": "023XX S KEELER AVE"}}}
+(10 lignes)
+----
+
+If the return object is a relation, it’s serialize as a JSON object like this : `{ type : "MY_TYPE", properties: { object } }`
+
+Example :
+
+[source,bash]
+----
+mydatabase=#
+SELECT cypher  FROM cypher('MATCH (n)-[r]->(m) RETURN r AS relation LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                          cypher
+-----------------------------------------------------------
+ {"relation":{"type": "IS_TYPE_OF","properties": {}}}
+ {"relation":{"type": "IS_TYPE_OF","properties": {}}}
+ {"relation":{"type": "IS_LOCALIZED_AT","properties": {}}}
+ {"relation":{"type": "HAS_ARREST","properties": {}}}
+ {"relation":{"type": "IS_DOMESTIC","properties": {}}}
+ {"relation":{"type": "IN_YEAR","properties": {}}}
+ {"relation":{"type": "IS_IN_CATEGORY","properties": {}}}
+ {"relation":{"type": "IS_TYPE_OF","properties": {}}}
+ {"relation":{"type": "IS_TYPE_OF","properties": {}}}
+ {"relation":{"type": "IS_TYPE_OF","properties": {}}}
+(10 lignes)
+----
+
+Of course, primitive types are also supported, and you can mix all of this : `SELECT cypher FROM cypher(MATCH (y:Year)-[r]→(m) RETURN y.value AS year, r, mLIMIT 10, localhost, 7474, neo4j, admin);`
+
+[source,bash]
+----
+mydatabase=#
+SELECT cypher  FROM cypher('MATCH (y:Year)-[r]->(m) RETURN y.value AS year, r, m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
+                                                      cypher
+-------------------------------------------------------------------------------------------------------------------
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10016718"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017521"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10018383"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10087834"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017190"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017379"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017246"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017248"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017208"}}}
+ {"year":2015,"r":{"type": "IN_YEAR","properties": {}},"m":{"labels": ["Crime"],"properties": {"id": "10017211"}}}
+(10 lignes)
+----
+
+=== The power of PG & JSON
+
+PG 9.4 have a function name json_to_record, that convert our json into a collection of typed tuple !
+
+[source,bash]
+----
+mydatabase=#
+SELECT year, id  FROM cypher('MATCH (y:Year)<-[r]-(m) RETURN y.value AS year, m.id AS id LIMIT 10', 'localhost', '7474', 'neo4j', 'admin') , json_to_record(cypher) as x(year int, id varchar)
+ year |    id
+------+----------
+ 2015 | 10016718
+ 2015 | 10017521
+ 2015 | 10018383
+ 2015 | 10087834
+ 2015 | 10017190
+ 2015 | 10017379
+ 2015 | 10017246
+ 2015 | 10017248
+ 2015 | 10017208
+ 2015 | 10017211
+(10 lignes)
+----
+
+== Annexe
+
+=== Some usefull links
+
+* http://www.postgresql.org/download/linux/debian/ : How to install Postgresql 9.4 with apt
+* https://wiki.postgresql.org/wiki/Foreign_data_wrappers : Postgresql wiki page about foreign data wrapper
+* http://multicorn.readthedocs.org/en/latest/implementing-tutorial.html : How to write a FDW with multicorn
+* http://leopard.in.ua/2013/09/28/postgresql-multicorn/ : Good article on how to use FDW
+
+=== Install postgresql 9.4 for wheezy
+
+[source,bash]
+----
+$> echo "deb http://apt.postgresql.org/pub/repos/apt/ wheezy-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+$< wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+$> apt-get update
+$> apt-get install postgresql-9.4
+----

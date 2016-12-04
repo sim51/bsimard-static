@@ -1,0 +1,15 @@
+<article class="resultItem">
+  <a href="{{ include.post.url }}" title="{{ include.include.post.title }}">
+    <header>
+      <h3>{{ post.title }}</h3>
+    </header>
+    <div class="row-fluid">
+      <div class="span2">
+        <img src="{{ include.post.image }}" width="100"/>
+      </div>
+      <div class="span8">
+        {{ include.post.description }}
+      </div>
+    </div>
+  </a>
+</article>

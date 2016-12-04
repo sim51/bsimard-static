@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include head.html description=site.description tags=site.keywords author=site.author %}
+  </head>
+  <body class="home" itemscope itemtype="http://schema.org/WebPage">
+
+    {% include header.html %}
+    {% include my_values.html %}
+    {{content}}
+    {% include last_posts.html %}
+    {% include footer.html %}
+
+  </body>
+</html>

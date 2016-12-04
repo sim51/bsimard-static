@@ -1,0 +1,152 @@
+= Comment SolR découpe vos phrases
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: en
+:page-description: Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr
+:page-disqusid: Comment-SolR-decoupe-vos-phrases
+:page-image: /public/images/solr/banner.jpg
+:page-tags: solr, lucene, full text search
+:toc: right
+
+== Le traitement du texte et des mots
+
+Dans un moteur de recherche, le traitement du texte et des mots s’effectue à deux endroits :
+
+* lors de l’indexation, pour la construction des ses indexes
+* lors d’une requête, pour traiter les mots recherchés
+
+INFO: Généralement on fait en sorte que le traitement effectué lors de l’indexation soit le même que celui de la requêtes, mais ce n’est pas une obligation.
+
+Il existe deux familles de traitement :
+
+* les *filters* qui permettent de manipuler et modifier le texte. Exemple : supprimer tous les accent du texte.
+* les *tokenizers* qui permettent de découper le texte en mot. Exemple : découper le texte selon les espaces et la ponctuation
+
+Lorsqu’on définit un champs dans Solr, on y définit la liste des filtres et des tokenizers qu’on veut utiliser, ainsi que l’ordre dans lequel ils vont être exécuté.
+
+=== Les filtres
+
+Dans cette section nous allons voir une série de filtres que SolR met à notre disposition.
+
+==== PatternReplaceCharFilterFactory
+
+Ce filtre nous permet de spécifier une liste de caractère afin de les supprimer du texte. Généralement on demande de supprimer les caractères spéciaux comme `()[]{}'|?!.`
+
+**Exemple :** `{Pomme} a des pépins !` devient `Pomme a des pépins`
+
+==== StopFilterFactory
+
+Ce filtre permet de supprimer du texte ce qu’on nomme les stopwords, c’est à dire tous les mots usuels de la langue comme `de, le, la, les, dans, pour, …​`
+
+Ces *stopwords* sont paramétrables via un fichier texte. Vous pouvez retrouver une liste de stopword pour la langue française à l’adresse suivante : http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt
+
+**Exemple :** `{Pomme} a des pépins !` devient `{Pomme} pépins !`
+
+==== LowerCaseFilterFactory
+
+Ce filtre permet de mettre tout le texte en minuscule.
+
+==== FrenchLightStemFilterFactory
+
+Ce filtre permet de trouver automatiquement la racine du mot. Il doit êre appliqué sur des mots et non des phrases entières. C’est pourquoi il est toujours positionné après un tokenizer. En outre, il supprime aussi tous les caractères accentués et spéciaux de la langue française.
+
+**Exemple :** `planetarirum` devient `planet`
+
+==== ASCIIFoldingFilterFactory
+
+Ce filtre permet de remplacer tous les caractères accentués et les caractères spécifiques de la langues française, par une représentation universelle (en ASCII) :
+
+* é, ê, è → e
+* ç → c
+* ù → u
+* …​
+
+Exemple : {Pomme} a des pépins ! devient {Pomme} a des pepins !
+
+=== Les tokenizers
+
+Dans cette section nous allons voir la liste des tokenizers que SolR met a notre disposition.
+
+==== StandardTokenizerFactory
+
+Ce tokernizer sépare le texte en fonction des espaces et de la ponctuation (qu’il supprime).
+
+**Exemple :** `{Pomme} a des pépins !` devient `{Pomme}, a, des, pépins`
+
+==== KeywordTokenizerFactory
+
+Ce tokenizer ne fait rien, puisqu’il renvoie le texte qu’on lui donne tel quel. Il sert surtout lorsqu’on veut faire de la recherche exact.
+
+**Exemple :** `{Pomme} a des pépins !` devient `{Pomme} a des pépins !`
+
+==== WhitespaceTokenizerFactory
+
+Ce tokernizer sépare le texte uniquement en fonction des espaces, il ne prend pas en compte la ponctuation.
+
+**Exemple :** `{Pomme} a des pépins, et c’est pas marrant.` devient `{Pomme}, a, des, pépins,, et, c’est, pas, marrant.`
+
+== La définition des types
+
+Dans tous mes projets, il y a deux types qui reviennent régulièrement.
+
+=== Texte Général
+
+Ce type permet de stocker dans les indexes, la racine des mots sans accent et en minuscule.
+
+Voici la liste des filtres/tokenizers utilisés pour ce champ :
+
+* PatternReplaceCharFilterFactory
+* StandardTokenizerFactory
+* LowerCaseFilterFactory
+* FrenchLightStemFilterFactory
+
+=== Texte exact
+
+Ce type permet de stocker dans les indexes les mots exacts mais sans accent et en minuscule.
+
+* PatternReplaceCharFilterFactory
+* StandardTokenizerFactory
+* LowerCaseFilterFactory
+* ASCIIFoldingFilterFactory
+
+
+== La recherche
+
+Lorsqu’on effectue une recherche, il est possible de spécifier un algorithme de recherche.
+Nous allons détailler dans les paragraphes à quoi cela correspond.
+
+=== Les types de recherche
+
+==== La recherche standard
+
+La recherche standard est simple, elle correspond à la recherche du terme exact (après son traitement comme vu précédemment).
+
+==== La recherche wildcard
+
+Avec un wildcard, on recherche dans les indexes tout les mots commençant par le pattern de la recherche.
+
+**Exemple :** `plan*` permet de trouver `plan, planète, planétarium, …​`
+
+IMPORTANT: Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+
+==== La recherche floue
+
+Avec une recherche floue, on recherche dans les indexes tous les mots qui sont proches du pattern de la recherche.
+Derrière la notion de proche/voisin se trouve un algorithme basé sur la distance de Levenshtein.
+
+Ce type de recherche permet d’être tolérant aux fautes orthographiques / frappes
+
+**Exemple :** `cosmik~` permet de trouver `cosmique` | `plannette` permet de trouver `planète` | `renconrte~` permet de trouver `rencontre`
+
+
+
+NOTE: Il est possible de définir le taux de similarité minimum, compris entre 0 & 1 (1 étant le plus proche possible): `comisk~0.8`
+
+IMPORTANT: Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
+
+=== Les coefficients / boost
+
+Lorsqu’on effectue une recherche sur plusieurs critères, il est possible de définir pour chaque critère quel est son incidence sur le resultat de recherche.
+C’est ce que l’on nomme les *boost*.
+
+Par exemple cela permet de donner un score plus élévé aux documents possédant le pattern de recherche dans le titre que dans la description.

@@ -1,0 +1,67 @@
+= Les icônes du passé
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-lang: fr
+:page-description: Lorsque je vois un graphiste mettre une disquette a cote du bouton save cela me fait toujours rire ! J'ai donc deide de faire un petit florilege des icones obsoletes.
+:page-disqusid: Les-ic&ocirc;nes-du-passe
+:page-image: /public/images/icones/obsolete.png
+:page-tags: ergonomie
+:toc:
+
+== Introduction
+
+Non ce n'est pas un post sur les stars de mon enfance.
+Dans mon travail je fais de plus en plus d'ergonomie, et lorsque je vois un graphiste mettre une "disquette" à coté du bouton "save" cela me fait toujours sourire...
+J'ai donc décidé de faire un petit florilège des icônes obsolètes qu'on utilise toujours et qui ne parle plus aux nouvelles générations, mais qu'on utilise toujours un peu partout.
+
+== Le top 5 des icônes du passé
+
+=== Enregistrer
+
+image::/public/images/icones/floppy.png[width=100]
+
+Mais pourquoi c'est encore une disquette !
+Cela fait 10 ans que je n'ai même plus un lecteur de disquette sur mon ordinateur, et au moins 15 que je les utilise plus.
+
+=== Le téléphone
+
+image::/public/images/icones/phone.jpg[width=200]
+
+Là on retrouve plusieurs variantes :
+
+Le téléphone avec le cadran qu'on tourne. Cela date quand même de l'époque de ma grand-mère, faudrait penser à passer à autre chose.
+Le combiné de téléphone qu'on retrouvait dans les cabines téléphoniques. Depuis combien de temps vous n'avez pas utilisé voir croisé une cabine téléphonique ?
+Le téléphone portable avec l'antenne qui dépasse en haut à gauche. Là aussi cela à plus de dix ans ... (coucou itinéris, hola, ...)
+Bon après représenter une brique noire sans touche, c'est pas simple ...
+
+=== La touche répondeur
+
+image::/public/images/icones/repondeur.png[width=100]
+
+Qui a connu les répondeurs à cassettes ? Il n'y a que dans les films des années 80 qu'on voit ça.
+
+=== La télévision
+
+image::/public/images/icones/television.jpg[width=500]
+
+Vous avez toujours une antenne sur votre télévision ?
+
+=== La touche vérouiller
+
+image::/public/images/icones/key.png[width=100]
+
+On voit encore souvent une bonne clef à l'ancienne comme symbole pour vérouiller le clavier de son téléphone ou autre.
+Personnellement j'en ai plus des comme ça depuis longtemps. Toutefois, je pense que ce symbole peut encore marcher, même s'il est voué à disparaitre. Il vaut mieux préférer un cadena ou prendre une clef récente.
+
+=== Et bien d'autres ...
+
+Que dire du "porte document", des banettes pour les dossiers,  de la caméra/pellicule pour les films, du micro datant d'une autre époque, du presse-papier, du termomètre à mercure pour la température ...
+
+== En résumé
+
+Je sais bien que réaliser des icônes n'est pas chose aisé, il faut qu'elles soient épurées et reconnaissables du premier coup.
+Toutefois, je pense qu'il est nécessaire de les faire évoluer pour que cela représente la réalité. Sinon cela n'est plus une icône, c'est à dire  une représentation de quelque chose, mais tout simplement un symbole, qui n'a que de sens que celui qu'on veut bien lui donner.
+
+=== Coup de gueule perso
+
+Dans le même genre, si un jour je tiens celui qui a créé l'icône "wifi", il passera un mauvais 1/4 d'heure. C'est quasiment la même que celle pour le volume, mais à la verticale. Il est fréquent que je me trompe, d'autant plus que j'ai aussi une icône RSS dans mon systemtray ...
