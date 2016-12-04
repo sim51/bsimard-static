@@ -2,13 +2,9 @@
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-lang: en
-:page-description: In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.
+:page-description: This project aims to create a referencial of all the lego sets, with theirs pieces based on Neo4j. So after, if you have a partial set, you will know wich piece to search to have a complete one.
 :page-image: /public/images/lego/banner.png
 :page-tags: neo4j, load csv, lego
-:customer: Perso
-:project: lego
-:neo4j-version: 3.0
-:description: This project aims to create a referencial of all the lego sets, with theirs pieces based on Neo4j. So after, if you have a partial set, you will know wich piece to search to have a complete one.
 :toc:
 
 == Description
