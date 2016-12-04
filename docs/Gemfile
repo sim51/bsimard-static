@@ -25,6 +25,7 @@ gem "therubyracer"
 
 group :jekyll_plugins do
   gem 'jekyll-less', github: 'sfi0zy/jekyll-less'
+  gem 'asciidoctor-diagram', '~> 1.4.0'
   gem 'jekyll-asciidoc'
   gem 'jekyll-paginate-v2'
 end

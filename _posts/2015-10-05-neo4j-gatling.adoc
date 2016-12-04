@@ -5,8 +5,7 @@ Benoit Simard <contact@bsimard.com>
 :page-description: Dans cet article nous allons voir comment créer simplement des tests de performance sur Neo4j en utilisant Gatling et les logs HTTP.
 :page-image: /public/images/neo4j-gatling/banner.png
 :page-tags: neo4j, gatling, stress-tool
-:toc: right
-
+:toc:
 
 == La création des scenarii
 

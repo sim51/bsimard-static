@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
   <head>
-  <title>Connecting Neo4j to any SQL tool with the power of Postgresql</title>
+  <title>Neo4j Pg Fdw</title>
   <meta charset="UTF-8">
-  <meta name="author" content="Benoit Simard"/>
+  <meta name="author" content=""/>
   <meta name="robots" content="index, follow" />
-  <meta name="description" content="Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j." />
-  <meta name="keywords" content="neo4j, postgresql, foreign data wrapper" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
@@ -52,37 +52,23 @@
       <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
         <div class="span12">
           <header>
-            <h1 itemprop="name"> Connecting Neo4j to any SQL tool with the power of Postgresql</h1>
-            <meta itemprop="description" content=" Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.">
-            <img itemprop="image" src="/public/images/pg-fdw/banner.png"/>
+            <h1 itemprop="name"> Neo4j Pg Fdw</h1>
+            <meta itemprop="description" content=" ">
+            <img itemprop="image" src=""/>
           </header>
           <section itemprop="articleBody">
-            <div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#implement-a-neo4j-foreign-data-wrapper">Implement A neo4j foreign data wrapper</a></li>
-<li><a href="#install-multicorn">Install Multicorn</a>
-<ul class="sectlevel2">
-<li><a href="#requirements">Requirements</a></li>
-<li><a href="#installing-multicorn-from-source">Installing Multicorn from source</a></li>
-<li><a href="#neo4j-fwd">Neo4j FWD</a></li>
-</ul>
-</li>
-<li><a href="#how-to-use-neo4j-foreign-data-wrapper">How to use Neo4j Foreign Data Wrapper</a></li>
-<li><a href="#make-cypher-query-into-a-sql-select">Make cypher query into a sql select</a>
-<ul class="sectlevel2">
-<li><a href="#create-the-function-into-your-database">Create the function into your database</a></li>
-<li><a href="#how-to-use-it">How to use it</a></li>
-<li><a href="#the-power-of-pg-json">The power of PG &amp; JSON</a></li>
-</ul>
-</li>
-<li><a href="#annexe">Annexe</a>
-<ul class="sectlevel2">
-<li><a href="#some-usefull-links">Some usefull links</a></li>
-<li><a href="#install-postgresql-9-4-for-wheezy">Install postgresql 9.4 for wheezy</a></li>
-</ul>
-</li>
-</ul>
+            <div class="literalblock">
+<div class="content">
+<pre> Connecting Neo4j to any SQL tool with the power of Postgresql
+Benoit Simard &lt;contact@bsimard.com&gt;
+:page-layout: post
+:page-lang: en
+:page-description: Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.
+:page-disqusid: Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
+:page-image: /public/images/pg-fdw/banner.png
+:page-tags: neo4j, postgresql, foreign data wrapper
+:toc:</pre>
+</div>
 </div>
 <div class="sect1">
 <h2 id="implement-a-neo4j-foreign-data-wrapper">Implement A neo4j foreign data wrapper</h2>
@@ -501,20 +487,20 @@ $&gt; apt-get install postgresql-9.4</code></pre>
               <li >
                 <span class="metadata">Tags :</span>
                 <span>
-                  neo4j, postgresql, foreign data wrapper
+                  
                 </span>,
               </li>
               <li >
                 <span class="metadata">Auteur :</span>
                 <span>
-                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author"></a>
                 </span>,
               </li>
               <li>
                 <span class="metadata">Créé le :</span>
                 <time itemprop="dateCreated" datetime="2015-06-04">Jun 4, 2015</time>
               </li>
-              <li><a href="" title="Permalien : Connecting Neo4j to any SQL tool with the power of Postgresql" itemprop="url">Permalien</a></li>
+              <li><a href="" title="Permalien : Neo4j Pg Fdw" itemprop="url">Permalien</a></li>
             </ul>
           </footer>
         </div>
@@ -608,7 +594,7 @@ $&gt; apt-get install postgresql-9.4</code></pre>
   
   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
   var disqus_shortname = 'bsimard';
-  var disqus_identifier = 'Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql';
+  var disqus_identifier = '/2015/06/04/neo4j-pg-fdw';
 
   /* * * DON'T EDIT BELOW THIS LINE * * */
   (function() {

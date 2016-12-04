@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <head>
+  <title>Lego Project</title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Benoit Simard"/>
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop." />
+  <meta name="keywords" content="neo4j, load csv, lego" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+  <!-- RSS feed -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav">
+                  <li><a href="/" title="Home">Home</a></li>
+                  <li><a href="/blog" title="Blog">Blog</a></li>
+                  <li><a href="/about-me.html" title="About me">About me</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <main class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Lego Project</h1>
+            <meta itemprop="description" content=" In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.">
+            <img itemprop="image" src="/public/images/lego/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#description">Description</a></li>
+<li><a href="#meta-graph">Meta-graph</a></li>
+<li><a href="#import-database">Import database</a>
+<ul class="sectlevel2">
+<li><a href="#schema-definition">Schema definition</a></li>
+<li><a href="#the-import-scripts">The import scripts</a></li>
+</ul>
+</li>
+<li><a href="#some-queries">Some queries</a>
+<ul class="sectlevel2">
+<li><a href="#piece-queries">Piece queries</a></li>
+<li><a href="#set-queries">Set queries</a></li>
+<li><a href="#give-me-some-pieces-and-i-will-construct-the-world">Give me some pieces and I will construct the world</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="description">Description</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This project aims to create a referencial of all the lego sets, with theirs pieces.
+So after, if you have a partial set, you will know wich piece to search to have a complete one.</p>
+</div>
+<div class="paragraph">
+<p>All the information comes from the website rebrickable.com, where you can download all the lego information under a CC-BY-SA : <a href="http://rebrickable.com/downloads" class="bare">http://rebrickable.com/downloads</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="meta-graph">Meta-graph</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-3d1914a5743da3d6d46673f3053ee94d.png" alt="diag 3d1914a5743da3d6d46673f3053ee94d" width="1217" height="287">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import-database">Import database</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The dataset is composed of 4 files :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>colors.csv</strong> : <code>id,descr</code></p>
+</li>
+<li>
+<p><strong>pieces.csv</strong> : <code>piece_id,descr,category</code></p>
+</li>
+<li>
+<p><strong>sets.csv</strong> : <code>set_id,year,pieces,t1,t2,t3,descr</code></p>
+</li>
+<li>
+<p><strong>set_pieces.csv</strong> : <code>set_id,piece_id,num,color,type</code> (type : 1=normal, 2=spare)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Just put those files into <code>NEO4J_HOME/import</code> folder.</p>
+</div>
+<div class="sect2">
+<h3 id="schema-definition">Schema definition</h3>
+<div class="sect3">
+<h4 id="constraints">Constraints</h4>
+<div class="paragraph">
+<p>Execute those commands with <code>NEO4J_HOME/bin/neo4j-shell</code> tools :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE CONSTRAINT ON (n:PieceCategory) ASSERT n.name IS UNIQUE;
+CREATE CONSTRAINT ON (n:Color) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Set) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:PieceType) ASSERT n.id IS UNIQUE;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="indexes">Indexes</h4>
+<div class="paragraph">
+<p>Execute those command with <code>NEO4J_HOME/bin/neo4j-shell</code> tools :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE INDEX ON :Set(name);
+CREATE INDEX ON :PieceType(name);
+CREATE INDEX ON :Color(name);
+CREATE INDEX ON :Theme(name);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-import-scripts">The import scripts</h3>
+<div class="paragraph">
+<p>You can execute those scripts one at a time into the browser (<code><a href="http://localhost:7474/browser" class="bare">http://localhost:7474/browser</a></code>) or via the <code>neo4j-shell</code> tool.</p>
+</div>
+<div class="sect3">
+<h4 id="colors">Colors</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM 'file:///colors.csv' AS row
+  CREATE (c:Color { id:row.id, name:row.descr });</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="pieces-type">Pieces Type</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM 'file:///pieces.csv' AS row
+  CREATE (pt:PieceType { id:row.piece_id, name:row.descr })
+  MERGE (c:PieceCategory { name:row.category })
+  CREATE UNIQUE (pt)-[:HAS_CATEGORY]-&gt;(c);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="sets">Sets</h4>
+<div class="paragraph">
+<p>Firstly, we create the <code>RootTheme</code> node :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE (:RootTheme);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we import the <code>sets.csv</code> files :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM 'file:///sets.csv' AS row
+  MATCH (rt:RootTheme)
+
+  CREATE (s:Set { id:row.set_id, name:row.descr, year:toInt(row.year), nbPieces:0})
+
+  MERGE (rt)-[:HAS_CHILD]-&gt;(t1:Theme { name: coalesce(row.t1, '@@')})
+  MERGE (t1)-[:HAS_CHILD]-&gt;(t2:Theme { name: coalesce(row.t2, '@@')})
+  MERGE (t2)-[:HAS_CHILD]-&gt;(t3:Theme { name: coalesce(row.t3, '@@')})
+
+  CREATE (s)-[:HAS_THEME]-&gt;(t3);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that sometimes t1, t2 &amp; t3 can be <code>null</code>, so in the above script we make some trick to import them with some dummy value.
+But this mean that after the execution, we have some clean-up todo :</p>
+</div>
+<div class="sect4">
+<h5 id="clean-up-level-3">Clean-up level 3</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (rt:RootTheme)-[:HAS_CHILD]-&gt;(t1:Theme)-[:HAS_CHILD]-&gt;(t2:Theme)-[:HAS_CHILD]-&gt;(t3:Theme)
+WHERE t3.name CONTAINS '@@'
+WITH t2, t3
+  MATCH (t3)&lt;-[r:HAS_THEME]-(s:Set)
+  DELETE r
+  CREATE (t2)&lt;-[:HAS_THEME]-(s);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="clean-up-level-2">Clean-up level 2</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (rt:RootTheme)-[:HAS_CHILD]-&gt;(t1:Theme)-[:HAS_CHILD]-&gt;(t2:Theme)
+WHERE t2.name CONTAINS '@@'
+WITH t1, t2
+  MATCH (t2)&lt;-[r:HAS_THEME]-(s:Set)
+  DELETE r
+  CREATE (t1)&lt;-[:HAS_THEME]-(s);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="delete-orphelan-theme-node">Delete orphelan theme node</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (t:Theme)
+WHERE
+  size((t)-[:HAS_CHILD]-&gt;()) = 0 AND
+  size((t)&lt;-[:HAS_THEME]-(:Set)) = 0
+WITH t
+  DETACH DELETE t;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="sets-pieces">Sets pieces</h4>
+<div class="paragraph">
+<p>To have better performances, we split the script into three parts :</p>
+</div>
+<div class="paragraph">
+<p>The creation of the <code>Piece</code> node (unique per type and color):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
+  MATCH (pt:PieceType {id:row.piece_id})
+  MATCH (c:Color {id:row.color})
+  WITH pt, collect(DISTINCT c) AS colors
+    WITH pt, colors
+      UNWIND colors AS color
+        CREATE (p:Piece)
+        CREATE (p)-[:IS_TYPE_OF]-&gt;(pt)
+        CREATE (p)-[:HAS_COLOR]-&gt;(color);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the link between the <code>Set</code> and its <code>Piece</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
+WITH row WHERE row.type = '1'
+
+  MATCH (s:Set {id:row.set_id})
+  MATCH (:Color {id:row.color})&lt;-[:HAS_COLOR]-(p:Piece)-[:IS_TYPE_OF]-&gt;(:PieceType {id:row.piece_id})
+
+  CREATE (s)-[r:IS_COMPOSED_OF {occurrence:toInt(row.num)}]-&gt;(p)
+
+  SET s.nbPieces = s.nbPieces + toInt(row.num);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Merge the link between the <code>Set</code> and <code>Piece</code> for spare pieces :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">USING PERIODIC COMMIT 10000
+LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
+WITH row WHERE row.type = '2'
+
+  MATCH (:Set {id:row.set_id})-[r:IS_COMPOSED_OF]-&gt;(p:Piece),
+        (:Color {id:row.color})&lt;-[:HAS_COLOR]-(p)-[:IS_TYPE_OF]-&gt;(:PieceType {id:row.piece_id})
+
+  SET r.spare = toInt(row.num);</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="some-queries">Some queries</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="piece-queries">Piece queries</h3>
+<div class="sect3">
+<h4 id="number-of-piece-type">Number of piece type</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (pt:PieceType)
+RETURN count(pt) AS nbPieceType;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="number-of-piece">Number of piece</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (p:Piece)
+RETURN count(p) AS nbPiece;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="number-of-pieces-type-per-category">Number of pieces type per category</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (p:PieceType)-[:HAS_CATEGORY]-&gt;(c:PieceCategory)
+RETURN c.name AS category, count(p) AS count
+ORDER BY category ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="get-piece-type-info">Get piece type info</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (c:Color)&lt;-[:HAS_COLOR]-(:Piece)-[:IS_TYPE_OF]-&gt;(pt:PieceType {name:"Technic Beam 1 x 11 Thick" })-[:HAS_CATEGORY]-&gt;(c:PieceCategory)
+RETURN pt.name AS name, c.name AS category, COLLECT(c.name) AS colors;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="fabrications-years-of-a-piece">Fabrications years of a piece</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Set)-[:IS_COMPOSED_OF]-&gt;(:Piece)-[:IS_TYPE_OF]-&gt;(:PieceType {name:"Technic Beam 1 x 11 Thick" })
+RETURN DISTINCT s.year AS year  ORDER BY year ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="colors-available-for-a-piece-type">Colors available for a piece type</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (p:Piece)-[:IS_TYPE_OF]-&gt;(pt:PieceType {name:"Technic Beam 1 x 11 Thick" }),
+      (p)-[:HAS_COLOR]-&gt;(c:Color)
+RETURN DISTINCT c.name AS color
+ORDER BY color ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="list-of-set-where-a-piece-type-appears-by-year">List of set where a piece type appears by year</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Set)-[:IS_COMPOSED_OF]-&gt;(:Piece)-[:IS_TYPE_OF]-&gt;(:PieceType {name:"Technic Beam 1 x 11 Thick" })
+RETURN DISTINCT s.name AS set, s.year AS year
+ORDER BY year DESC, set ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="list-of-set-where-piece-appears-with-its-number-of-occurrence">List of set where piece appears with its number of occurrence</h4>
+<div class="paragraph">
+<p>This query can be usefull if you have a missing piece and you want to search a partial set where it&#8217;s frequent to find it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Set)-[r:IS_COMPOSED_OF]-&gt;(p:Piece),
+      (p)-[:IS_TYPE_OF]-&gt;(:PieceType {name:"Technic Beam 1 x 11 Thick" }),
+      (p)-[:HAS_COLOR]-&gt;(:Color { name:"Black"})
+RETURN s AS set, r.occurrence AS occurrence
+ORDER BY occurrence DESC, set.name ASC;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="set-queries">Set queries</h3>
+<div class="sect3">
+<h4 id="number-of-sets">Number of sets</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Set)
+RETURN count(*) AS nbSet;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="number-of-set-per-top-theme">Number of set per top-theme</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (:RootTheme)-[:HAS_CHILD]-&gt;(t),
+      (t)-[:HAS_CHILD*]-&gt;(st)-[:HAS_THEME]-(s:Set)
+RETURN t.name AS name, count(s)+ size((t)&lt;-[:HAS_THEME]-(:Set)) AS count
+ORDER BY name ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="number-of-set-per-year">Number of set per year</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Set)
+RETURN s.year AS year, count(s)
+ORDER BY year ASC;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="is-there-some-sub-set-of-a-set">Is there some sub-set of a set ?</h4>
+<div class="paragraph">
+<p>Can I do an other (sub)set with a set ?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s1:Set)-[r1:IS_COMPOSED_OF]-&gt;(p:Piece)&lt;-[r2:IS_COMPOSED_OF]-(s2:Set)
+WHERE s1.name = "The Kwik-E-Mart" AND
+      r2.occurrence &lt;= (r1.occurrence + coalesce(r1.spare, 0))
+WITH s1, s2, collect(id(p)) AS pieces
+  WHERE size(pieces) = size((s2)-[:IS_COMPOSED_OF]-&gt;(:Piece))
+  RETURN s2.name;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="give-me-some-pieces-and-i-will-construct-the-world">Give me some pieces and I will construct the world</h3>
+<div class="sect3">
+<h4 id="initialize-piece-set-for-a-person">Initialize piece set for a person</h4>
+<div class="paragraph">
+<p>Here we will create a user node, and attach to it the list of its pieces.</p>
+</div>
+<div class="paragraph">
+<p>Firstly we will create a new constraint based on user email address :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE CONSTRAINT ON (n:Person) ASSERT n.email IS UNIQUE;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then we create the user :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE (me:Person { name:'Simard', firstname:'Benoit', email:'benoit@lego.com'});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the example, let&#8217;s consider that Benoit has all the piece to make the <code>Taj Mahal</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (me:Person {email:'benoit@lego.com'}),
+      (s:Set)-[r:IS_COMPOSED_OF]-&gt;(p:Piece)
+WHERE s.name = 'Taj Mahal'
+WITH me, r.occurrence AS nb, p
+        CREATE (me)-[:HAS_PIECE {occurrence:nb}]-&gt;(p);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="give-me-all-sets-that-can-i-do">Give me all sets that can I do</h4>
+<div class="paragraph">
+<p>With a given number of piece (type and number), what set can I do ?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">// look at piece in common where user have enought number of pieces
+MATCH (me:Person {email:'benoit@lego.com'})-[r:HAS_PIECE]-&gt;(p:Piece)&lt;-[r2:IS_COMPOSED_OF]-(s:Set)
+WHERE r2.occurrence &lt;= r.occurrence
+WITH s, count(p) AS nbPiecesType
+  // we look if the set is complete
+  WHERE nbPiecesType = size((s)-[:IS_COMPOSED_OF]-&gt;(:Piece))
+  RETURN s;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="give-me-all-sets-that-can-pretty-much-do">Give me all sets that can pretty much do</h4>
+<div class="paragraph">
+<p>With a given number of piece (type and number), what set can I pretty much do (missing at max 10% of pieces type) ?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (me:Person {email:'benoit@lego.com'}),
+      (s:Set)-[r:IS_COMPOSED_OF]-&gt;(p:Piece)
+OPTIONAL MATCH (me)-[r2:HAS_PIECE]-&gt;(p)
+WITH s,
+     p,
+     CASE
+       WHEN (r2.occurrence - r.occurrence) IS null THEN r.occurrence
+       WHEN (r2.occurrence - r.occurrence) &lt; 0 THEN (r.occurrence - r2.occurrence)
+       ELSE 0
+     END AS missing
+     WITH s, sum(missing) AS nbMissingPieces
+       WHERE nbMissingPieces &gt; 0 AND
+             (nbMissingPieces/toFloat(s.nbPieces) &lt; 0.1
+       RETURN s, nbMissingPieces
+       ORDER BY nbMissingPieces ASC;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  neo4j, load csv, lego
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2016-12-04">Dec 4, 2016</time>
+              </li>
+              <li><a href="" title="Permalien : Lego Project" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2016/01/04/neo4j-jrebel.html" title="How to use JRebel with Neo4j">&lt; How to use JRebel with Neo4j</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </main>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte Github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2016/12/04/lego-project';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+</body>
+</html>

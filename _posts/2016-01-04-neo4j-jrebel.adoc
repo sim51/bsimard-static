@@ -6,7 +6,7 @@ Benoit Simard <contact@bsimard.com>
 :page-image: /public/images/jrebel/banner.png
 :page-disqusid: How-to-use-JRebel-with-Neo4j
 :page-tags: neo4j, jrebel
-:toc: right
+:toc:
 
 In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.
 

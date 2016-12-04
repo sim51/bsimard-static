@@ -6,7 +6,7 @@ Benoit Simard <contact@bsimard.com>
 :page-disqusid: Comment-SolR-decoupe-vos-phrases
 :page-image: /public/images/solr/banner.jpg
 :page-tags: solr, lucene, full text search
-:toc: right
+:toc:
 
 == Le traitement du texte et des mots
 

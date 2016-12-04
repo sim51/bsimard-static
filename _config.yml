@@ -23,3 +23,10 @@ pagination:
   # How many objects per paginated page, used to be `paginate` (default: 0, means all)
   per_page: 5
 ############################################################
+
+keep_files: [public/images/diag]
+asciidoctor:
+  base_dir: :docdir
+  safe: unsafe
+  attributes:
+    imagesdir: /public/images/diag

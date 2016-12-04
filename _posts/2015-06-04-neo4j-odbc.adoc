@@ -6,7 +6,7 @@ Benoit Simard <contact@bsimard.com>
 :page-disqusid: How-to-communicate-with-Neo4j-throw-ODBC
 :page-image: /public/images/odbc/banner.png
 :page-tags: neo4j, odbc, jdbc
-:toc: right
+:toc:
 
 == Market solutions
 
