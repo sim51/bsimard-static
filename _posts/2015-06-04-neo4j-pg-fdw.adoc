@@ -4,6 +4,7 @@ Benoit Simard <contact@bsimard.com>
 :page-lang: en
 :page-description: Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.
 :page-disqusid: Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
+:page-permalink: /Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
 :page-image: /public/images/pg-fdw/banner.png
 :page-tags: neo4j, postgresql, foreign data wrapper
 :toc:

@@ -4,6 +4,7 @@ Benoit Simard <contact@bsimard.com>
 :page-lang: en
 :page-description: Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr
 :page-disqusid: Comment-SolR-decoupe-vos-phrases
+:page-permalink: /Comment-SolR-decoupe-vos-phrases
 :page-image: /public/images/solr/banner.jpg
 :page-tags: solr, lucene, full text search
 :toc:

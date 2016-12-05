@@ -5,8 +5,8 @@
     <description>Site de Benoit Simard</description>
     <link>http://www.bsimard.com//</link>
     <atom:link href="http://www.bsimard.com//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 05 Dec 2016 00:41:13 +0100</pubDate>
-    <lastBuildDate>Mon, 05 Dec 2016 00:41:13 +0100</lastBuildDate>
+    <pubDate>Mon, 05 Dec 2016 01:16:17 +0100</pubDate>
+    <lastBuildDate>Mon, 05 Dec 2016 01:16:17 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -763,8 +763,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2016/01/04/neo4j-jrebel.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2016/01/04/neo4j-jrebel.html</guid>
+        <link>http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</link>
+        <guid isPermaLink="true">http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</guid>
         
         <category>neo4j, jrebel</category>
         
@@ -894,8 +894,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2015/11/05/les-icones-du-passee.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/11/05/les-icones-du-passee.html</guid>
+        <link>http://www.bsimard.com//Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1185,8 +1185,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/10/05/neo4j-gatling.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/10/05/neo4j-gatling.html</guid>
+        <link>http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
@@ -1497,8 +1497,8 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/07/14/solr.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/07/14/solr.html</guid>
+        <link>http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</guid>
         
         <category>solr, lucene, full text search</category>
         
@@ -1515,6 +1515,7 @@ Benoit Simard &amp;lt;contact@bsimard.com&amp;gt;
 :page-lang: en
 :page-description: Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.
 :page-disqusid: Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
+:page-permalink: /Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
 :page-image: /public/images/pg-fdw/banner.png
 :page-tags: neo4j, postgresql, foreign data wrapper
 :toc:&lt;/pre&gt;
@@ -2312,8 +2313,8 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essaye
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2014/02/18/point-collecte.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2014/02/18/point-collecte.html</guid>
+        <link>http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</link>
+        <guid isPermaLink="true">http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</guid>
         
         <category>opendata, osm</category>
         
