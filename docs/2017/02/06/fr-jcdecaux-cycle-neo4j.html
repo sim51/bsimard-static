@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <title>Import JCDecaux dataset into Neo4j</title>
+  <title>Importer de l&#8217;API opendata de JCDécaux dans Neo4j</title>
 <meta charset="UTF-8">
 <meta name="author" content="Benoit Simard"/>
 <meta name="robots" content="index, follow" />
-<meta name="description" content="A small tutorial on how to model, load and query some data, based on the opendata API from JCDecaux." />
+<meta name="description" content="A travers de l'utlisation de l'API de JCDecaux, vous allez voir comment modéliser en graph, charger les données et faire quelque reqûetes Cypher." />
 <meta name="keywords" content="opendata, jcdecaux, neo4j" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +30,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/en" title="Benoît Simard">
+            <a class="brand" href="/" title="Benoît Simard">
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
@@ -38,11 +38,15 @@
                   
                   
                     
-                      <li><a href="/en/" title="Home">Home</a></li>
+                      <li><a href="/" title="Accueil">Accueil</a></li>
                     
                   
                     
-                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
                     
                   
                 </ul>
@@ -70,8 +74,8 @@
       <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
         <div class="span12">
           <header>
-            <h1 itemprop="name"> Import JCDecaux dataset into Neo4j</h1>
-            <meta itemprop="description" content=" A small tutorial on how to model, load and query some data, based on the opendata API from JCDecaux.">
+            <h1 itemprop="name"> Importer de l&#8217;API opendata de JCDécaux dans Neo4j</h1>
+            <meta itemprop="description" content=" A travers de l'utlisation de l'API de JCDecaux, vous allez voir comment modéliser en graph, charger les données et faire quelque reqûetes Cypher.">
             <img itemprop="image" src="/public/images/neo4j-bicloo/banner.jpg"/>
           </header>
           <section itemprop="articleBody">
@@ -79,40 +83,40 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#goals">Goals</a></li>
-<li><a href="#jcdecaux-model">JCDecaux model</a></li>
-<li><a href="#imports">Imports</a>
+<li><a href="#le-modèle-de-jcdecaux">Le modèle de JCDecaux</a></li>
+<li><a href="#l-import">L&#8217;import</a>
 <ul class="sectlevel2">
-<li><a href="#constraints">Constraints</a></li>
-<li><a href="#importing-all-contracts">Importing all contracts</a></li>
-<li><a href="#importing-station-with-their-state">Importing station with their state</a></li>
+<li><a href="#les-contraintes">Les contraintes</a></li>
+<li><a href="#import-des-contrats">Import des contrats</a></li>
+<li><a href="#importer-les-stations-et-leur-état">Importer les stations et leur état</a></li>
 </ul>
 </li>
-<li><a href="#some-cool-stuff">Some cool stuff</a></li>
+<li><a href="#amusons-nous-maintenant">Amusons-nous maintenant !</a></li>
 </ul>
 </div>
 <div class="sect1">
 <h2 id="goals">Goals</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>During this post, we will play with the opendata JCDecaux API.
-I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.</p>
+<p>Durant ce billet, nous allons nous amuser avec l&#8217;API opendata de JCDécaux sur les bicloo (ou vélib si vous préférez), et Neo4j.
+Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l&#8217;API JSON, faire quelques requête Cypher pour finir sur l&#8217;tuilisation du driver JS afin de créer une petite application web.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s start !</p>
+<p>C&#8217;est parti !</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="jcdecaux-model">JCDecaux model</h2>
+<h2 id="le-modèle-de-jcdecaux">Le modèle de JCDecaux</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
+<p>JCDecaux fournit une APIpour les informations sur leur services de vélos. La documentation est disponible ici : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
 </div>
 <div class="paragraph">
-<p>INFO: you need to create an API key to use the API. On my examplesm you should replace the <code>@JCD_TOKEN_API@</code> by your own.</p>
+<p>INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer <code>@JCD_TOKEN_API@</code> par la votre.</p>
 </div>
 <div class="paragraph">
-<p>By reading the <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">real-time API documentation</a>, we can compute that JCD is using the following schema :</p>
+<p>En lisant <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">la document 'real-time'</a>, on peut en définir que JCD utilise le mod̀le sivant :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -120,23 +124,23 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 </div>
 </div>
 <div class="paragraph">
-<p>So we have two entities, related together : it&#8217;s a graph ! But can we do a better graph modelisation ?</p>
+<p>Il y a deux entitées, liées ensemble : c&#8217;est le début d&#8217;un graphe ! Mais on peut faire mieux &#8230;&#8203;</p>
 </div>
 <div class="paragraph">
-<p>If you look at the <code>Contract</code> entity, you can see :</p>
+<p>Si on regarde l&#8217;entité <code>Contact</code>, on voit :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>a dependency to a country</p>
+<p>une dépendance à un pays</p>
 </li>
 <li>
-<p>a list of cities</p>
+<p>une liste de ville</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>So let&#8217;s explode this entity like this :</p>
+<p>Donc explosons ce noeud !</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -144,15 +148,15 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 </div>
 </div>
 <div class="paragraph">
-<p>And what can we do about the <code>Station</code> entity ? It&#8217;s easy we can split it into two parts :</p>
+<p>Et si on regardait à présent le noeud <code>Station</code> ? Il est facile de voir qu&#8217;on peut le séparer en deux</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>The station</p>
+<p>les données statiques</p>
 </li>
 <li>
-<p>The State of the station (ie. ephemeral data)</p>
+<p>les données éphémères</p>
 </li>
 </ul>
 </div>
@@ -162,8 +166,8 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 </div>
 </div>
 <div class="paragraph">
-<p>And what if I want to keep the state history ?
-So let&#8217;s create a chain of <code>State</code> nodes.</p>
+<p>Mais que fait-on si on a envie de garder l&#8217;historique des données ?
+Et bien il suffit de créer une chaine de noeud <code>State</code>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -171,10 +175,10 @@ So let&#8217;s create a chain of <code>State</code> nodes.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.</p>
+<p>J&#8217;ai choisi cette modélisation car mon principal objectif est d&#8217;obtenir les derniéres données (ie. l&#8217;état courant de la station). Avec ce système je n&#8217;ai qu&#8217;a traverser une seule relation, et je garde l&#8217;historique.</p>
 </div>
 <div class="paragraph">
-<p>So the final schema looks like that :</p>
+<p>Donc mon schéma finale reseemble à cela :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -182,17 +186,21 @@ So let&#8217;s create a chain of <code>State</code> nodes.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now that we have our model, let see how to load the data.</p>
+<p>Now that we have our model, let see how to load the data.
+A présent que nous avons notre modèle, passons à l&#8217;étape d&#8217;import.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="imports">Imports</h2>
+<h2 id="l-import">L&#8217;import</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="constraints">Constraints</h3>
+<h3 id="les-contraintes">Les contraintes</h3>
 <div class="paragraph">
-<p>Firstly we have to declare the constraints of our model, we all the unique keys :</p>
+<p>Dans Neo4j nous pouvons créer des contraintes d&#8217;unicité, ce qui permet d&#8217;accélérer d&#8217;une part de s&#8217;assurer de la cohérence de nos données, mais aussi aqccélère la recherche d&#8217;un noeud via son identifiant.</p>
+</div>
+<div class="paragraph">
+<p>Ceci va être utile pour la phase d&#8217;import pour s&#8217;assurer qu&#8217;on ne crée pas deux fois le même noeud.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -211,8 +219,8 @@ CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can note here, that we haven&#8217;t create a constraint on cities. This just due because two countries can have the same city name.
-But we can create an index on it if we want to speed up our queries that are based on this field</p>
+<p>Il est a noter qu&#8217;ici je n&#8217;ai pas crée de contrainte sur les villes. C&#8217;est juste parceque deux pays peuvent avoir une ville avec le même nom.
+Mais si on veut on peut créer un index dessus, pour accélérer nos recherches de ville per leur nom .</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -221,9 +229,12 @@ But we can create an index on it if we want to speed up our queries that are bas
 </div>
 </div>
 <div class="sect2">
-<h3 id="importing-all-contracts">Importing all contracts</h3>
+<h3 id="import-des-contrats">Import des contrats</h3>
 <div class="paragraph">
-<p>We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code></p>
+<p>La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>Et voici la requête :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -239,9 +250,15 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </div>
 </div>
 <div class="sect2">
-<h3 id="importing-station-with-their-state">Importing station with their state</h3>
+<h3 id="importer-les-stations-et-leur-état">Importer les stations et leur état</h3>
 <div class="paragraph">
-<p>Now we are going to create stations with their data, for all contract, with the help of this endpoint : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
+<p>Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
+</div>
+<div class="paragraph">
+<p>`@contract_name@ ` doit simplement être remplacé par le nom commerciale du contrat afin d&#8217;obtenir la liste des stations.</p>
+</div>
+<div class="paragraph">
+<p>Voici la requête :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -283,33 +300,32 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </div>
 </div>
 <div class="paragraph">
-<p>First instruction is <code>apoc.periodic.iterate</code>. It&#8217;s a APOC procedure that takes 3 parameters:</p>
+<p>La première instruction est <code>apoc.periodic.iterate</code>. Il s&#8217;agit d&#8217;une procédure stockée qui prend 3 paramêtre :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A cypher query that give a first collection of results</p>
+<p>Une requête cyphe qui permet d&#8217;obtenir une première collection de résultat</p>
 </li>
 <li>
-<p>An other cypher query that will be applied on each result from the first one</p>
+<p>Une autre requête qui va s&#8217;appliquer sur chacun des résultats de la première</p>
 </li>
 <li>
-<p>Some configurations, here <code>{batchSize:1,parallel:true}</code></p>
+<p>De la configuration (ici <code>{batchSize:1,parallel:true}</code>)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Basically, it&#8217;s the same as a <code>WITH</code> (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.</p>
+<p>Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&#8217;itération sur la première), et de parallélisation.</p>
 </div>
 <div class="paragraph">
-<p>So here, I&#8217;m just creating one job per <code>Contract</code>, to create all the corresponding <code>Station</code> with theirs <code>State</code>.</p>
+<p>Donc ici je crée juste un job par <code>Contrat</code> pour crée ses stations.
+la
+Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&#8217;état des stations, vu que j&#8217;utilise l&#8217;instruction <code>MERGE</code>.
+Dans ce but, il suffit de créer un <code>cron</code> job, ou encore d&#8217;utiliser la procedure <code>apoc.periodic.repeat</code> procedure (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).</p>
 </div>
 <div class="paragraph">
-<p>You can replay this script every 5 minutes, to update the state of each station.
-To do this you can create a <code>cron</code> task, or you also can use the <code>apoc.periodic.repeat</code> procedure (Job are not persisted, so you will have to re-create it after each restart of neo4j).</p>
-</div>
-<div class="paragraph">
-<p>At the end you should have a graph like this</p>
+<p>Si vous avez bien suivi les étapes, vous devriez avoir un graph ressemblant à cela :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -320,10 +336,10 @@ To do this you can create a <code>cron</code> task, or you also can use the <cod
 </div>
 </div>
 <div class="sect1">
-<h2 id="some-cool-stuff">Some cool stuff</h2>
+<h2 id="amusons-nous-maintenant">Amusons-nous maintenant !</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now that we have the data, we can ask to the database, what is the nearest station from me with an available bike :</p>
+<p>Maintenant que nous avons une base opérationnelle avec les donnéesm pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -336,20 +352,20 @@ LIMIT 5</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see I&#8217;m using two new functions of Neo4j 3.1 :</p>
+<p>J&#8217;utilise deux nouvelles fonctions de Neo4j 3.1 :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>point( { latitude: XXX, longitude: XXX} ) :</strong> allow you to create a geospatial point in WGS-83 projection</p>
+<p><strong>point( { latitude: XXX, longitude: XXX} ) :</strong> permets de créer un point geospatial avec la projection WGS-83.</p>
 </li>
 <li>
-<p><strong>distance( point, point) :</strong> will returned the geodesic distance between the two points.</p>
+<p><strong>distance( point, point) :</strong> retourne la distance géodésique entre deux points.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>We can have a better performances, if we create those two indexes :</p>
+<p>C&#8217;est bien, mais nous pouvons avoir de meilleur performances en créant ces deux indexes (je vous laisse faire les EXPLAIN des requête avant et après) :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -358,8 +374,8 @@ CREATE INDEX ON :State(status);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>And what if we display this result directly on a map ?
-Nothing easier, Cypher can produce some JSON result, so let&#8217;s change the result to produce a geojson :</p>
+<p>Ok, et si je veux afficher ces données sur une carte avec du geojson ?
+Ba Cypher sait construire du json, il suffit de lui dire comment :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -387,10 +403,13 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
 </div>
 </div>
 <div class="paragraph">
-<p>To see the result, you can copy/paste the json result on <a href="http://geojson.io/" class="bare">http://geojson.io/</a></p>
+<p>Pour voir le résultat (et vérifier la validité du geoJson), vous pouvez copier/coller le résultat de la requête dans <a href="http://geojson.io/" class="bare">http://geojson.io/</a></p>
 </div>
 <div class="paragraph">
-<p>Or you can also  build a simple webpage to display the result with <a href="http://leafletjs.com/">Leaflet</a>, <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
+<p>Ou si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a <a href="http://leafletjs.com/">Leaflet</a> : <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
+</div>
+<div class="paragraph">
+<p>Voici le rendu finale :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -403,22 +422,22 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
           <footer>
             <ul class="inline pull-right metadata">
               <li >
-                <span class="metadata">Tags :</span>
+                <span class="metadata">Mot-Clefs :</span>
                 <span>
                   opendata, jcdecaux, neo4j
                 </span>,
               </li>
               <li >
-                <span class="metadata">Auteur :</span>
+                <span class="metadata">Author :</span>
                 <span>
                   <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
                 </span>,
               </li>
               <li>
-                <span class="metadata">Created at :</span>
+                <span class="metadata">Créé le :</span>
                 <time itemprop="dateCreated" datetime="2017-02-06">Feb 6, 2017</time>
               </li>
-              <li><a href="" title="Permalien : Import JCDecaux dataset into Neo4j" itemprop="url">Permalink</a></li>
+              <li><a href="" title="Permalien : Importer de l&#8217;API opendata de JCDécaux dans Neo4j" itemprop="url">Permalien</a></li>
             </ul>
           </footer>
         </div>
@@ -432,9 +451,13 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
           <ul class="unstyled">
             
             <li class="pull-left">
-              <a class="btn btn-primary" href="/2017/02/06/fr-jcdecaux-cycle-neo4j.html" title="Importer de l&#8217;API opendata de JCDécaux dans Neo4j">&lt; Importer de l&#8217;API opendata de JCDécaux dans Neo4j</a>
+              <a class="btn btn-primary" href="/2016/12/04/lego-project.html" title="Lego Project">&lt; Lego Project</a>
             </li>
             
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2017/02/06/jcdecaux-cycle-neo4j.html" title="Import JCDecaux dataset into Neo4j">Import JCDecaux dataset into Neo4j &gt;</a>
+            </li>
             
           </ul>
         </div>
@@ -464,22 +487,22 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
         <div class="span8">
           <ul class="pull-right inline">
             <li>
-              <a href="mailto:contact@bsimard.com" title="Contact me">
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
                 <i class="icon-envelope"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
                 <i class="icon-twitter"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.github.com/sim51" title="My github account">
+              <a href="https://www.github.com/sim51" title="Mon compte github">
                 <i class="icon-github-alt"></i>
               </a>
             </li>
             <li>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
                 <i class="icon-linkedin"></i>
               </a>
             </li>
@@ -519,7 +542,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
   
   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
   var disqus_shortname = 'bsimard';
-  var disqus_identifier = '/2017/02/06/jcdecaux-cycle-neo4j';
+  var disqus_identifier = '/2017/02/06/fr-jcdecaux-cycle-neo4j';
 
   /* * * DON'T EDIT BELOW THIS LINE * * */
   (function() {
