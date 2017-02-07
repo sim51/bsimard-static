@@ -315,6 +315,6 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson
 
 To see the result, you can copy/paste the json result on http://geojson.io/
 
-I have also build a simple webpage to display the result with http://leafletjs.com/[Leaflet], so you can test the result https://cdn.rawgit.com/sim51/409c769d0501956549221449ca845360/raw/index.html[HERE]
+Or you can also  build a simple webpage to display the result with http://leafletjs.com/[Leaflet], https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
 
-The source code is available https://gist.github.com/sim51/409c769d0501956549221449ca845360[HERE]
+image::/public/images/neo4j-bicloo/app-example.png[]

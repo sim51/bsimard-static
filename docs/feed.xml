@@ -5,8 +5,8 @@
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 07 Feb 2017 14:08:48 +0100</pubDate>
-    <lastBuildDate>Tue, 07 Feb 2017 14:08:48 +0100</lastBuildDate>
+    <pubDate>Tue, 07 Feb 2017 14:19:04 +0100</pubDate>
+    <lastBuildDate>Tue, 07 Feb 2017 14:19:04 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -326,10 +326,12 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;p&gt;To see the result, you can copy/paste the json result on &lt;a href=&quot;http://geojson.io/&quot; class=&quot;bare&quot;&gt;http://geojson.io/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I have also build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, so you can test the result &lt;a href=&quot;https://cdn.rawgit.com/sim51/409c769d0501956549221449ca845360/raw/index.html&quot;&gt;HERE&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Or you can also  build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The source code is available &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;HERE&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-bicloo/app-example.png&quot; alt=&quot;app example&quot;&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
