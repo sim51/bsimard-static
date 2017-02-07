@@ -82,10 +82,11 @@
             <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#goals">Goals</a></li>
+<li><a href="#l-objectif">L&#8217;objectif</a></li>
 <li><a href="#le-modèle-de-jcdecaux">Le modèle de JCDecaux</a></li>
 <li><a href="#l-import">L&#8217;import</a>
 <ul class="sectlevel2">
+<li><a href="#pré-requis">Pré-requis</a></li>
 <li><a href="#les-contraintes">Les contraintes</a></li>
 <li><a href="#import-des-contrats">Import des contrats</a></li>
 <li><a href="#importer-les-stations-et-leur-état">Importer les stations et leur état</a></li>
@@ -95,11 +96,13 @@
 </ul>
 </div>
 <div class="sect1">
-<h2 id="goals">Goals</h2>
+<h2 id="l-objectif">L&#8217;objectif</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Durant ce billet, nous allons nous amuser avec l&#8217;API opendata de JCDécaux sur les bicloo (ou vélib si vous préférez), et Neo4j.
-Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l&#8217;API JSON, faire quelques requête Cypher pour finir sur l&#8217;tuilisation du driver JS afin de créer une petite application web.</p>
+<p>Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.</p>
+</div>
+<div class="paragraph">
+<p>Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.</p>
 </div>
 <div class="paragraph">
 <p>C&#8217;est parti !</p>
@@ -140,7 +143,7 @@ Je vais vous montrer comment réaliser un modèle en graphe, charger les donné
 </ul>
 </div>
 <div class="paragraph">
-<p>Donc explosons ce noeud !</p>
+<p>Donc explosons le !</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -175,10 +178,11 @@ Et bien il suffit de créer une chaine de noeud <code>State</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>J&#8217;ai choisi cette modélisation car mon principal objectif est d&#8217;obtenir les derniéres données (ie. l&#8217;état courant de la station). Avec ce système je n&#8217;ai qu&#8217;a traverser une seule relation, et je garde l&#8217;historique.</p>
+<p>J&#8217;ai choisi cette modélisation car mon principal objectif est d&#8217;obtenir les derniéres données (ie. l&#8217;état courant de la station).
+Avec ce système je n&#8217;ai qu&#8217;a traverser une seule relation, et je garde l&#8217;historique.</p>
 </div>
 <div class="paragraph">
-<p>Donc mon schéma finale reseemble à cela :</p>
+<p>Donc mon schéma finale ressemble à cela :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -186,8 +190,7 @@ Et bien il suffit de créer une chaine de noeud <code>State</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now that we have our model, let see how to load the data.
-A présent que nous avons notre modèle, passons à l&#8217;étape d&#8217;import.</p>
+<p>A présent que nous avons notre modèle, passons à l&#8217;étape d&#8217;import.</p>
 </div>
 </div>
 </div>
@@ -195,9 +198,44 @@ A présent que nous avons notre modèle, passons à l&#8217;étape d&#8217;imp
 <h2 id="l-import">L&#8217;import</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="pré-requis">Pré-requis</h3>
+<div class="paragraph">
+<p>Avant de commencer, il vous faut installer <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures">APOC</a>. Il s&#8217;agit d&#8217;une collection de procédures stockées très utilise, dont je ne peux plus me passer.</p>
+</div>
+<div class="paragraph">
+<p>Voici la procédure de son installation :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Télécharger la dernière version de la librairie à l&#8217;adresse suivante :
+<a href="https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar" class="bare">https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar</a></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt; cd NEO4J_HOME/plugins
+$&gt; wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Redémarrer le serveur Neo4j</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt; bin/neo4j restart</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="les-contraintes">Les contraintes</h3>
 <div class="paragraph">
-<p>Dans Neo4j nous pouvons créer des contraintes d&#8217;unicité, ce qui permet d&#8217;accélérer d&#8217;une part de s&#8217;assurer de la cohérence de nos données, mais aussi aqccélère la recherche d&#8217;un noeud via son identifiant.</p>
+<p>Dans Neo4j nous pouvons créer des contraintes d&#8217;unicité, ce qui permet de s&#8217;assurer de la cohérence de nos données, mais aussi d&#8217;qccélèrer la recherche d&#8217;un noeud via son identifiant.</p>
 </div>
 <div class="paragraph">
 <p>Ceci va être utile pour la phase d&#8217;import pour s&#8217;assurer qu&#8217;on ne crée pas deux fois le même noeud.</p>
@@ -231,7 +269,7 @@ Mais si on veut on peut créer un index dessus, pour accélérer nos recherches 
 <div class="sect2">
 <h3 id="import-des-contrats">Import des contrats</h3>
 <div class="paragraph">
-<p>La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code>.</p>
+<p>La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons utiliser l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code>.</p>
 </div>
 <div class="paragraph">
 <p>Et voici la requête :</p>
@@ -255,7 +293,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 <p>Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
 </div>
 <div class="paragraph">
-<p>`@contract_name@ ` doit simplement être remplacé par le nom commerciale du contrat afin d&#8217;obtenir la liste des stations.</p>
+<p>`@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d&#8217;obtenir la liste des stations de celui-ci.</p>
 </div>
 <div class="paragraph">
 <p>Voici la requête :</p>
@@ -316,13 +354,16 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </ul>
 </div>
 <div class="paragraph">
-<p>Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&#8217;itération sur la première), et de parallélisation.</p>
+<p>Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&#8217;itération de la première requêete), et de parallélisation.</p>
 </div>
 <div class="paragraph">
-<p>Donc ici je crée juste un job par <code>Contrat</code> pour crée ses stations.
-la
-Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&#8217;état des stations, vu que j&#8217;utilise l&#8217;instruction <code>MERGE</code>.
-Dans ce but, il suffit de créer un <code>cron</code> job, ou encore d&#8217;utiliser la procedure <code>apoc.periodic.repeat</code> procedure (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).</p>
+<p>Donc ici je crée juste un job par <code>Contrat</code> pour créer les stations.</p>
+</div>
+<div class="paragraph">
+<p>Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&#8217;état des stations, vu que j&#8217;utilise l&#8217;instruction <code>MERGE</code>, qui permet de selectionner une noeud et de le créer s&#8217;il n&#8217;exsite pas.</p>
+</div>
+<div class="paragraph">
+<p>Un <code>cron</code> job est suffisant, ou vous pouvez aussi utiliser la procedure <code>apoc.periodic.repeat</code> (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).</p>
 </div>
 <div class="paragraph">
 <p>Si vous avez bien suivi les étapes, vous devriez avoir un graph ressemblant à cela :</p>

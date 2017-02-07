@@ -82,6 +82,7 @@
 <li><a href="#jcdecaux-model">JCDecaux model</a></li>
 <li><a href="#imports">Imports</a>
 <ul class="sectlevel2">
+<li><a href="#apoc">APOC</a></li>
 <li><a href="#constraints">Constraints</a></li>
 <li><a href="#importing-all-contracts">Importing all contracts</a></li>
 <li><a href="#importing-station-with-their-state">Importing station with their state</a></li>
@@ -94,8 +95,8 @@
 <h2 id="goals">Goals</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>During this post, we will play with the opendata JCDecaux API.
-I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.</p>
+<p>During this post, we will use Neo4j and JCDecaux opendata API, to find the % nearest stations from my position, with a free bike.
+I will show you how to design your graph, to load the dataset from the JSON API, and make some queries. As a bonus I have also build a simple javascript application to display the result.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s start !</p>
@@ -109,7 +110,7 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 <p>JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
 </div>
 <div class="paragraph">
-<p>INFO: you need to create an API key to use the API. On my examplesm you should replace the <code>@JCD_TOKEN_API@</code> by your own.</p>
+<p>INFO: you need to create an API key to use the API. On my examples you should replace the <code>@JCD_TOKEN_API@</code> by your own.</p>
 </div>
 <div class="paragraph">
 <p>By reading the <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">real-time API documentation</a>, we can compute that JCD is using the following schema :</p>
@@ -149,10 +150,10 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 <div class="ulist">
 <ul>
 <li>
-<p>The station</p>
+<p>The station (static data)</p>
 </li>
 <li>
-<p>The State of the station (ie. ephemeral data)</p>
+<p>The state of the station (ie. ephemeral data)</p>
 </li>
 </ul>
 </div>
@@ -171,7 +172,7 @@ So let&#8217;s create a chain of <code>State</code> nodes.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.</p>
+<p>I have chosen this modeling, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.</p>
 </div>
 <div class="paragraph">
 <p>So the final schema looks like that :</p>
@@ -190,9 +191,31 @@ So let&#8217;s create a chain of <code>State</code> nodes.</p>
 <h2 id="imports">Imports</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="apoc">APOC</h3>
+<div class="paragraph">
+<p>Before to start, you need to install <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures">APOC</a>. APOC is a collection of very usefull procedure for Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>This how to install it :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Download the jar here : <a href="https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download" class="bare">https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download</a></p>
+</li>
+<li>
+<p>Put it into the neo4j <code>plugin</code> directory</p>
+</li>
+<li>
+<p>Restart your server</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
 <h3 id="constraints">Constraints</h3>
 <div class="paragraph">
-<p>Firstly we have to declare the constraints of our model, we all the unique keys :</p>
+<p>Now we have to declare some constraints on our model, with all the unique keys :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -211,7 +234,7 @@ CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can note here, that we haven&#8217;t create a constraint on cities. This just due because two countries can have the same city name.
+<p>You can note here, that I haven&#8217;t create a constraint on cities. This is just because two countries can have a city with the same name.
 But we can create an index on it if we want to speed up our queries that are based on this field</p>
 </div>
 <div class="listingblock">
@@ -223,7 +246,7 @@ But we can create an index on it if we want to speed up our queries that are bas
 <div class="sect2">
 <h3 id="importing-all-contracts">Importing all contracts</h3>
 <div class="paragraph">
-<p>We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code></p>
+<p>We will import all contracts of JCDecaux. To do this, there is an endpoint : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code></p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -299,7 +322,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </ul>
 </div>
 <div class="paragraph">
-<p>Basically, it&#8217;s the same as a <code>WITH</code> (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.</p>
+<p>Basically, it&#8217;s the same as a <code>WITH</code> (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionally to parallelize them.</p>
 </div>
 <div class="paragraph">
 <p>So here, I&#8217;m just creating one job per <code>Contract</code>, to create all the corresponding <code>Station</code> with theirs <code>State</code>.</p>
@@ -358,6 +381,9 @@ CREATE INDEX ON :State(status);</code></pre>
 </div>
 </div>
 <div class="paragraph">
+<p>To see the differences, just makes an explain before and after the creations of these indexes.</p>
+</div>
+<div class="paragraph">
 <p>And what if we display this result directly on a map ?
 Nothing easier, Cypher can produce some JSON result, so let&#8217;s change the result to produce a geojson :</p>
 </div>
@@ -390,7 +416,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
 <p>To see the result, you can copy/paste the json result on <a href="http://geojson.io/" class="bare">http://geojson.io/</a></p>
 </div>
 <div class="paragraph">
-<p>Or you can also  build a simple webpage to display the result with <a href="http://leafletjs.com/">Leaflet</a>, <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
+<p>Or you can also build a simple webpage to display the result with <a href="http://leafletjs.com/">Leaflet</a>, <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
 </div>
 <div class="imageblock">
 <div class="content">

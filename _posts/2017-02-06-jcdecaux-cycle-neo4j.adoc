@@ -10,8 +10,8 @@ Benoit Simard <contact@bsimard.com>
 
 == Goals
 
-During this post, we will play with the opendata JCDecaux API.
-I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.
+During this post, we will use Neo4j and JCDecaux opendata API, to find the % nearest stations from my position, with a free bike.
+I will show you how to design your graph, to load the dataset from the JSON API, and make some queries. As a bonus I have also build a simple javascript application to display the result.
 
 Let's start !
 
@@ -19,7 +19,7 @@ Let's start !
 
 JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : https://developer.jcdecaux.com
 
-INFO: you need to create an API key to use the API. On my examplesm you should replace the `@JCD_TOKEN_API@` by your own.
+INFO: you need to create an API key to use the API. On my examples you should replace the `@JCD_TOKEN_API@` by your own.
 
 By reading the https://developer.jcdecaux.com/#/opendata/vls?page=dynamic[real-time API documentation], we can compute that JCD is using the following schema :
 
@@ -75,8 +75,8 @@ digraph finite_state_machine {
 
 And what can we do about the `Station` entity ? It's easy we can split it into two parts :
 
-* The station
-* The State of the station (ie. ephemeral data)
+* The station (static data)
+* The state of the station (ie. ephemeral data)
 
 [graphviz]
 ----
@@ -120,7 +120,7 @@ digraph finite_state_machine {
 }
 ----
 
-I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.
+I have chosen this modeling, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.
 
 So the final schema looks like that :
 
@@ -154,9 +154,19 @@ Now that we have our model, let see how to load the data.
 
 == Imports
 
+=== APOC
+
+Before to start, you need to install https://neo4j-contrib.github.io/neo4j-apoc-procedures[APOC]. APOC is a collection of very usefull procedure for Neo4j.
+
+This how to install it :
+
+* Download the jar here : https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download
+* Put it into the neo4j `plugin` directory
+* Restart your server
+
 === Constraints
 
-Firstly we have to declare the constraints of our model, we all the unique keys :
+Now we have to declare some constraints on our model, with all the unique keys :
 
 [source,cypher]
 ----
@@ -174,7 +184,7 @@ CREATE CONSTRAINT ON (n:Station) ASSERT n.id IS UNIQUE;
 CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;
 ----
 
-You can note here, that we haven't create a constraint on cities. This just due because two countries can have the same city name.
+You can note here, that I haven't create a constraint on cities. This is just because two countries can have a city with the same name.
 But we can create an index on it if we want to speed up our queries that are based on this field
 
 [source,cypher]
@@ -184,7 +194,7 @@ CREATE INDEX ON :City(name);
 
 === Importing all contracts
 
-We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : `https://api.jcdecaux.com/vls/v1/contracts`
+We will import all contracts of JCDecaux. To do this, there is an endpoint : `https://api.jcdecaux.com/vls/v1/contracts`
 
 [source,cypher]
 ----
@@ -247,7 +257,7 @@ First instruction is `apoc.periodic.iterate`. It's a APOC procedure that takes 3
   * An other cypher query that will be applied on each result from the first one
   * Some configurations, here `{batchSize:1,parallel:true}`
 
-Basically, it's the same as a `WITH` (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.
+Basically, it's the same as a `WITH` (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionally to parallelize them.
 
 So here, I'm just creating one job per `Contract`, to create all the corresponding `Station` with theirs `State`.
 
@@ -285,6 +295,8 @@ CREATE INDEX ON :State(available_bikes);
 CREATE INDEX ON :State(status);
 ----
 
+To see the differences, just makes an explain before and after the creations of these indexes.
+
 And what if we display this result directly on a map ?
 Nothing easier, Cypher can produce some JSON result, so let's change the result to produce a geojson :
 
@@ -315,6 +327,6 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson
 
 To see the result, you can copy/paste the json result on http://geojson.io/
 
-Or you can also  build a simple webpage to display the result with http://leafletjs.com/[Leaflet], https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
+Or you can also build a simple webpage to display the result with http://leafletjs.com/[Leaflet], https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
 
 image::/public/images/neo4j-bicloo/app-example.png[]

@@ -8,10 +8,11 @@ Benoit Simard <contact@bsimard.com>
 :page-ref: blog-neo4j-jcd
 :toc:
 
-== Goals
+== L'objectif
 
-Durant ce billet, nous allons nous amuser avec l'API opendata de JCDécaux sur les bicloo (ou vélib si vous préférez), et Neo4j.
-Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l'API JSON, faire quelques requête Cypher pour finir sur l'tuilisation du driver JS afin de créer une petite application web.
+Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.
+
+Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.
 
 C'est parti !
 
@@ -50,7 +51,7 @@ Si on regarde l'entité `Contact`, on voit :
 * une dépendance à un pays
 * une liste de ville
 
-Donc explosons ce noeud !
+Donc explosons le !
 
 [graphviz]
 ----
@@ -120,9 +121,10 @@ digraph finite_state_machine {
 }
 ----
 
-J'ai choisi cette modélisation car mon principal objectif est d'obtenir les derniéres données (ie. l'état courant de la station). Avec ce système je n'ai qu'a traverser une seule relation, et je garde l'historique.
+J'ai choisi cette modélisation car mon principal objectif est d'obtenir les derniéres données (ie. l'état courant de la station). 
+Avec ce système je n'ai qu'a traverser une seule relation, et je garde l'historique.
 
-Donc mon schéma finale reseemble à cela :
+Donc mon schéma finale ressemble à cela :
 
 [graphviz]
 ----
@@ -150,14 +152,35 @@ digraph finite_state_machine {
 }
 ----
 
-Now that we have our model, let see how to load the data.
 A présent que nous avons notre modèle, passons à l'étape d'import.
 
 == L'import
 
+=== Pré-requis
+
+Avant de commencer, il vous faut installer https://neo4j-contrib.github.io/neo4j-apoc-procedures[APOC]. Il s'agit d'une collection de procédures stockées très utilise, dont je ne peux plus me passer.
+
+Voici la procédure de son installation : 
+
+* Télécharger la dernière version de la librairie à l'adresse suivante : 
+https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar
+
+[source, shell]
+----
+$> cd NEO4J_HOME/plugins
+$> wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar
+----
+
+* Redémarrer le serveur Neo4j
+
+[source, shell]
+----
+$> bin/neo4j restart
+----
+
 === Les contraintes
 
-Dans Neo4j nous pouvons créer des contraintes d'unicité, ce qui permet d'accélérer d'une part de s'assurer de la cohérence de nos données, mais aussi aqccélère la recherche d'un noeud via son identifiant.
+Dans Neo4j nous pouvons créer des contraintes d'unicité, ce qui permet de s'assurer de la cohérence de nos données, mais aussi d'qccélèrer la recherche d'un noeud via son identifiant.
 
 Ceci va être utile pour la phase d'import pour s'assurer qu'on ne crée pas deux fois le même noeud.
 
@@ -187,7 +210,7 @@ CREATE INDEX ON :City(name);
 
 === Import des contrats
 
-La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons l'endpoint suivant : `https://api.jcdecaux.com/vls/v1/contracts`.
+La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons utiliser l'endpoint suivant : `https://api.jcdecaux.com/vls/v1/contracts`.
 
 Et voici la requête :
 
@@ -207,7 +230,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 
 Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l'endpoint suivant : `https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@`
 
-`@contract_name@ ` doit simplement être remplacé par le nom commerciale du contrat afin d'obtenir la liste des stations.
+`@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d'obtenir la liste des stations de celui-ci.
 
 Voici la requête :
 
@@ -256,12 +279,13 @@ La première instruction est `apoc.periodic.iterate`. Il s'agit d'une procédur
   * Une autre requête qui va s'appliquer sur chacun des résultats de la première
   * De la configuration (ici `{batchSize:1,parallel:true}`)
 
-Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d'une requête), mais avec des possiblités de batches (basé sur le nombre d'itération sur la première), et de parallélisation.
+Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d'une requête), mais avec des possiblités de batches (basé sur le nombre d'itération de la première requêete), et de parallélisation.
 
-Donc ici je crée juste un job par `Contrat` pour crée ses stations.
-la
-Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l'état des stations, vu que j'utilise l'instruction `MERGE`.
-Dans ce but, il suffit de créer un `cron` job, ou encore d'utiliser la procedure `apoc.periodic.repeat` procedure (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).
+Donc ici je crée juste un job par `Contrat` pour créer les stations.
+
+Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l'état des stations, vu que j'utilise l'instruction `MERGE`, qui permet de selectionner une noeud et de le créer s'il n'exsite pas.
+
+Un `cron` job est suffisant, ou vous pouvez aussi utiliser la procedure `apoc.periodic.repeat` (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).
 
 Si vous avez bien suivi les étapes, vous devriez avoir un graph ressemblant à cela :
 

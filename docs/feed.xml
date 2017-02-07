@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 07 Feb 2017 15:05:34 +0100</pubDate>
-    <lastBuildDate>Tue, 07 Feb 2017 15:05:34 +0100</lastBuildDate>
+    <link>http://www.bsimard.com//</link>
+    <atom:link href="http://www.bsimard.com//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 07 Feb 2017 17:59:06 +0100</pubDate>
+    <lastBuildDate>Tue, 07 Feb 2017 17:59:06 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -18,6 +18,7 @@
 &lt;li&gt;&lt;a href=&quot;#jcdecaux-model&quot;&gt;JCDecaux model&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#imports&quot;&gt;Imports&lt;/a&gt;
 &lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#apoc&quot;&gt;APOC&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#constraints&quot;&gt;Constraints&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#importing-all-contracts&quot;&gt;Importing all contracts&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#importing-station-with-their-state&quot;&gt;Importing station with their state&lt;/a&gt;&lt;/li&gt;
@@ -30,8 +31,8 @@
 &lt;h2 id=&quot;goals&quot;&gt;Goals&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;During this post, we will play with the opendata JCDecaux API.
-I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.&lt;/p&gt;
+&lt;p&gt;During this post, we will use Neo4j and JCDecaux opendata API, to find the % nearest stations from my position, with a free bike.
+I will show you how to design your graph, to load the dataset from the JSON API, and make some queries. As a bonus I have also build a simple javascript application to display the result.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Let&amp;#8217;s start !&lt;/p&gt;
@@ -45,7 +46,7 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 &lt;p&gt;JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : &lt;a href=&quot;https://developer.jcdecaux.com&quot; class=&quot;bare&quot;&gt;https://developer.jcdecaux.com&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;INFO: you need to create an API key to use the API. On my examplesm you should replace the &lt;code&gt;@JCD_TOKEN_API@&lt;/code&gt; by your own.&lt;/p&gt;
+&lt;p&gt;INFO: you need to create an API key to use the API. On my examples you should replace the &lt;code&gt;@JCD_TOKEN_API@&lt;/code&gt; by your own.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;By reading the &lt;a href=&quot;https://developer.jcdecaux.com/#/opendata/vls?page=dynamic&quot;&gt;real-time API documentation&lt;/a&gt;, we can compute that JCD is using the following schema :&lt;/p&gt;
@@ -85,10 +86,10 @@ I will shou you how to design your graph, to load the dataset from the JSON API,
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;The station&lt;/p&gt;
+&lt;p&gt;The station (static data)&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;The State of the station (ie. ephemeral data)&lt;/p&gt;
+&lt;p&gt;The state of the station (ie. ephemeral data)&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -107,7 +108,7 @@ So let&amp;#8217;s create a chain of &lt;code&gt;State&lt;/code&gt; nodes.&lt;/p
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.&lt;/p&gt;
+&lt;p&gt;I have chosen this modeling, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;So the final schema looks like that :&lt;/p&gt;
@@ -126,9 +127,31 @@ So let&amp;#8217;s create a chain of &lt;code&gt;State&lt;/code&gt; nodes.&lt;/p
 &lt;h2 id=&quot;imports&quot;&gt;Imports&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;apoc&quot;&gt;APOC&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Before to start, you need to install &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt;. APOC is a collection of very usefull procedure for Neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This how to install it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the jar here : &lt;a href=&quot;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download&quot; class=&quot;bare&quot;&gt;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Put it into the neo4j &lt;code&gt;plugin&lt;/code&gt; directory&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Restart your server&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;constraints&quot;&gt;Constraints&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Firstly we have to declare the constraints of our model, we all the unique keys :&lt;/p&gt;
+&lt;p&gt;Now we have to declare some constraints on our model, with all the unique keys :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -147,7 +170,7 @@ CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You can note here, that we haven&amp;#8217;t create a constraint on cities. This just due because two countries can have the same city name.
+&lt;p&gt;You can note here, that I haven&amp;#8217;t create a constraint on cities. This is just because two countries can have a city with the same name.
 But we can create an index on it if we want to speed up our queries that are based on this field&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
@@ -159,7 +182,7 @@ But we can create an index on it if we want to speed up our queries that are bas
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;importing-all-contracts&quot;&gt;Importing all contracts&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/contracts&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/contracts&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;We will import all contracts of JCDecaux. To do this, there is an endpoint : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/contracts&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/contracts&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -235,7 +258,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Basically, it&amp;#8217;s the same as a &lt;code&gt;WITH&lt;/code&gt; (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.&lt;/p&gt;
+&lt;p&gt;Basically, it&amp;#8217;s the same as a &lt;code&gt;WITH&lt;/code&gt; (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionally to parallelize them.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;So here, I&amp;#8217;m just creating one job per &lt;code&gt;Contract&lt;/code&gt;, to create all the corresponding &lt;code&gt;Station&lt;/code&gt; with theirs &lt;code&gt;State&lt;/code&gt;.&lt;/p&gt;
@@ -294,6 +317,9 @@ CREATE INDEX ON :State(status);&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To see the differences, just makes an explain before and after the creations of these indexes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;And what if we display this result directly on a map ?
 Nothing easier, Cypher can produce some JSON result, so let&amp;#8217;s change the result to produce a geojson :&lt;/p&gt;
 &lt;/div&gt;
@@ -326,7 +352,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;p&gt;To see the result, you can copy/paste the json result on &lt;a href=&quot;http://geojson.io/&quot; class=&quot;bare&quot;&gt;http://geojson.io/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Or you can also  build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Or you can also build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -336,8 +362,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        <link>http://www.bsimard.com//2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com//2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -349,10 +375,11 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
         <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
 &lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
 &lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#goals&quot;&gt;Goals&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#l-objectif&quot;&gt;L&amp;#8217;objectif&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#le-modèle-de-jcdecaux&quot;&gt;Le modèle de JCDecaux&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#l-import&quot;&gt;L&amp;#8217;import&lt;/a&gt;
 &lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#pré-requis&quot;&gt;Pré-requis&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#les-contraintes&quot;&gt;Les contraintes&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#import-des-contrats&quot;&gt;Import des contrats&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#importer-les-stations-et-leur-état&quot;&gt;Importer les stations et leur état&lt;/a&gt;&lt;/li&gt;
@@ -362,11 +389,13 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;goals&quot;&gt;Goals&lt;/h2&gt;
+&lt;h2 id=&quot;l-objectif&quot;&gt;L&amp;#8217;objectif&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Durant ce billet, nous allons nous amuser avec l&amp;#8217;API opendata de JCDécaux sur les bicloo (ou vélib si vous préférez), et Neo4j.
-Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l&amp;#8217;API JSON, faire quelques requête Cypher pour finir sur l&amp;#8217;tuilisation du driver JS afin de créer une petite application web.&lt;/p&gt;
+&lt;p&gt;Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;C&amp;#8217;est parti !&lt;/p&gt;
@@ -407,7 +436,7 @@ Je vais vous montrer comment réaliser un modèle en graphe, charger les donné
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc explosons ce noeud !&lt;/p&gt;
+&lt;p&gt;Donc explosons le !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -442,10 +471,11 @@ Et bien il suffit de créer une chaine de noeud &lt;code&gt;State&lt;/code&gt;.&
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;J&amp;#8217;ai choisi cette modélisation car mon principal objectif est d&amp;#8217;obtenir les derniéres données (ie. l&amp;#8217;état courant de la station). Avec ce système je n&amp;#8217;ai qu&amp;#8217;a traverser une seule relation, et je garde l&amp;#8217;historique.&lt;/p&gt;
+&lt;p&gt;J&amp;#8217;ai choisi cette modélisation car mon principal objectif est d&amp;#8217;obtenir les derniéres données (ie. l&amp;#8217;état courant de la station).
+Avec ce système je n&amp;#8217;ai qu&amp;#8217;a traverser une seule relation, et je garde l&amp;#8217;historique.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc mon schéma finale reseemble à cela :&lt;/p&gt;
+&lt;p&gt;Donc mon schéma finale ressemble à cela :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -453,8 +483,7 @@ Et bien il suffit de créer une chaine de noeud &lt;code&gt;State&lt;/code&gt;.&
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now that we have our model, let see how to load the data.
-A présent que nous avons notre modèle, passons à l&amp;#8217;étape d&amp;#8217;import.&lt;/p&gt;
+&lt;p&gt;A présent que nous avons notre modèle, passons à l&amp;#8217;étape d&amp;#8217;import.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -462,9 +491,44 @@ A présent que nous avons notre modèle, passons à l&amp;#8217;étape d&amp;#
 &lt;h2 id=&quot;l-import&quot;&gt;L&amp;#8217;import&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;pré-requis&quot;&gt;Pré-requis&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Avant de commencer, il vous faut installer &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt;. Il s&amp;#8217;agit d&amp;#8217;une collection de procédures stockées très utilise, dont je ne peux plus me passer.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici la procédure de son installation :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Télécharger la dernière version de la librairie à l&amp;#8217;adresse suivante :
+&lt;a href=&quot;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar&quot; class=&quot;bare&quot;&gt;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;$&amp;gt; cd NEO4J_HOME/plugins
+$&amp;gt; wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Redémarrer le serveur Neo4j&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;$&amp;gt; bin/neo4j restart&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;les-contraintes&quot;&gt;Les contraintes&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans Neo4j nous pouvons créer des contraintes d&amp;#8217;unicité, ce qui permet d&amp;#8217;accélérer d&amp;#8217;une part de s&amp;#8217;assurer de la cohérence de nos données, mais aussi aqccélère la recherche d&amp;#8217;un noeud via son identifiant.&lt;/p&gt;
+&lt;p&gt;Dans Neo4j nous pouvons créer des contraintes d&amp;#8217;unicité, ce qui permet de s&amp;#8217;assurer de la cohérence de nos données, mais aussi d&amp;#8217;qccélèrer la recherche d&amp;#8217;un noeud via son identifiant.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Ceci va être utile pour la phase d&amp;#8217;import pour s&amp;#8217;assurer qu&amp;#8217;on ne crée pas deux fois le même noeud.&lt;/p&gt;
@@ -498,7 +562,7 @@ Mais si on veut on peut créer un index dessus, pour accélérer nos recherches 
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;import-des-contrats&quot;&gt;Import des contrats&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons l&amp;#8217;endpoint suivant : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/contracts&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/contracts&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;La seconde étape consiste à importer la liste des contrats de JCD. Pour ce faire nous allons utiliser l&amp;#8217;endpoint suivant : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/contracts&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/contracts&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Et voici la requête :&lt;/p&gt;
@@ -522,7 +586,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;p&gt;Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l&amp;#8217;endpoint suivant : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;`@contract_name@ ` doit simplement être remplacé par le nom commerciale du contrat afin d&amp;#8217;obtenir la liste des stations.&lt;/p&gt;
+&lt;p&gt;`@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d&amp;#8217;obtenir la liste des stations de celui-ci.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Voici la requête :&lt;/p&gt;
@@ -583,13 +647,16 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&amp;#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&amp;#8217;itération sur la première), et de parallélisation.&lt;/p&gt;
+&lt;p&gt;Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&amp;#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&amp;#8217;itération de la première requêete), et de parallélisation.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc ici je crée juste un job par &lt;code&gt;Contrat&lt;/code&gt; pour crée ses stations.
-la
-Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&amp;#8217;état des stations, vu que j&amp;#8217;utilise l&amp;#8217;instruction &lt;code&gt;MERGE&lt;/code&gt;.
-Dans ce but, il suffit de créer un &lt;code&gt;cron&lt;/code&gt; job, ou encore d&amp;#8217;utiliser la procedure &lt;code&gt;apoc.periodic.repeat&lt;/code&gt; procedure (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).&lt;/p&gt;
+&lt;p&gt;Donc ici je crée juste un job par &lt;code&gt;Contrat&lt;/code&gt; pour créer les stations.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&amp;#8217;état des stations, vu que j&amp;#8217;utilise l&amp;#8217;instruction &lt;code&gt;MERGE&lt;/code&gt;, qui permet de selectionner une noeud et de le créer s&amp;#8217;il n&amp;#8217;exsite pas.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Un &lt;code&gt;cron&lt;/code&gt; job est suffisant, ou vous pouvez aussi utiliser la procedure &lt;code&gt;apoc.periodic.repeat&lt;/code&gt; (Les jobs ne sont pas persistés, donc a chaque redémarrage de Neo4j il faudra rejouer recréer le job).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Si vous avez bien suivi les étapes, vous devriez avoir un graph ressemblant à cela :&lt;/p&gt;
@@ -686,8 +753,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://www.bsimard.com//2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com//2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -1166,8 +1233,8 @@ WITH s,
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2016/12/04/lego-project.html</guid>
+        <link>http://www.bsimard.com//2016/12/04/lego-project.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com//2016/12/04/lego-project.html</guid>
         
         <category>neo4j, load csv, lego</category>
         
@@ -1448,8 +1515,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/How-to-use-JRebel-with-Neo4j</link>
-        <guid isPermaLink="true">http://localhost:4000/How-to-use-JRebel-with-Neo4j</guid>
+        <link>http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</link>
+        <guid isPermaLink="true">http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</guid>
         
         <category>neo4j, jrebel</category>
         
@@ -1579,8 +1646,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/Les-icones-du-passe</link>
-        <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
+        <link>http://www.bsimard.com//Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1870,8 +1937,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
-        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        <link>http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
@@ -2182,8 +2249,8 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/Comment-SolR-decoupe-vos-phrases</link>
-        <guid isPermaLink="true">http://localhost:4000/Comment-SolR-decoupe-vos-phrases</guid>
+        <link>http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</guid>
         
         <category>solr, lucene, full text search</category>
         
@@ -2631,8 +2698,8 @@ $&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
-        <guid isPermaLink="true">http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
+        <link>http://www.bsimard.com//Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
+        <guid isPermaLink="true">http://www.bsimard.com//Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
         
         <category>neo4j, postgresql, foreign data wrapper</category>
         
@@ -2874,8 +2941,8 @@ So you have to install it on each machine.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
+        <link>http://www.bsimard.com//2015/06/04/neo4j-odbc.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-odbc.html</guid>
         
         <category>neo4j, odbc, jdbc</category>
         
@@ -3013,8 +3080,8 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essaye
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/A-la-recherche-des-points-de-collecte-pour-recycler</link>
-        <guid isPermaLink="true">http://localhost:4000/A-la-recherche-des-points-de-collecte-pour-recycler</guid>
+        <link>http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</link>
+        <guid isPermaLink="true">http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</guid>
         
         <category>opendata, osm</category>
         
