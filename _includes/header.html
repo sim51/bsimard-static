@@ -7,14 +7,31 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/" title="Benoît Simard">
+            <a class="brand" href="{{ page.locale| replace: 'fr', ''  | prepend : '/'}}" title="Benoît Simard">
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
-                <ul class="nav">
-                  <li><a href="/" title="Home">Home</a></li>
-                  <li><a href="/blog" title="Blog">Blog</a></li>
-                  <li><a href="/about-me" title="About me">About me</a></li>
+                <ul class="nav navbar-nav">
+                  {% assign pages=site.pages | where:"locale", page.locale  | sort: 'order'%}
+                  {% for my_page in pages %}
+                    {% if my_page.title and my_page.autogen == nil %}
+                      <li><a href="{{ my_page.url | prepend: site.baseurl }}" title="{{ my_page.title }}">{{ my_page.title }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  {% assign posts=site.posts | where:"ref", page.ref | sort: 'locale' %}
+                  {% for post in posts %}
+                    <li>
+                      <a href="{{ post.url | prepend: site.baseurl }}" class="{{ post.locale }}">{{ post.locale }}</a> {% endfor %}
+                    </li>
+
+                  {% assign pages=site.pages | where:"ref", page.ref | sort: 'locale' %}
+                  {% for page in pages %}
+                    <li>
+                      <a href="{{ page.url | prepend: site.baseurl }}" class="{{ page.locale }}">{{ page.locale }}</a> {% endfor %}
+                    </li>
                 </ul>
             </nav>
         </div>

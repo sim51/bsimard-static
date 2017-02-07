@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
     <title>Accueil</title>
 <meta charset="UTF-8">
-<meta name="author" content=""/>
+<meta name="author" content="site.author"/>
 <meta name="robots" content="index, follow" />
-<meta name="description" content="Site de Benoit Simard" />
-<meta name="keywords" content="" />
+<meta name="description" content="site.description[page.locale]" />
+<meta name="keywords" content="site.keywords[page.locale]" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
@@ -34,10 +34,35 @@
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
-                <ul class="nav">
-                  <li><a href="/" title="Home">Home</a></li>
-                  <li><a href="/blog" title="Blog">Blog</a></li>
-                  <li><a href="/about-me" title="About me">About me</a></li>
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    </li>
+
+                  
+                  
+                    <li>
+                      <a href="/en/" class="en">en</a> 
+                    <li>
+                      <a href="/" class="fr">fr</a> 
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -52,9 +77,9 @@
     <div id="valeurs" class="row-fluid">
       <ul class="inline span12">
         <li class="span3" id="free"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Je suis un libriste convaincu ! (et même parfois un peu extrémiste)"><i class="icon-linux"></i> <div>Libriste</div></a></li>
-        <li class="span3" id="webdev"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Développeur et fier de l'être, vive les artisans du web ! "><i class="iconmoon-earth"></i> <div>D&eacute;veloppeur Web</div></a></li>
-        <li class="span3" id="java"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Le java c'est bien , en abuser ça craint !"><i class="icon-coffee"></i><div>Aimant le caf&eacute;</div></a></li>
-        <li class="span3" id="data"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Quelles soient big, linked ou open, j'aime les data !"><i class="iconmoon-stack"></i> <div>Et les donn&eacute;es</div></a></li>
+        <li class="span3" id="webdev"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Développeur et fier de l'être, vive les artisans du web !"><i class="iconmoon-earth"></i> <div>Développeur web</div></a></li>
+        <li class="span3" id="java"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Le java c'est bien , en abuser ça craint !"><i class="icon-coffee"></i><div>Amaint le café</div></a></li>
+        <li class="span3" id="data"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Quelles soient big, linked ou open, j'aime les data !"><i class="iconmoon-stack"></i> <div>Et les données</div></a></li>
       </ul>
     </div>
   </div>
@@ -71,17 +96,17 @@
         <ul class="inline pull-right">
           <li>
             <div>
-              <a href="https://www.twitter.com/logisima" title="Me suivre sur Twitter : @logisima"><i class="icon-twitter"></i></a>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter"><i class="icon-twitter"></i></a>
             </div>
           </li>
           <li>
             <div>
-              <a href="https://www.github.com/sim51" title="Mon profil github : sim51"><i class="icon-github-alt"></i></a>
+              <a href="https://www.github.com/sim51" title="Mon compte github"><i class="icon-github-alt"></i></a>
             </div>
           </li>
           <li>
             <div>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil linked"><i class="icon-linkedin"></i></a>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title=""><i class="icon-linkedin"></i></a>
             </div>
           </li>
         </ul>
@@ -97,44 +122,10 @@
       <a href="/feed.xml" title="Flux RSS">
         <i class="icon-rss"></i>
       </a>
-      Mes derniers tickets
+      Mes derniers billet
     </h2>
     <div class="row-fluid">
       <!-- This loops through the paginated posts -->
-      
-        <article class="resultItem">
-  <a href="/2016/12/04/lego-project.html" title="">
-    <header>
-      <h3>Lego Project</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/lego/banner.png" width="100"/>
-      </div>
-      <div class="span8">
-        This project aims to create a referencial of all the lego sets, with theirs pieces based on Neo4j. So after, if you have a partial set, you will know wich piece to search to have a complete one.
-      </div>
-    </div>
-  </a>
-</article>
-
-      
-        <article class="resultItem">
-  <a href="/How-to-use-JRebel-with-Neo4j" title="">
-    <header>
-      <h3>How to use JRebel with Neo4j</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/jrebel/banner.png" width="100"/>
-      </div>
-      <div class="span8">
-        In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.
-      </div>
-    </div>
-  </a>
-</article>
-
       
         <article class="resultItem">
   <a href="/Les-icones-du-passe" title="">
@@ -187,6 +178,23 @@
 </article>
 
       
+        <article class="resultItem">
+  <a href="/A-la-recherche-des-points-de-collecte-pour-recycler" title="">
+    <header>
+      <h3>A la recherche des points de collecte pour recycler</h3>
+    </header>
+    <div class="row-fluid">
+      <div class="span2">
+        <img src="/public/images/opendata-collect/banner.png" width="100"/>
+      </div>
+      <div class="span8">
+        Ce midi on m'a pose une question simple : ou je peux trouver le point de recyclage de verre le plus proche de chez moi ? Question simple, mais pas evident de trouver la donnee...
+      </div>
+    </div>
+  </a>
+</article>
+
+      
     </div>
   </div>
 </section>
@@ -199,7 +207,7 @@
         <div class="span4">
           <ul class="pull-left inline">
             <li>
-              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
                 <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
               </a>
             </li>
@@ -222,12 +230,12 @@
               </a>
             </li>
             <li>
-              <a href="https://www.github.com/sim51" title="Mon compte Github">
+              <a href="https://www.github.com/sim51" title="Mon compte github">
                 <i class="icon-github-alt"></i>
               </a>
             </li>
             <li>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
                 <i class="icon-linkedin"></i>
               </a>
             </li>
@@ -242,6 +250,13 @@
 
 <script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
 <script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
 
 <!-- Addthis -->
 <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>

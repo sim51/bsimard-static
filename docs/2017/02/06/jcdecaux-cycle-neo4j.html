@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Import JCDecaux dataset into Neo4j</title>
+<meta charset="UTF-8">
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="A small tutorial on how to model, load and query some data, based on the opendata API from JCDecaux." />
+<meta name="keywords" content="opendata, jcdecaux, neo4j" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/en" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    <li>
+                      <a href="/2017/02/06/jcdecaux-cycle-neo4j.html" class="en">en</a> 
+                    </li>
+
+                  
+                  
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Import JCDecaux dataset into Neo4j</h1>
+            <meta itemprop="description" content=" A small tutorial on how to model, load and query some data, based on the opendata API from JCDecaux.">
+            <img itemprop="image" src="/public/images/neo4j-bicloo/banner.jpg"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#goals">Goals</a></li>
+<li><a href="#jcdecaux-model">JCDecaux model</a></li>
+<li><a href="#imports">Imports</a>
+<ul class="sectlevel2">
+<li><a href="#constraints">Constraints</a></li>
+<li><a href="#importing-all-contracts">Importing all contracts</a></li>
+<li><a href="#importing-station-with-their-state">Importing station with their state</a></li>
+</ul>
+</li>
+<li><a href="#some-cool-stuff">Some cool stuff</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During this post, we will play with the opendata JCDecaux API.
+I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start !</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jcdecaux-model">JCDecaux model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
+</div>
+<div class="paragraph">
+<p>INFO: you need to create an API key to use the API. On my examplesm you should replace the <code>@JCD_TOKEN_API@</code> by your own.</p>
+</div>
+<div class="paragraph">
+<p>By reading the <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">real-time API documentation</a>, we can compute that JCD is using the following schema :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-eb6c5cecc9b1438965322d064c0c4350.png" alt="diag eb6c5cecc9b1438965322d064c0c4350" width="728" height="273">
+</div>
+</div>
+<div class="paragraph">
+<p>So we have two entities, related together : it&#8217;s a graph ! But can we do a better graph modelisation ?</p>
+</div>
+<div class="paragraph">
+<p>If you look at the <code>Contract</code> entity, you can see :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a dependency to a country</p>
+</li>
+<li>
+<p>a list of cities</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So let&#8217;s explode this entity like this :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-b317109bf90f015fb06b4866a5533cc1.png" alt="diag b317109bf90f015fb06b4866a5533cc1" width="819" height="93">
+</div>
+</div>
+<div class="paragraph">
+<p>And what can we do about the <code>Station</code> entity ? It&#8217;s easy we can split it into two parts :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The station</p>
+</li>
+<li>
+<p>The State of the station (ie. ephemeral data)</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-f3a47245d234f526a6116c10479f97e6.png" alt="diag f3a47245d234f526a6116c10479f97e6" width="589" height="173">
+</div>
+</div>
+<div class="paragraph">
+<p>And what if I want to keep the state history ?
+So let&#8217;s create a chain of <code>State</code> nodes.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-6ffe1f11d0d54893b023927cfab8c6a6.png" alt="diag 6ffe1f11d0d54893b023927cfab8c6a6" width="589" height="207">
+</div>
+</div>
+<div class="paragraph">
+<p>I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.</p>
+</div>
+<div class="paragraph">
+<p>So the final schema looks like that :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-74331910fff57af03e80c64bc790e020.png" alt="diag 74331910fff57af03e80c64bc790e020" width="1279" height="261">
+</div>
+</div>
+<div class="paragraph">
+<p>Now that we have our model, let see how to load the data.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="imports">Imports</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="constraints">Constraints</h3>
+<div class="paragraph">
+<p>Firstly we have to declare the constraints of our model, we all the unique keys :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">// Contract name is unique
+CREATE CONSTRAINT ON (n:Contract) ASSERT n.name IS UNIQUE;
+
+// Country code is unique
+CREATE CONSTRAINT ON (n:Country) ASSERT n.code IS UNIQUE;
+
+// Station ID is a composition of the contract's name and the station id.
+// Because the number field into the Station entity is only unique inside a contract
+CREATE CONSTRAINT ON (n:Station) ASSERT n.id IS UNIQUE;
+
+// State id is a composition of the station id plus the last_update timestamp
+CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can note here, that we haven&#8217;t create a constraint on cities. This just due because two countries can have the same city name.
+But we can create an index on it if we want to speed up our queries that are based on this field</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE INDEX ON :City(name);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="importing-all-contracts">Importing all contracts</h3>
+<div class="paragraph">
+<p>We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : <code><a href="https://api.jcdecaux.com/vls/v1/contracts" class="bare">https://api.jcdecaux.com/vls/v1/contracts</a></code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH '@JCD_TOKEN_API@' AS key
+CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) YIELD value as row
+    MERGE (contract:Contract { name: row.name, commercial_name:row.commercial_name })
+    MERGE (country:Country { code: row.country_code })
+    WITH row, contract, country
+      UNWIND row.cities AS cityName
+          MERGE (country)-[:HAS_CITY]-&gt;(city:City { name: cityName })
+          MERGE (contract)-[:FOR_CITY]-&gt;(city)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="importing-station-with-their-state">Importing station with their state</h3>
+<div class="paragraph">
+<p>Now we are going to create stations with their data, for all contract, with the help of this endpoint : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.periodic.iterate(
+    "MATCH (c:Contract) RETURN c",
+    "WITH '@JCD_TOKEN_API@' AS key , {c} AS contract
+        CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/stations?contract=' + contract.name + '&amp;apiKey=' + key) YIELD value as row
+
+            // we can find the same station number on two contracts, so the unique id is a compisition of the id and the contract
+            MERGE (contract)-[:HAS_STATION]-&gt;(station:Station {id: row.contract_name + '_' + row.number})
+                ON CREATE SET
+                    station.number = row.number,
+                    station.name = row.name,
+                    station.address = row.address,
+                    station.lat = row.position.lat,
+                    station.lng = row.position.lng,
+                    station.banking = row.banking,
+                    station.bonus = row.bonus
+
+            // to have a unique id, I'm using a composition of the station id and the last_update timetsamp
+            MERGE (state:State {id: station.id + '_' + row.last_update})
+                ON CREATE SET
+                    state.status = row.status,
+                    state.available_bikes = row.available_bikes,
+                    state.bike_stands = row.bike_stands,
+                    state.available_bike_stands = row.available_bike_stands
+
+            WITH station, state
+                MERGE (station)-[:LAST_STATE]-&gt;(state)
+
+                // Here we remove the previous `LAST_STATE` rel if it exists, and we create the chain
+                WITH station, state
+                    MATCH (old:State)&lt;-[r:LAST_STATE]-(station)-[:LAST_STATE]-&gt;(state)
+                    WHERE NOT id(old) =id(state)
+                    WITH old, r, state
+                    CREATE (state)-[:PREVIOUS]-&gt;(old)
+                    DELETE r",
+    {batchSize:1,parallel:true}) YIELD batches, total, errorMessages</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>First instruction is <code>apoc.periodic.iterate</code>. It&#8217;s a APOC procedure that takes 3 parameters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A cypher query that give a first collection of results</p>
+</li>
+<li>
+<p>An other cypher query that will be applied on each result from the first one</p>
+</li>
+<li>
+<p>Some configurations, here <code>{batchSize:1,parallel:true}</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Basically, it&#8217;s the same as a <code>WITH</code> (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.</p>
+</div>
+<div class="paragraph">
+<p>So here, I&#8217;m just creating one job per <code>Contract</code>, to create all the corredponding <code>Station</code> with theirs <code>State</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can replay this script every 5 minutes, to update the state of each station.
+To do this you can create a <code>cron</code> task, or you also can use the <code>apoc.periodic.repeat</code> procedure (Job are not persisted, so you will have to re-create it after each restart of neo4j).</p>
+</div>
+<div class="paragraph">
+<p>At the end you should have a graph like this</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/neo4j-bicloo/graph-example.png" alt="graph example">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="some-cool-stuff">Some cool stuff</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that we have the data, we can ask to the database, what is the nearest station from me with an available bike :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH point({latitude: 56.7, longitude: 12.6}) as my_position
+MATCH (station:Station)-[:LAST_STATE]-&gt;(state:State)
+WHERE state.status = "OPEN" AND state.available_bikes &gt; 0
+RETURN station, distance(point({latitude: station.lat, longitude: station.lng}), poi)  AS distance
+ORDER BY distance
+LIMIT 5</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see I&#8217;m using two new functions of Neo4j 3.1 :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>point( { latitude: XXX, longitude: XXX} ) :</strong> allow you to create a geospatial point in WGS-83 projection</p>
+</li>
+<li>
+<p><strong>distance( point, point) :</strong> will returned the geodesic distance between the two points.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can have a better performances, if we create those two indexes :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE INDEX ON :State(available_bikes);
+CREATE INDEX ON :State(status);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And what if we display this result directly on a map ?
+Nothing easier, Cypher can produce some JSON result, so let&#8217;s change the result to produce a geojson :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH point({latitude: 56.7, longitude: 12.6}) as my_position
+MATCH (station:Station)-[:LAST_STATE]-&gt;(state:State)
+WHERE state.status = "OPEN" AND state.available_bikes &gt; 0
+WITH station, state, distance(point({latitude: station.lat, longitude: station.lng}), my_position)  AS distance
+ORDER BY  distance
+LIMIT 5
+WITH collect( {
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [station.lng, station.lat]
+        },
+        properties : {
+            name : station.name,
+            distance: round(distance),
+            address : station.address,
+            free_bike: state.available_bikes,
+            free_slot: state.available_bike_stands
+        }
+    }) AS features
+RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To see the result, you can copy/paste the json result on <a href="http://geojson.io/" class="bare">http://geojson.io/</a></p>
+</div>
+<div class="paragraph">
+<p>I have also build a simple webpage to display the result with <a href="http://leafletjs.com/">Leaflet</a>, so you can test the result <a href="https://cdn.rawgit.com/sim51/409c769d0501956549221449ca845360/raw/index.html">HERE</a></p>
+</div>
+<div class="paragraph">
+<p>The source code is available <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">HERE</a></p>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  opendata, jcdecaux, neo4j
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Created at :</span>
+                <time itemprop="dateCreated" datetime="2017-02-06">Feb 6, 2017</time>
+              </li>
+              <li><a href="" title="Permalien : Import JCDecaux dataset into Neo4j" itemprop="url">Permalink</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2016/12/04/lego-project.html" title="Lego Project">&lt; Lego Project</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Contact me">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="My github account">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2017/02/06/jcdecaux-cycle-neo4j';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

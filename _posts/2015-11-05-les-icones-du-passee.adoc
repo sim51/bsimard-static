@@ -1,12 +1,13 @@
 = Les icônes du passé
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
-:page-lang: fr
+:page-locale: fr
 :page-description: Lorsque je vois un graphiste mettre une disquette a cote du bouton save cela me fait toujours rire ! J'ai donc deide de faire un petit florilege des icones obsoletes.
 :page-disqusid: Les-ic&ocirc;nes-du-passe
 :page-permalink: /Les-icones-du-passe
 :page-image: /public/images/icones/obsolete.png
 :page-tags: ergonomie
+:page-ref: blog-icone
 :toc:
 
 == Introduction

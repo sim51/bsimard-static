@@ -1,12 +1,13 @@
 = A la recherche des points de collecte pour recycler
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
-:page-lang: fr
+:page-locale: fr
 :page-description: Ce midi on m'a pose une question simple : ou je peux trouver le point de recyclage de verre le plus proche de chez moi ? Question simple, mais pas evident de trouver la donnee...
 :page-disqusid: A-la-recherche-des-points-de-collecte-pour-recycler
 :page-permalink: /A-la-recherche-des-points-de-collecte-pour-recycler
 :page-image: /public/images/opendata-collect/banner.png
 :page-tags: opendata, osm
+:page-ref: blog-opendata-collect
 :toc:
 
 Depuis plusieurs années, je travaille quasiment uniquement pour la ville de Nantes et Nantes Métropole. Ainsi lorsque mes collègues cherchent une réponse à une problématique sur Nantes, ils me demandent si je sais où trouver l'information.

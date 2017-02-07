@@ -1,14 +1,83 @@
 title: Benoit Simard
 email: contact@bsimard.com
-description: Site de Benoit Simard
+description:
+  fr: Site de Benoit Simard
+  en: Benoit 's Blog
 keywords:
+  fr:
+  en:
 baseurl: ""
 url: "http://www.bsimard.com/"
 twitter_username: logisima
 github_username:  sim51
 discuss_shortname: bsimard
 
-paginate_path: /blog/page:num
+contact-me:
+  fr: Me contacter
+  en: Contact me
+follow-me:
+  fr: Suivez-moi sur Twitter
+  en: Follow-me on Twitter
+github-account:
+  fr: Mon compte github
+  en: My github account
+linked-account:
+  fr: Mon profile Linked-in
+  en: My profile on Linked-in
+page-home:
+  fr: Accueil
+  en: Home
+page-blog:
+  fr: Blog
+  en: Blog
+page-me:
+  fr: Qui suis-je
+  en: About me
+last-blog-post:
+  fr: Mes derniers billet
+  en: My last posts
+posts:
+  fr: Les billets
+  en: Blog posts
+find-me-on-web:
+  fr: Retrouvez-moi sur le web
+  en: Find me on the web
+author:
+  fr: Author
+  en: Auteur
+created:
+  fr: Créé le
+  en: Created at
+permalien:
+  fr: Permalien
+  en: Permalink
+keywords:
+  fr: Mot-Clefs
+  en: Tags
+librist:
+  fr: Libriste
+  en: Librist
+librist-desc:
+  fr: Je suis un libriste convaincu ! (et même parfois un peu extrémiste)
+  en: And sometimes a little extremist on free software ...
+kawa:
+  fr: Amaint le café
+  en: Kawa lover
+kawa-desc:
+  fr: Le java c'est bien , en abuser ça craint !
+  en: Java world is so cool !
+webdev:
+  fr: Développeur web
+  en: Web developer
+webdev-desc:
+  fr: Développeur et fier de l'être, vive les artisans du web !
+  en: Proud to be a developper !
+data:
+  fr: Et les données
+  en: Data addict
+data-desc:
+  fr: Quelles soient big, linked ou open, j'aime les data !
+  en: Big, linked or open, I'm addict to data (specially on graph databases)
 
 destination: docs
 

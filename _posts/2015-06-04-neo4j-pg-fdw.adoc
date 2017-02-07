@@ -1,4 +1,4 @@
- Connecting Neo4j to any SQL tool with the power of Postgresql
+= Connecting Neo4j to any SQL tool with the power of Postgresql
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-lang: en
@@ -7,6 +7,7 @@ Benoit Simard <contact@bsimard.com>
 :page-permalink: /Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
 :page-image: /public/images/pg-fdw/banner.png
 :page-tags: neo4j, postgresql, foreign data wrapper
+:page-ref: blog-neo4j-fdw
 :toc:
 
 == Implement A neo4j foreign data wrapper

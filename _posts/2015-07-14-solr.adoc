@@ -1,12 +1,13 @@
 = Comment SolR découpe vos phrases
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
-:page-lang: en
+:page-locale: fr
 :page-description: Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr
 :page-disqusid: Comment-SolR-decoupe-vos-phrases
 :page-permalink: /Comment-SolR-decoupe-vos-phrases
 :page-image: /public/images/solr/banner.jpg
 :page-tags: solr, lucene, full text search
+:page-ref: blog-solr
 :toc:
 
 == Le traitement du texte et des mots

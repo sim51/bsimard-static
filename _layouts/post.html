@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{page.locale}}">
 <head>
   {% include head.html description=page.description tags=page.tags author=page.author %}
 </head>
 <body class="page">
 
   {% include header.html %}
-  <main class="firstBlock blockDefault mainContainer container">
+  <section class="firstBlock blockDefault mainContainer container">
     <section>
       <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
         <div class="span12">
@@ -21,22 +21,22 @@
           <footer>
             <ul class="inline pull-right metadata">
               <li >
-                <span class="metadata">Tags :</span>
+                <span class="metadata">{{site.keywords[page.locale]}} :</span>
                 <span>
                   {{page.tags}}
                 </span>,
               </li>
               <li >
-                <span class="metadata">Auteur :</span>
+                <span class="metadata">{{site.author[page.locale]}} :</span>
                 <span>
                   <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">{{page.author}}</a>
                 </span>,
               </li>
               <li>
-                <span class="metadata">Créé le :</span>
+                <span class="metadata">{{site.created[page.locale]}} :</span>
                 <time itemprop="dateCreated" datetime="{{page.date | date: '%Y-%m-%d'}}">{{ page.date | date: "%b %-d, %Y" }}</time>
               </li>
-              <li><a href="{{page.parmalink}}" title="Permalien : {{page.title}}" itemprop="url">Permalien</a></li>
+              <li><a href="{{page.parmalink}}" title="Permalien : {{page.title}}" itemprop="url">{{site.permalien[page.locale]}}</a></li>
             </ul>
           </footer>
         </div>
@@ -44,7 +44,7 @@
 
       <section id="disqus_thread"></section>
 
-      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
         <div class="alpha-wrapper"></div>
         <div class="span12">
           <ul class="unstyled">
@@ -63,8 +63,19 @@
       </nav>
 
     </section>
-  </main>
+  </section>
 
   {% include footer.html %}
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
 </body>
 </html>

@@ -1,11 +1,12 @@
 = How to communicate with Neo4j through ODBC
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
-:page-lang: en
+:page-locale: en
 :page-description: Lorsque je vois un graphiste mettre une disquette a cote du bouton save cela me fait toujours rire ! J'ai donc deide de faire un petit florilege des icones obsoletes.
 :page-disqusid: How-to-communicate-with-Neo4j-throw-ODBC
 :page-image: /public/images/odbc/banner.png
 :page-tags: neo4j, odbc, jdbc
+:page-ref: blog-neo4j-odbc
 :toc:
 
 == Market solutions

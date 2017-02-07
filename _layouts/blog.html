@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{page.locale}}">
 <head>
   {% include head.html description=site.description tags=site.keywords author=site.author %}
 </head>
@@ -10,7 +10,7 @@
   <main class="firstBlock blockDefault mainContainer container">
     <section>
       <div class="span12">
-        <h1 itemprop="name">Blog posts</h1>
+        <h1 itemprop="name">{{site.posts[page.locale]}}</h1>
 
         <!-- This loops through the paginated posts -->
         {% for post in paginator.posts %}
@@ -25,13 +25,13 @@
                 <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&lt;</a></li>
               {% endif %}
 
-              {% for page in (1..paginator.total_pages) %}
-                {% if page == paginator.page %}
-                  <li><a class="current" href="#" title="Page n° {{ page }}">{{ page }}</a></li>
-                {% elsif page == 1 %}
-                  <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" title="Page n° {{ page }}">{{ page }}</a></li>
+              {% for pagination in (1..paginator.total_pages) %}
+                {% if pagination == paginator.page %}
+                  <li><a class="current" href="#" title="Page n° {{ pagination }}">{{ pagination }}</a></li>
+                {% elsif pagination == 1 %}
+                  <li><a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" title="Page n° {{ pagination }}">{{ pagination }}</a></li>
                 {% else %}
-                  <li><a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}" title="Page n° {{ page }}">{{ page }}</a></li>
+                  <li><a href="{{ page.pagination.permalink | prepend: page.permalink | prepend: site.baseurl | replace: '//', '/' | replace: ':num', pagination  }}" title="Page n° {{ pagination }}">{{ pagination }}</a></li>
                 {% endif %}
               {% endfor %}
 
@@ -41,6 +41,7 @@
             </ul>
           </div>
           {% endif %}
+
         </div>
       </section>
     </main>

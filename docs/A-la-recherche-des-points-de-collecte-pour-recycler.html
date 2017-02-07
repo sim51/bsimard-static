@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <title>A la recherche des points de collecte pour recycler</title>
 <meta charset="UTF-8">
@@ -34,17 +34,40 @@
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
-                <ul class="nav">
-                  <li><a href="/" title="Home">Home</a></li>
-                  <li><a href="/blog" title="Blog">Blog</a></li>
-                  <li><a href="/about-me" title="About me">About me</a></li>
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    <li>
+                      <a href="/A-la-recherche-des-points-de-collecte-pour-recycler" class="fr">fr</a> 
+                    </li>
+
+                  
+                  
+                    </li>
                 </ul>
             </nav>
         </div>
     </div>
 </header>
 
-  <main class="firstBlock blockDefault mainContainer container">
+  <section class="firstBlock blockDefault mainContainer container">
     <section>
       <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
         <div class="span12">
@@ -186,13 +209,13 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
           <footer>
             <ul class="inline pull-right metadata">
               <li >
-                <span class="metadata">Tags :</span>
+                <span class="metadata">Mot-Clefs :</span>
                 <span>
                   opendata, osm
                 </span>,
               </li>
               <li >
-                <span class="metadata">Auteur :</span>
+                <span class="metadata">Author :</span>
                 <span>
                   <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
                 </span>,
@@ -209,7 +232,7 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
 
       <section id="disqus_thread"></section>
 
-      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
         <div class="alpha-wrapper"></div>
         <div class="span12">
           <ul class="unstyled">
@@ -224,7 +247,7 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
       </nav>
 
     </section>
-  </main>
+  </section>
 
   <footer id="footer" class="hidden-print">
   <div class=" blockOdd">
@@ -234,7 +257,7 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
         <div class="span4">
           <ul class="pull-left inline">
             <li>
-              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
                 <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
               </a>
             </li>
@@ -257,12 +280,12 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
               </a>
             </li>
             <li>
-              <a href="https://www.github.com/sim51" title="Mon compte Github">
+              <a href="https://www.github.com/sim51" title="Mon compte github">
                 <i class="icon-github-alt"></i>
               </a>
             </li>
             <li>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
                 <i class="icon-linkedin"></i>
               </a>
             </li>
@@ -277,6 +300,13 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
 
 <script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
 <script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
 
 <!-- Addthis -->
 <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
@@ -306,5 +336,16 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&#8217;essayerai 
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
 </body>
 </html>

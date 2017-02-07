@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>How to communicate with Neo4j through ODBC</title>
 <meta charset="UTF-8">
@@ -30,21 +30,40 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/" title="Benoît Simard">
+            <a class="brand" href="/en" title="Benoît Simard">
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
-                <ul class="nav">
-                  <li><a href="/" title="Home">Home</a></li>
-                  <li><a href="/blog" title="Blog">Blog</a></li>
-                  <li><a href="/about-me" title="About me">About me</a></li>
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    <li>
+                      <a href="/2015/06/04/neo4j-odbc.html" class="en">en</a> 
+                    </li>
+
+                  
+                  
+                    </li>
                 </ul>
             </nav>
         </div>
     </div>
 </header>
 
-  <main class="firstBlock blockDefault mainContainer container">
+  <section class="firstBlock blockDefault mainContainer container">
     <section>
       <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
         <div class="span12">
@@ -302,10 +321,10 @@ So you have to install it on each machine.</p>
                 </span>,
               </li>
               <li>
-                <span class="metadata">Créé le :</span>
+                <span class="metadata">Created at :</span>
                 <time itemprop="dateCreated" datetime="2015-06-04">Jun 4, 2015</time>
               </li>
-              <li><a href="" title="Permalien : How to communicate with Neo4j through ODBC" itemprop="url">Permalien</a></li>
+              <li><a href="" title="Permalien : How to communicate with Neo4j through ODBC" itemprop="url">Permalink</a></li>
             </ul>
           </footer>
         </div>
@@ -313,7 +332,7 @@ So you have to install it on each machine.</p>
 
       <section id="disqus_thread"></section>
 
-      <nav class="row-fluid blog" data-spy="affix" data-offset-top="100">
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
         <div class="alpha-wrapper"></div>
         <div class="span12">
           <ul class="unstyled">
@@ -324,7 +343,7 @@ So you have to install it on each machine.</p>
             
             
             <li class="pull-right">
-              <a class="btn btn-primary" href="/2015/06/04/neo4j-pg-fdw.html" title="Neo4j Pg Fdw">Neo4j Pg Fdw &gt;</a>
+              <a class="btn btn-primary" href="/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql" title="Connecting Neo4j to any SQL tool with the power of Postgresql">Connecting Neo4j to any SQL tool with the power of Postgresql &gt;</a>
             </li>
             
           </ul>
@@ -332,7 +351,7 @@ So you have to install it on each machine.</p>
       </nav>
 
     </section>
-  </main>
+  </section>
 
   <footer id="footer" class="hidden-print">
   <div class=" blockOdd">
@@ -342,7 +361,7 @@ So you have to install it on each machine.</p>
         <div class="span4">
           <ul class="pull-left inline">
             <li>
-              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="License Creative commons : BY-SA">
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
                 <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
               </a>
             </li>
@@ -355,22 +374,22 @@ So you have to install it on each machine.</p>
         <div class="span8">
           <ul class="pull-right inline">
             <li>
-              <a href="mailto:contact@bsimard.com" title="Me contacter">
+              <a href="mailto:contact@bsimard.com" title="Contact me">
                 <i class="icon-envelope"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
                 <i class="icon-twitter"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.github.com/sim51" title="Mon compte Github">
+              <a href="https://www.github.com/sim51" title="My github account">
                 <i class="icon-github-alt"></i>
               </a>
             </li>
             <li>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profil Linked-In">
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
                 <i class="icon-linkedin"></i>
               </a>
             </li>
@@ -385,6 +404,13 @@ So you have to install it on each machine.</p>
 
 <script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
 <script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
 
 <!-- Addthis -->
 <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
@@ -414,5 +440,16 @@ So you have to install it on each machine.</p>
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
 </body>
 </html>

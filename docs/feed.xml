@@ -2,12 +2,345 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Benoit Simard</title>
-    <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com//</link>
-    <atom:link href="http://www.bsimard.com//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 05 Dec 2016 22:34:34 +0100</pubDate>
-    <lastBuildDate>Mon, 05 Dec 2016 22:34:34 +0100</lastBuildDate>
+    <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 07 Feb 2017 14:08:48 +0100</pubDate>
+    <lastBuildDate>Tue, 07 Feb 2017 14:08:48 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
+    
+      <item>
+        <title>Import JCDecaux dataset into Neo4j</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#goals&quot;&gt;Goals&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#jcdecaux-model&quot;&gt;JCDecaux model&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#imports&quot;&gt;Imports&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#constraints&quot;&gt;Constraints&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#importing-all-contracts&quot;&gt;Importing all contracts&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#importing-station-with-their-state&quot;&gt;Importing station with their state&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#some-cool-stuff&quot;&gt;Some cool stuff&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;goals&quot;&gt;Goals&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;During this post, we will play with the opendata JCDecaux API.
+I will shou you how to design your graph, to load the dataset from the JSON API, and make some queries and use the javascript driver into with a simple html application.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Let&amp;#8217;s start !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jcdecaux-model&quot;&gt;JCDecaux model&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JCDecaux provide an API to get all the information about their bicycle services. All is documentated here : &lt;a href=&quot;https://developer.jcdecaux.com&quot; class=&quot;bare&quot;&gt;https://developer.jcdecaux.com&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;INFO: you need to create an API key to use the API. On my examplesm you should replace the &lt;code&gt;@JCD_TOKEN_API@&lt;/code&gt; by your own.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By reading the &lt;a href=&quot;https://developer.jcdecaux.com/#/opendata/vls?page=dynamic&quot;&gt;real-time API documentation&lt;/a&gt;, we can compute that JCD is using the following schema :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-eb6c5cecc9b1438965322d064c0c4350.png&quot; alt=&quot;diag eb6c5cecc9b1438965322d064c0c4350&quot; width=&quot;728&quot; height=&quot;273&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So we have two entities, related together : it&amp;#8217;s a graph ! But can we do a better graph modelisation ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you look at the &lt;code&gt;Contract&lt;/code&gt; entity, you can see :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a dependency to a country&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a list of cities&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So let&amp;#8217;s explode this entity like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-b317109bf90f015fb06b4866a5533cc1.png&quot; alt=&quot;diag b317109bf90f015fb06b4866a5533cc1&quot; width=&quot;819&quot; height=&quot;93&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And what can we do about the &lt;code&gt;Station&lt;/code&gt; entity ? It&amp;#8217;s easy we can split it into two parts :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The station&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The State of the station (ie. ephemeral data)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-f3a47245d234f526a6116c10479f97e6.png&quot; alt=&quot;diag f3a47245d234f526a6116c10479f97e6&quot; width=&quot;589&quot; height=&quot;173&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And what if I want to keep the state history ?
+So let&amp;#8217;s create a chain of &lt;code&gt;State&lt;/code&gt; nodes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-6ffe1f11d0d54893b023927cfab8c6a6.png&quot; alt=&quot;diag 6ffe1f11d0d54893b023927cfab8c6a6&quot; width=&quot;589&quot; height=&quot;207&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I have choosen this modelisation, because my main goal is to get the last updated state, and with this one, I just have to traverse one relationship.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So the final schema looks like that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-74331910fff57af03e80c64bc790e020.png&quot; alt=&quot;diag 74331910fff57af03e80c64bc790e020&quot; width=&quot;1279&quot; height=&quot;261&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that we have our model, let see how to load the data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;imports&quot;&gt;Imports&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;constraints&quot;&gt;Constraints&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Firstly we have to declare the constraints of our model, we all the unique keys :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;// Contract name is unique
+CREATE CONSTRAINT ON (n:Contract) ASSERT n.name IS UNIQUE;
+
+// Country code is unique
+CREATE CONSTRAINT ON (n:Country) ASSERT n.code IS UNIQUE;
+
+// Station ID is a composition of the contract's name and the station id.
+// Because the number field into the Station entity is only unique inside a contract
+CREATE CONSTRAINT ON (n:Station) ASSERT n.id IS UNIQUE;
+
+// State id is a composition of the station id plus the last_update timestamp
+CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can note here, that we haven&amp;#8217;t create a constraint on cities. This just due because two countries can have the same city name.
+But we can create an index on it if we want to speed up our queries that are based on this field&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE INDEX ON :City(name);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;importing-all-contracts&quot;&gt;Importing all contracts&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We will import all the contract of JCDecaux. To do this, there is an endpoint that list all contracts : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/contracts&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/contracts&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;WITH '@JCD_TOKEN_API@' AS key
+CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) YIELD value as row
+    MERGE (contract:Contract { name: row.name, commercial_name:row.commercial_name })
+    MERGE (country:Country { code: row.country_code })
+    WITH row, contract, country
+      UNWIND row.cities AS cityName
+          MERGE (country)-[:HAS_CITY]-&amp;gt;(city:City { name: cityName })
+          MERGE (contract)-[:FOR_CITY]-&amp;gt;(city)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;importing-station-with-their-state&quot;&gt;Importing station with their state&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now we are going to create stations with their data, for all contract, with the help of this endpoint : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.periodic.iterate(
+    &quot;MATCH (c:Contract) RETURN c&quot;,
+    &quot;WITH '@JCD_TOKEN_API@' AS key , {c} AS contract
+        CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/stations?contract=' + contract.name + '&amp;amp;apiKey=' + key) YIELD value as row
+
+            // we can find the same station number on two contracts, so the unique id is a compisition of the id and the contract
+            MERGE (contract)-[:HAS_STATION]-&amp;gt;(station:Station {id: row.contract_name + '_' + row.number})
+                ON CREATE SET
+                    station.number = row.number,
+                    station.name = row.name,
+                    station.address = row.address,
+                    station.lat = row.position.lat,
+                    station.lng = row.position.lng,
+                    station.banking = row.banking,
+                    station.bonus = row.bonus
+
+            // to have a unique id, I'm using a composition of the station id and the last_update timetsamp
+            MERGE (state:State {id: station.id + '_' + row.last_update})
+                ON CREATE SET
+                    state.status = row.status,
+                    state.available_bikes = row.available_bikes,
+                    state.bike_stands = row.bike_stands,
+                    state.available_bike_stands = row.available_bike_stands
+
+            WITH station, state
+                MERGE (station)-[:LAST_STATE]-&amp;gt;(state)
+
+                // Here we remove the previous `LAST_STATE` rel if it exists, and we create the chain
+                WITH station, state
+                    MATCH (old:State)&amp;lt;-[r:LAST_STATE]-(station)-[:LAST_STATE]-&amp;gt;(state)
+                    WHERE NOT id(old) =id(state)
+                    WITH old, r, state
+                    CREATE (state)-[:PREVIOUS]-&amp;gt;(old)
+                    DELETE r&quot;,
+    {batchSize:1,parallel:true}) YIELD batches, total, errorMessages&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;First instruction is &lt;code&gt;apoc.periodic.iterate&lt;/code&gt;. It&amp;#8217;s a APOC procedure that takes 3 parameters:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A cypher query that give a first collection of results&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;An other cypher query that will be applied on each result from the first one&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Some configurations, here &lt;code&gt;{batchSize:1,parallel:true}&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Basically, it&amp;#8217;s the same as a &lt;code&gt;WITH&lt;/code&gt; (ie. to iterate over the result of a query), with the ability to create some batches (based on the first query), and optionnaly to parellelize them.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So here, I&amp;#8217;m just creating one job per &lt;code&gt;Contract&lt;/code&gt;, to create all the corredponding &lt;code&gt;Station&lt;/code&gt; with theirs &lt;code&gt;State&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can replay this script every 5 minutes, to update the state of each station.
+To do this you can create a &lt;code&gt;cron&lt;/code&gt; task, or you also can use the &lt;code&gt;apoc.periodic.repeat&lt;/code&gt; procedure (Job are not persisted, so you will have to re-create it after each restart of neo4j).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At the end you should have a graph like this&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-bicloo/graph-example.png&quot; alt=&quot;graph example&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;some-cool-stuff&quot;&gt;Some cool stuff&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that we have the data, we can ask to the database, what is the nearest station from me with an available bike :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;WITH point({latitude: 56.7, longitude: 12.6}) as my_position
+MATCH (station:Station)-[:LAST_STATE]-&amp;gt;(state:State)
+WHERE state.status = &quot;OPEN&quot; AND state.available_bikes &amp;gt; 0
+RETURN station, distance(point({latitude: station.lat, longitude: station.lng}), poi)  AS distance
+ORDER BY distance
+LIMIT 5&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you can see I&amp;#8217;m using two new functions of Neo4j 3.1 :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;point( { latitude: XXX, longitude: XXX} ) :&lt;/strong&gt; allow you to create a geospatial point in WGS-83 projection&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;distance( point, point) :&lt;/strong&gt; will returned the geodesic distance between the two points.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We can have a better performances, if we create those two indexes :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE INDEX ON :State(available_bikes);
+CREATE INDEX ON :State(status);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And what if we display this result directly on a map ?
+Nothing easier, Cypher can produce some JSON result, so let&amp;#8217;s change the result to produce a geojson :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;WITH point({latitude: 56.7, longitude: 12.6}) as my_position
+MATCH (station:Station)-[:LAST_STATE]-&amp;gt;(state:State)
+WHERE state.status = &quot;OPEN&quot; AND state.available_bikes &amp;gt; 0
+WITH station, state, distance(point({latitude: station.lat, longitude: station.lng}), my_position)  AS distance
+ORDER BY  distance
+LIMIT 5
+WITH collect( {
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [station.lng, station.lat]
+        },
+        properties : {
+            name : station.name,
+            distance: round(distance),
+            address : station.address,
+            free_bike: state.available_bikes,
+            free_slot: state.available_bike_stands
+        }
+    }) AS features
+RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To see the result, you can copy/paste the json result on &lt;a href=&quot;http://geojson.io/&quot; class=&quot;bare&quot;&gt;http://geojson.io/&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I have also build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, so you can test the result &lt;a href=&quot;https://cdn.rawgit.com/sim51/409c769d0501956549221449ca845360/raw/index.html&quot;&gt;HERE&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The source code is available &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;HERE&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        
+        <category>opendata, jcdecaux, neo4j</category>
+        
+        
+      </item>
     
       <item>
         <title>Lego Project</title>
@@ -481,8 +814,8 @@ WITH s,
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2016/12/04/lego-project.html</guid>
+        <link>http://localhost:4000/2016/12/04/lego-project.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/12/04/lego-project.html</guid>
         
         <category>neo4j, load csv, lego</category>
         
@@ -763,8 +1096,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</link>
-        <guid isPermaLink="true">http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</guid>
+        <link>http://localhost:4000/How-to-use-JRebel-with-Neo4j</link>
+        <guid isPermaLink="true">http://localhost:4000/How-to-use-JRebel-with-Neo4j</guid>
         
         <category>neo4j, jrebel</category>
         
@@ -894,8 +1227,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//Les-icones-du-passe</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Les-icones-du-passe</guid>
+        <link>http://localhost:4000/Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1185,8 +1518,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
@@ -1497,8 +1830,8 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</guid>
+        <link>http://localhost:4000/Comment-SolR-decoupe-vos-phrases</link>
+        <guid isPermaLink="true">http://localhost:4000/Comment-SolR-decoupe-vos-phrases</guid>
         
         <category>solr, lucene, full text search</category>
         
@@ -1506,20 +1839,33 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
       </item>
     
       <item>
-        <title>Neo4j Pg Fdw</title>
-        <description>&lt;div class=&quot;literalblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt; Connecting Neo4j to any SQL tool with the power of Postgresql
-Benoit Simard &amp;lt;contact@bsimard.com&amp;gt;
-:page-layout: post
-:page-lang: en
-:page-description: Since version 9.1, Postgreqsl has a new SQL feature : foreign data wrapper. It is a standardized way of handling access to remote objects from SQL databases. We will see how to install/implement/use it for Neo4j.
-:page-disqusid: Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
-:page-permalink: /Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql
-:page-image: /public/images/pg-fdw/banner.png
-:page-tags: neo4j, postgresql, foreign data wrapper
-:toc:&lt;/pre&gt;
-&lt;/div&gt;
+        <title>Connecting Neo4j to any SQL tool with the power of Postgresql</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#install-multicorn&quot;&gt;Install Multicorn&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#requirements&quot;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#installing-multicorn-from-source&quot;&gt;Installing Multicorn from source&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-fwd&quot;&gt;Neo4j FWD&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-use-neo4j-foreign-data-wrapper&quot;&gt;How to use Neo4j Foreign Data Wrapper&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#make-cypher-query-into-a-sql-select&quot;&gt;Make cypher query into a sql select&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#create-the-function-into-your-database&quot;&gt;Create the function into your database&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-use-it&quot;&gt;How to use it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-power-of-pg-json&quot;&gt;The power of PG &amp;amp; JSON&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#annexe&quot;&gt;Annexe&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#some-usefull-links&quot;&gt;Some usefull links&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#install-postgresql-9-4-for-wheezy&quot;&gt;Install postgresql 9.4 for wheezy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
 &lt;h2 id=&quot;implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/h2&gt;
@@ -1933,8 +2279,10 @@ $&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/06/04/neo4j-pg-fdw.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-pg-fdw.html</guid>
+        <link>http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
+        <guid isPermaLink="true">http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
+        
+        <category>neo4j, postgresql, foreign data wrapper</category>
         
         
       </item>
@@ -2174,8 +2522,8 @@ So you have to install it on each machine.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/06/04/neo4j-odbc.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-odbc.html</guid>
+        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
         
         <category>neo4j, odbc, jdbc</category>
         
@@ -2313,8 +2661,8 @@ Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essaye
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</link>
-        <guid isPermaLink="true">http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</guid>
+        <link>http://localhost:4000/A-la-recherche-des-points-de-collecte-pour-recycler</link>
+        <guid isPermaLink="true">http://localhost:4000/A-la-recherche-des-points-de-collecte-pour-recycler</guid>
         
         <category>opendata, osm</category>
         
