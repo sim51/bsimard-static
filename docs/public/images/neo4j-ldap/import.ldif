@@ -1,0 +1,99 @@
+
+dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+
+dn: cn=reader,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: reader
+member:uid=reader,ou=users,dc=example,dc=org
+
+dn: cn=publisher,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: publisher
+member:uid=publisher,ou=users,dc=example,dc=org
+
+dn: cn=architect,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: architect
+member:uid=architect,ou=users,dc=example,dc=org
+
+dn: cn=admin,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: admin
+member:uid=admin,ou=users,dc=example,dc=org
+
+dn: uid=reader,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Reader User
+givenName: Reader
+sn: reader
+uid: reader
+mail: reader@example.com
+ou: users
+userpassword: test
+memberOf: cn=reader,ou=groups,dc=example,dc=org
+
+dn: uid=publisher,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Publisher User
+givenName: Publisher
+sn: publisher
+uid: publisher
+mail: publisher@example.com
+ou: users
+userpassword: test
+memberOf: cn=publisher,ou=groups,dc=example,dc=org
+
+dn: uid=architect,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Architect User
+givenName: Architect
+sn: architect
+uid: architect
+mail: architect@example.com
+ou: users
+userpassword: test
+memberOf: cn=architect,ou=groups,dc=example,dc=org
+
+dn: uid=admin,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Admin User
+givenName: Architect
+sn: admin
+uid: admin
+mail: admin@example.com
+ou: users
+userpassword: test
+memberOf: cn=admin,ou=groups,dc=example,dc=org

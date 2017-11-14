@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Connect Neo4j to a LDAP</title>
+<meta charset="UTF-8">
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="A small tutorial on how to connect Neo4j to a LDAP server for authentication and authorization" />
+<meta name="keywords" content="opendata, jcdecaux, neo4j" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/en" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    <li>
+                      <a href="/2017/11/13/neo4j-ldap.html" class="en">en</a> 
+                    </li>
+
+                  
+                  
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Connect Neo4j to a LDAP</h1>
+            <meta itemprop="description" content=" A small tutorial on how to connect Neo4j to a LDAP server for authentication and authorization">
+            <img itemprop="image" src="/public/images/neo4j-ldap/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#goals">Goals</a></li>
+<li><a href="#an-openldap-server">An Openldap server</a></li>
+<li><a href="#neo4j-configuration">Neo4j configuration</a></li>
+<li><a href="#how-it-works">How it works ?</a>
+<ul class="sectlevel2">
+<li><a href="#authentication">authentication</a></li>
+<li><a href="#authorization">Authorization</a></li>
+</ul>
+</li>
+<li><a href="#good-to-know">Good to know</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="goals">Goals</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this tutorial you will see how to connect Neo4j to an LDAP server for authentication and authorization (only available with the Enterprise Edition).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="an-openldap-server">An Openldap server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We need to have a LDAP server with some data.
+For this purpose, I will use a docker with the following image : <a href="https://github.com/osixia/docker-openldap" class="bare">https://github.com/osixia/docker-openldap</a></p>
+</div>
+<div class="paragraph">
+<p>By default the domain is <code>dc=example,dc=org</code> and the admin is <code>cn=admin,dc=example,dc=org</code> with the password <code>admin</code>.</p>
+</div>
+<div class="paragraph">
+<p>We can also pass as an argument to docker, an <strong>ldif</strong> folder for initiate the ldap server with some data.</p>
+</div>
+<div class="paragraph">
+<p>This is the ldif file that I will use :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-ldif" data-lang="ldif">dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+
+dn: cn=reader,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: reader
+member:uid=reader,ou=users,dc=example,dc=org
+
+dn: cn=publisher,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: publisher
+member:uid=publisher,ou=users,dc=example,dc=org
+
+dn: cn=architect,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: architect
+member:uid=architect,ou=users,dc=example,dc=org
+
+dn: cn=admin,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: admin
+member:uid=admin,ou=users,dc=example,dc=org
+
+dn: uid=reader,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Reader User
+givenName: Reader
+sn: reader
+uid: reader
+mail: reader@example.com
+ou: users
+userpassword: test
+memberOf: cn=reader,ou=groups,dc=example,dc=org
+
+dn: uid=publisher,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Publisher User
+givenName: Publisher
+sn: publisher
+uid: publisher
+mail: publisher@example.com
+ou: users
+userpassword: test
+memberOf: cn=publisher,ou=groups,dc=example,dc=org
+
+dn: uid=architect,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Architect User
+givenName: Architect
+sn: architect
+uid: architect
+mail: architect@example.com
+ou: users
+userpassword: test
+memberOf: cn=architect,ou=groups,dc=example,dc=org
+
+dn: uid=admin,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Admin User
+givenName: Architect
+sn: admin
+uid: admin
+mail: admin@example.com
+ou: users
+userpassword: test
+memberOf: cn=admin,ou=groups,dc=example,dc=org</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, it only defines :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an organization unit for <strong>groups</strong> : <code>ou=groups,dc=example,dc=org</code>, with the following groups</p>
+<div class="ulist">
+<ul>
+<li>
+<p>group <strong>admin</strong> <code>cn=admin,ou=groupss,dc=example,dc=org</code> with the <code>admin</code></p>
+</li>
+<li>
+<p>group <strong>architect</strong> <code>cn=architect,ou=groups,dc=example,dc=org</code> with the <code>architect</code></p>
+</li>
+<li>
+<p>group <strong>publisher</strong> <code>cn=publisher,ou=groups,dc=example,dc=org</code> with the <code>publisher</code></p>
+</li>
+<li>
+<p>group <strong>reader</strong> <code>cn=reader,ou=groups,dc=example,dc=org</code> with the <code>reader</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>an organization unit for <strong>users</strong> : <code>ou=users,dc=example,dc=org</code>, with the following users</p>
+<div class="ulist">
+<ul>
+<li>
+<p>user <strong>admin</strong> <code>uid=admin,ou=users,dc=example,dc=org</code></p>
+</li>
+<li>
+<p>user <strong>architect</strong> <code>uid=architect,ou=users,dc=example,dc=org</code></p>
+</li>
+<li>
+<p>user <strong>publisher</strong> <code>uid=publisher,ou=users,dc=example,dc=org</code></p>
+</li>
+<li>
+<p>user <strong>reader</strong> <code>uid=reader,ou=users,dc=example,dc=org</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In my case, I have stored this ldif file here : /home/bsimard/ldif</p>
+</div>
+<div class="paragraph">
+<p>This is the command to start our ldap container with the ldif file :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">docker run \
+   --volume /home/bsimard/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom \
+   osixia/openldap:1.1.10 \
+   --copy-service \
+   --loglevel debug</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="neo4j-configuration">Neo4j configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now we have to tell to Neo4j how to connect to the LDAP.</p>
+</div>
+<div class="paragraph">
+<p>For this, you just have to edit the <code>NEO4J_HOME/conf/neo4j.conf</code> and put those properties :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-properties" data-lang="properties">#********************************************************************
+# Security Configuration
+#********************************************************************
+
+# The authentication and authorization provider that contains both users and roles.
+# This can be one of the built-in `native` or `ldap` auth providers,
+# or it can be an externally provided plugin, with a custom name prefixed by `plugin`,
+# i.e. `plugin-&lt;AUTH_PROVIDER_NAME&gt;`.
+dbms.security.auth_provider=ldap
+
+# The time to live (TTL) for cached authentication and authorization info when using
+# external auth providers (LDAP or plugin). Setting the TTL to 0 will
+# disable auth caching.
+#dbms.security.auth_cache_ttl=10m
+
+# The maximum capacity for authentication and authorization caches (respectively).
+#dbms.security.auth_cache_max_capacity=10000
+
+# Set to log successful authentication events to the security log.
+# If this is set to `false` only failed authentication events will be logged, which
+# could be useful if you find that the successful events spam the logs too much,
+# and you do not require full auditing capability.
+#dbms.security.log_successful_authentication=true
+
+#================================================
+# LDAP Auth Provider Configuration
+#================================================
+
+# URL of LDAP server to use for authentication and authorization.
+# The format of the setting is `&lt;protocol&gt;://&lt;hostname&gt;:&lt;port&gt;`, where hostname is the only required field.
+# The supported values for protocol are `ldap` (default) and `ldaps`.
+# The default port for `ldap` is 389 and for `ldaps` 636.
+# For example: `ldaps://ldap.example.com:10389`.
+#
+# NOTE: You may want to consider using STARTTLS (`dbms.security.ldap.use_starttls`) instead of LDAPS
+# for secure connections, in which case the correct protocol is `ldap`.
+dbms.security.ldap.host=172.17.0.2
+
+# Use secure communication with the LDAP server using opportunistic TLS.
+# First an initial insecure connection will be made with the LDAP server, and then a STARTTLS command
+# will be issued to negotiate an upgrade of the connection to TLS before initiating authentication.
+#dbms.security.ldap.use_starttls=false
+
+# The LDAP referral behavior when creating a connection. This is one of `follow`, `ignore` or `throw`.
+# `follow` automatically follows any referrals
+# `ignore` ignores any referrals
+# `throw` throws an exception, which will lead to authentication failure
+#dbms.security.ldap.referral=follow
+
+# The timeout for establishing an LDAP connection. If a connection with the LDAP server cannot be
+# established within the given time the attempt is aborted.
+# A value of 0 means to use the network protocol's (i.e., TCP's) timeout value.
+#dbms.security.ldap.connection_timeout=30s
+
+# The timeout for an LDAP read request (i.e. search). If the LDAP server does not respond within
+# the given time the request will be aborted. A value of 0 means wait for a response indefinitely.
+#dbms.security.ldap.read_timeout=30s
+
+#----------------------------------
+# LDAP Authentication Configuration
+#----------------------------------
+
+# LDAP authentication mechanism. This is one of `simple` or a SASL mechanism supported by JNDI,
+# for example `DIGEST-MD5`. `simple` is basic username
+# and password authentication and SASL is used for more advanced mechanisms. See RFC 2251 LDAPv3
+# documentation for more details.
+dbms.security.ldap.authentication.mechanism=simple
+
+# LDAP user DN template. An LDAP object is referenced by its distinguished name (DN), and a user DN is
+# an LDAP fully-qualified unique user identifier. This setting is used to generate an LDAP DN that
+# conforms with the LDAP directory's schema from the user principal that is submitted with the
+# authentication token when logging in.
+# The special token {0} is a placeholder where the user principal will be substituted into the DN string.
+dbms.security.ldap.authentication.user_dn_template=uid={0},ou=users,dc=example,dc=org
+
+# Determines if the result of authentication via the LDAP server should be cached or not.
+# Caching is used to limit the number of LDAP requests that have to be made over the network
+# for users that have already been authenticated successfully. A user can be authenticated against
+# an existing cache entry (instead of via an LDAP server) as long as it is alive
+# (see `dbms.security.auth_cache_ttl`).
+# An important consequence of setting this to `true` is that
+# Neo4j then needs to cache a hashed version of the credentials in order to perform credentials
+# matching. This hashing is done using a cryptographic hash function together with a random salt.
+# Preferably a conscious decision should be made if this method is considered acceptable by
+# the security standards of the organization in which this Neo4j instance is deployed.
+dbms.security.ldap.authentication.cache_enabled=false
+
+#----------------------------------
+# LDAP Authorization Configuration
+#----------------------------------
+# Authorization is performed by searching the directory for the groups that
+# the user is a member of, and then map those groups to Neo4j roles.
+
+# Perform LDAP search for authorization info using a system account instead of the user's own account.
+#
+# If this is set to `false` (default), the search for group membership will be performed
+# directly after authentication using the LDAP context bound with the user's own account.
+# The mapped roles will be cached for the duration of `dbms.security.auth_cache_ttl`,
+# and then expire, requiring re-authentication. To avoid frequently having to re-authenticate
+# sessions you may want to set a relatively long auth cache expiration time together with this option.
+# NOTE: This option will only work if the users are permitted to search for their
+# own group membership attributes in the directory.
+#
+# If this is set to `true`, the search will be performed using a special system account user
+# with read access to all the users in the directory.
+# You need to specify the username and password using the settings
+# `dbms.security.ldap.authorization.system_username` and
+# `dbms.security.ldap.authorization.system_password` with this option.
+# Note that this account only needs read access to the relevant parts of the LDAP directory
+# and does not need to have access rights to Neo4j, or any other systems.
+dbms.security.ldap.authorization.use_system_account=true
+
+# An LDAP system account username to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+# Note that the `dbms.security.ldap.authentication.user_dn_template` will not be applied to this username,
+# so you may have to specify a full DN.
+dbms.security.ldap.authorization.system_username=cn=admin,dc=example,dc=org
+
+# An LDAP system account password to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+dbms.security.ldap.authorization.system_password=admin
+
+# The name of the base object or named context to search for user objects when LDAP authorization is enabled.
+# A common case is that this matches the last part of `dbms.security.ldap.authentication.user_dn_template`.
+dbms.security.ldap.authorization.user_search_base=ou=users,dc=example,dc=org
+
+# The LDAP search filter to search for a user principal when LDAP authorization is
+# enabled. The filter should contain the placeholder token {0} which will be substituted for the
+# user principal.
+dbms.security.ldap.authorization.user_search_filter=(&amp;(objectClass=*)(uid={0}))
+
+# A list of attribute names on a user object that contains groups to be used for mapping to roles
+# when LDAP authorization is enabled.
+dbms.security.ldap.authorization.group_membership_attributes=memberOf
+
+# An authorization mapping from LDAP group names to Neo4j role names.
+# The map should be formatted as a semicolon separated list of key-value pairs, where the
+# key is the LDAP group name and the value is a comma separated list of corresponding role names.
+# For example: group1=role1;group2=role2;group3=role3,role4,role5
+#
+# You could also use whitespaces and quotes around group names to make this mapping more readable,
+# for example: dbms.security.ldap.authorization.group_to_role_mapping=\
+#          "cn=Neo4j Read Only,cn=users,dc=example,dc=com"      = reader;    \
+#          "cn=Neo4j Read-Write,cn=users,dc=example,dc=com"     = publisher; \
+#          "cn=Neo4j Schema Manager,cn=users,dc=example,dc=com" = architect; \
+#          "cn=Neo4j Administrator,cn=users,dc=example,dc=com"  = admin
+dbms.security.ldap.authorization.group_to_role_mapping=\
+          "cn=reader,ou=groups,dc=example,dc=org"  = reader; \
+          "cn=publisher,ou=groups,dc=example,dc=org"  = publisher; \
+          "cn=architect,ou=groups,dc=example,dc=org"  = architect; \
+          "cn=admin,ou=groups,dc=example,dc=org"  = admin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can restart Neo4j, and go to the browser to test the connection.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="how-it-works">How it works ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is two steps : authentication and authorization.</p>
+</div>
+<div class="sect2">
+<h3 id="authentication">authentication</h3>
+<div class="paragraph">
+<p>The authentication is made by a direct bind of the user with the following <strong>DN</strong> : Neo4j replace the user login (ie .<code>{0}</code>) in the properties <code>dbms.security.ldap.authentication.user_dn_template</code>.</p>
+</div>
+<div class="paragraph">
+<p>In the example, if you try to connect with the user <code>admin</code>, Neo4j will do a bind with <strong>DN</strong> <code>uid=admin,ou=Users,dc=example,dc=org</code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="authorization">Authorization</h3>
+<div class="paragraph">
+<p>Neo4j knows that the user is valid, so it can search for its groups.</p>
+</div>
+<div class="paragraph">
+<p>Neo4j will use a <strong>system  account</strong> to searh the authorization of users. To do it, it performs :
+  * the ldap query configure by <strong>dbms.security.ldap.authorization.user_search_filter</strong> by replacing the <code>{0}</code> with the user&#8217;s login : <code>(&amp;(objectClass=*)(uid={0}))</code>
+  * in the DN configure by <strong>dbms.security.ldap.authorization.user_search_base</strong> : <code>ou=users,dc=example,dc=org</code></p>
+</div>
+<div class="paragraph">
+<p>Once it has found the object correspondig to the user, Neo4j will take the attribute configure by <strong>dbms.security.ldap.authorization.group_membership_attributes</strong> (so <code>memberOf</code> in our example) to have the list of all the user&#8217;s group, and make the <strong>role</strong> mapping as defined in <strong>dbms.security.ldap.authorization.group_to_role_mapping</strong>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="good-to-know">Good to know</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>The LDAP connector is only available into the <strong>Enterprise Edition</strong></p>
+</li>
+<li>
+<p>Configuration is simple</p>
+</li>
+<li>
+<p>LDAP groups <strong>must be</strong> linked into users DN (via an attribut like <strong>memberOf</strong> in our case)</p>
+</li>
+<li>
+<p>In this example we have used a <strong>system account</strong> but it&#8217;s not necessary if users have the right to <code>BIND</code> &amp; <code>SEARCH</code> themself</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  opendata, jcdecaux, neo4j
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Created at :</span>
+                <time itemprop="dateCreated" datetime="2017-11-13">Nov 13, 2017</time>
+              </li>
+              <li><a href="" title="Permalien : Connect Neo4j to a LDAP" itemprop="url">Permalink</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2017/02/06/jcdecaux-cycle-neo4j.html" title="Import JCDecaux dataset into Neo4j">&lt; Import JCDecaux dataset into Neo4j</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Contact me">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="My github account">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2017/11/13/neo4j-ldap';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

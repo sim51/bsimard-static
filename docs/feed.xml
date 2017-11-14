@@ -3,11 +3,446 @@
   <channel>
     <title>Benoit Simard</title>
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
-    <link>http://www.bsimard.com//</link>
-    <atom:link href="http://www.bsimard.com//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 07 Feb 2017 17:59:06 +0100</pubDate>
-    <lastBuildDate>Tue, 07 Feb 2017 17:59:06 +0100</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 14 Nov 2017 11:09:45 +0100</pubDate>
+    <lastBuildDate>Tue, 14 Nov 2017 11:09:45 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
+    
+      <item>
+        <title>Connect Neo4j to a LDAP</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#goals&quot;&gt;Goals&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#an-openldap-server&quot;&gt;An Openldap server&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-configuration&quot;&gt;Neo4j configuration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-it-works&quot;&gt;How it works ?&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#authentication&quot;&gt;authentication&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#authorization&quot;&gt;Authorization&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#good-to-know&quot;&gt;Good to know&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;goals&quot;&gt;Goals&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this tutorial you will see how to connect Neo4j to an LDAP server for authentication and authorization (only available with the Enterprise Edition).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;an-openldap-server&quot;&gt;An Openldap server&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We need to have a LDAP server with some data.
+For this purpose, I will use a docker with the following image : &lt;a href=&quot;https://github.com/osixia/docker-openldap&quot; class=&quot;bare&quot;&gt;https://github.com/osixia/docker-openldap&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By default the domain is &lt;code&gt;dc=example,dc=org&lt;/code&gt; and the admin is &lt;code&gt;cn=admin,dc=example,dc=org&lt;/code&gt; with the password &lt;code&gt;admin&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We can also pass as an argument to docker, an &lt;strong&gt;ldif&lt;/strong&gt; folder for initiate the ldap server with some data.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the ldif file that I will use :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ldif&quot; data-lang=&quot;ldif&quot;&gt;dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+
+dn: cn=reader,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: reader
+member:uid=reader,ou=users,dc=example,dc=org
+
+dn: cn=publisher,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: publisher
+member:uid=publisher,ou=users,dc=example,dc=org
+
+dn: cn=architect,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: architect
+member:uid=architect,ou=users,dc=example,dc=org
+
+dn: cn=admin,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: admin
+member:uid=admin,ou=users,dc=example,dc=org
+
+dn: uid=reader,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Reader User
+givenName: Reader
+sn: reader
+uid: reader
+mail: reader@example.com
+ou: users
+userpassword: test
+memberOf: cn=reader,ou=groups,dc=example,dc=org
+
+dn: uid=publisher,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Publisher User
+givenName: Publisher
+sn: publisher
+uid: publisher
+mail: publisher@example.com
+ou: users
+userpassword: test
+memberOf: cn=publisher,ou=groups,dc=example,dc=org
+
+dn: uid=architect,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Architect User
+givenName: Architect
+sn: architect
+uid: architect
+mail: architect@example.com
+ou: users
+userpassword: test
+memberOf: cn=architect,ou=groups,dc=example,dc=org
+
+dn: uid=admin,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Admin User
+givenName: Architect
+sn: admin
+uid: admin
+mail: admin@example.com
+ou: users
+userpassword: test
+memberOf: cn=admin,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you can see, it only defines :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;an organization unit for &lt;strong&gt;groups&lt;/strong&gt; : &lt;code&gt;ou=groups,dc=example,dc=org&lt;/code&gt;, with the following groups&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;group &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;cn=admin,ou=groupss,dc=example,dc=org&lt;/code&gt; with the &lt;code&gt;admin&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;group &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;cn=architect,ou=groups,dc=example,dc=org&lt;/code&gt; with the &lt;code&gt;architect&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;group &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;cn=publisher,ou=groups,dc=example,dc=org&lt;/code&gt; with the &lt;code&gt;publisher&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;group &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;cn=reader,ou=groups,dc=example,dc=org&lt;/code&gt; with the &lt;code&gt;reader&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;an organization unit for &lt;strong&gt;users&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;, with the following users&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;user &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;uid=admin,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;user &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;uid=architect,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;user &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;uid=publisher,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;user &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;uid=reader,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In my case, I have stored this ldif file here : /home/bsimard/ldif&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the command to start our ldap container with the ldif file :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker run \
+   --volume /home/bsimard/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom \
+   osixia/openldap:1.1.10 \
+   --copy-service \
+   --loglevel debug&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;neo4j-configuration&quot;&gt;Neo4j configuration&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now we have to tell to Neo4j how to connect to the LDAP.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For this, you just have to edit the &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt; and put those properties :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;#********************************************************************
+# Security Configuration
+#********************************************************************
+
+# The authentication and authorization provider that contains both users and roles.
+# This can be one of the built-in `native` or `ldap` auth providers,
+# or it can be an externally provided plugin, with a custom name prefixed by `plugin`,
+# i.e. `plugin-&amp;lt;AUTH_PROVIDER_NAME&amp;gt;`.
+dbms.security.auth_provider=ldap
+
+# The time to live (TTL) for cached authentication and authorization info when using
+# external auth providers (LDAP or plugin). Setting the TTL to 0 will
+# disable auth caching.
+#dbms.security.auth_cache_ttl=10m
+
+# The maximum capacity for authentication and authorization caches (respectively).
+#dbms.security.auth_cache_max_capacity=10000
+
+# Set to log successful authentication events to the security log.
+# If this is set to `false` only failed authentication events will be logged, which
+# could be useful if you find that the successful events spam the logs too much,
+# and you do not require full auditing capability.
+#dbms.security.log_successful_authentication=true
+
+#================================================
+# LDAP Auth Provider Configuration
+#================================================
+
+# URL of LDAP server to use for authentication and authorization.
+# The format of the setting is `&amp;lt;protocol&amp;gt;://&amp;lt;hostname&amp;gt;:&amp;lt;port&amp;gt;`, where hostname is the only required field.
+# The supported values for protocol are `ldap` (default) and `ldaps`.
+# The default port for `ldap` is 389 and for `ldaps` 636.
+# For example: `ldaps://ldap.example.com:10389`.
+#
+# NOTE: You may want to consider using STARTTLS (`dbms.security.ldap.use_starttls`) instead of LDAPS
+# for secure connections, in which case the correct protocol is `ldap`.
+dbms.security.ldap.host=172.17.0.2
+
+# Use secure communication with the LDAP server using opportunistic TLS.
+# First an initial insecure connection will be made with the LDAP server, and then a STARTTLS command
+# will be issued to negotiate an upgrade of the connection to TLS before initiating authentication.
+#dbms.security.ldap.use_starttls=false
+
+# The LDAP referral behavior when creating a connection. This is one of `follow`, `ignore` or `throw`.
+# `follow` automatically follows any referrals
+# `ignore` ignores any referrals
+# `throw` throws an exception, which will lead to authentication failure
+#dbms.security.ldap.referral=follow
+
+# The timeout for establishing an LDAP connection. If a connection with the LDAP server cannot be
+# established within the given time the attempt is aborted.
+# A value of 0 means to use the network protocol's (i.e., TCP's) timeout value.
+#dbms.security.ldap.connection_timeout=30s
+
+# The timeout for an LDAP read request (i.e. search). If the LDAP server does not respond within
+# the given time the request will be aborted. A value of 0 means wait for a response indefinitely.
+#dbms.security.ldap.read_timeout=30s
+
+#----------------------------------
+# LDAP Authentication Configuration
+#----------------------------------
+
+# LDAP authentication mechanism. This is one of `simple` or a SASL mechanism supported by JNDI,
+# for example `DIGEST-MD5`. `simple` is basic username
+# and password authentication and SASL is used for more advanced mechanisms. See RFC 2251 LDAPv3
+# documentation for more details.
+dbms.security.ldap.authentication.mechanism=simple
+
+# LDAP user DN template. An LDAP object is referenced by its distinguished name (DN), and a user DN is
+# an LDAP fully-qualified unique user identifier. This setting is used to generate an LDAP DN that
+# conforms with the LDAP directory's schema from the user principal that is submitted with the
+# authentication token when logging in.
+# The special token {0} is a placeholder where the user principal will be substituted into the DN string.
+dbms.security.ldap.authentication.user_dn_template=uid={0},ou=users,dc=example,dc=org
+
+# Determines if the result of authentication via the LDAP server should be cached or not.
+# Caching is used to limit the number of LDAP requests that have to be made over the network
+# for users that have already been authenticated successfully. A user can be authenticated against
+# an existing cache entry (instead of via an LDAP server) as long as it is alive
+# (see `dbms.security.auth_cache_ttl`).
+# An important consequence of setting this to `true` is that
+# Neo4j then needs to cache a hashed version of the credentials in order to perform credentials
+# matching. This hashing is done using a cryptographic hash function together with a random salt.
+# Preferably a conscious decision should be made if this method is considered acceptable by
+# the security standards of the organization in which this Neo4j instance is deployed.
+dbms.security.ldap.authentication.cache_enabled=false
+
+#----------------------------------
+# LDAP Authorization Configuration
+#----------------------------------
+# Authorization is performed by searching the directory for the groups that
+# the user is a member of, and then map those groups to Neo4j roles.
+
+# Perform LDAP search for authorization info using a system account instead of the user's own account.
+#
+# If this is set to `false` (default), the search for group membership will be performed
+# directly after authentication using the LDAP context bound with the user's own account.
+# The mapped roles will be cached for the duration of `dbms.security.auth_cache_ttl`,
+# and then expire, requiring re-authentication. To avoid frequently having to re-authenticate
+# sessions you may want to set a relatively long auth cache expiration time together with this option.
+# NOTE: This option will only work if the users are permitted to search for their
+# own group membership attributes in the directory.
+#
+# If this is set to `true`, the search will be performed using a special system account user
+# with read access to all the users in the directory.
+# You need to specify the username and password using the settings
+# `dbms.security.ldap.authorization.system_username` and
+# `dbms.security.ldap.authorization.system_password` with this option.
+# Note that this account only needs read access to the relevant parts of the LDAP directory
+# and does not need to have access rights to Neo4j, or any other systems.
+dbms.security.ldap.authorization.use_system_account=true
+
+# An LDAP system account username to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+# Note that the `dbms.security.ldap.authentication.user_dn_template` will not be applied to this username,
+# so you may have to specify a full DN.
+dbms.security.ldap.authorization.system_username=cn=admin,dc=example,dc=org
+
+# An LDAP system account password to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+dbms.security.ldap.authorization.system_password=admin
+
+# The name of the base object or named context to search for user objects when LDAP authorization is enabled.
+# A common case is that this matches the last part of `dbms.security.ldap.authentication.user_dn_template`.
+dbms.security.ldap.authorization.user_search_base=ou=users,dc=example,dc=org
+
+# The LDAP search filter to search for a user principal when LDAP authorization is
+# enabled. The filter should contain the placeholder token {0} which will be substituted for the
+# user principal.
+dbms.security.ldap.authorization.user_search_filter=(&amp;amp;(objectClass=*)(uid={0}))
+
+# A list of attribute names on a user object that contains groups to be used for mapping to roles
+# when LDAP authorization is enabled.
+dbms.security.ldap.authorization.group_membership_attributes=memberOf
+
+# An authorization mapping from LDAP group names to Neo4j role names.
+# The map should be formatted as a semicolon separated list of key-value pairs, where the
+# key is the LDAP group name and the value is a comma separated list of corresponding role names.
+# For example: group1=role1;group2=role2;group3=role3,role4,role5
+#
+# You could also use whitespaces and quotes around group names to make this mapping more readable,
+# for example: dbms.security.ldap.authorization.group_to_role_mapping=\
+#          &quot;cn=Neo4j Read Only,cn=users,dc=example,dc=com&quot;      = reader;    \
+#          &quot;cn=Neo4j Read-Write,cn=users,dc=example,dc=com&quot;     = publisher; \
+#          &quot;cn=Neo4j Schema Manager,cn=users,dc=example,dc=com&quot; = architect; \
+#          &quot;cn=Neo4j Administrator,cn=users,dc=example,dc=com&quot;  = admin
+dbms.security.ldap.authorization.group_to_role_mapping=\
+          &quot;cn=reader,ou=groups,dc=example,dc=org&quot;  = reader; \
+          &quot;cn=publisher,ou=groups,dc=example,dc=org&quot;  = publisher; \
+          &quot;cn=architect,ou=groups,dc=example,dc=org&quot;  = architect; \
+          &quot;cn=admin,ou=groups,dc=example,dc=org&quot;  = admin&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now you can restart Neo4j, and go to the browser to test the connection.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;how-it-works&quot;&gt;How it works ?&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There is two steps : authentication and authorization.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;authentication&quot;&gt;authentication&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The authentication is made by a direct bind of the user with the following &lt;strong&gt;DN&lt;/strong&gt; : Neo4j replace the user login (ie .&lt;code&gt;{0}&lt;/code&gt;) in the properties &lt;code&gt;dbms.security.ldap.authentication.user_dn_template&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In the example, if you try to connect with the user &lt;code&gt;admin&lt;/code&gt;, Neo4j will do a bind with &lt;strong&gt;DN&lt;/strong&gt; &lt;code&gt;uid=admin,ou=Users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;authorization&quot;&gt;Authorization&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Neo4j knows that the user is valid, so it can search for its groups.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Neo4j will use a &lt;strong&gt;system  account&lt;/strong&gt; to searh the authorization of users. To do it, it performs :
+  * the ldap query configure by &lt;strong&gt;dbms.security.ldap.authorization.user_search_filter&lt;/strong&gt; by replacing the &lt;code&gt;{0}&lt;/code&gt; with the user&amp;#8217;s login : &lt;code&gt;(&amp;amp;(objectClass=*)(uid={0}))&lt;/code&gt;
+  * in the DN configure by &lt;strong&gt;dbms.security.ldap.authorization.user_search_base&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Once it has found the object correspondig to the user, Neo4j will take the attribute configure by &lt;strong&gt;dbms.security.ldap.authorization.group_membership_attributes&lt;/strong&gt; (so &lt;code&gt;memberOf&lt;/code&gt; in our example) to have the list of all the user&amp;#8217;s group, and make the &lt;strong&gt;role&lt;/strong&gt; mapping as defined in &lt;strong&gt;dbms.security.ldap.authorization.group_to_role_mapping&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;good-to-know&quot;&gt;Good to know&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The LDAP connector is only available into the &lt;strong&gt;Enterprise Edition&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configuration is simple&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LDAP groups &lt;strong&gt;must be&lt;/strong&gt; linked into users DN (via an attribut like &lt;strong&gt;memberOf&lt;/strong&gt; in our case)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In this example we have used a &lt;strong&gt;system account&lt;/strong&gt; but it&amp;#8217;s not necessary if users have the right to &lt;code&gt;BIND&lt;/code&gt; &amp;amp; &lt;code&gt;SEARCH&lt;/code&gt; themself&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
+        
+        <category>opendata, jcdecaux, neo4j</category>
+        
+        
+      </item>
     
       <item>
         <title>Import JCDecaux dataset into Neo4j</title>
@@ -352,7 +787,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;p&gt;To see the result, you can copy/paste the json result on &lt;a href=&quot;http://geojson.io/&quot; class=&quot;bare&quot;&gt;http://geojson.io/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Or you can also build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Or you can also build a simple webpage to display the result with &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt;, &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;The story of an Omaha man who hated Muslims…until some Syrian refugees became his neighbors. wapo.st/2kFgG2o
+like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -362,8 +798,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2017/02/06/jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -753,8 +1189,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -1233,8 +1669,8 @@ WITH s,
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2016/12/04/lego-project.html</guid>
+        <link>http://localhost:4000/2016/12/04/lego-project.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/12/04/lego-project.html</guid>
         
         <category>neo4j, load csv, lego</category>
         
@@ -1515,8 +1951,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</link>
-        <guid isPermaLink="true">http://www.bsimard.com//How-to-use-JRebel-with-Neo4j</guid>
+        <link>http://localhost:4000/How-to-use-JRebel-with-Neo4j</link>
+        <guid isPermaLink="true">http://localhost:4000/How-to-use-JRebel-with-Neo4j</guid>
         
         <category>neo4j, jrebel</category>
         
@@ -1646,8 +2082,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//Les-icones-du-passe</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Les-icones-du-passe</guid>
+        <link>http://localhost:4000/Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1937,8 +2373,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
@@ -2249,8 +2685,8 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Comment-SolR-decoupe-vos-phrases</guid>
+        <link>http://localhost:4000/Comment-SolR-decoupe-vos-phrases</link>
+        <guid isPermaLink="true">http://localhost:4000/Comment-SolR-decoupe-vos-phrases</guid>
         
         <category>solr, lucene, full text search</category>
         
@@ -2698,8 +3134,8 @@ $&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
-        <guid isPermaLink="true">http://www.bsimard.com//Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
+        <link>http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
+        <guid isPermaLink="true">http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
         
         <category>neo4j, postgresql, foreign data wrapper</category>
         
@@ -2941,149 +3377,10 @@ So you have to install it on each machine.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com//2015/06/04/neo4j-odbc.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com//2015/06/04/neo4j-odbc.html</guid>
+        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
         
         <category>neo4j, odbc, jdbc</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>A la recherche des points de collecte pour recycler</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#le-site-de-la-ville-de-nantes&quot;&gt;Le site de la ville de Nantes&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#le-site-de-nantes-métropole&quot;&gt;Le site de Nantes Métropole&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#le-site-opendata&quot;&gt;Le site opendata&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#open-street-map&quot;&gt;Open Street Map&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div id=&quot;preamble&quot;&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Depuis plusieurs années, je travaille quasiment uniquement pour la ville de Nantes et Nantes Métropole. Ainsi lorsque mes collègues cherchent une réponse à une problématique sur Nantes, ils me demandent si je sais où trouver l&amp;#8217;information.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce midi, la question était très simple : &lt;strong&gt;où peut-on trouver le point de collecte pour recycler le plus proche de chez moi ?&lt;/strong&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;le-site-de-la-ville-de-nantes&quot;&gt;Le site de la ville de Nantes&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Naturellement, je me dirige sur le site de la ville de Nantes et j&amp;#8217;effectue une recherche globale sur &quot;recyclage verre&quot;. Aucun résultat &amp;#8230;&amp;#8203;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je m&amp;#8217;obstine un peu, en effectuant d&amp;#8217;autres recherches avec des synonymes, en élargissant ma recherche, en testant par exemple &quot;verre&quot; ou &quot;recyclage&quot;.
-J&amp;#8217;obtiens quelque fois des résultats, mais cela ne correspond pas du tout à ce que je veux.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Là je vois une rubrique &quot;A votre service&quot; avec un formulaire plus détaillé et surtout un champ &quot;votre recherche concerne&quot; avec un item &quot;déchets/propreté&quot;. Je lance alors ma recherche avec cet unique critère.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je vois des résultats avec comme titre &quot;Ecopoint&quot; !  &amp;#8230;&amp;#8203; mais ce sont des déchetteries, alors que je veux connaître les points de collecte !&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;le-site-de-nantes-métropole&quot;&gt;Le site de Nantes Métropole&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Bon si cela se trouve, ces points de collecte sont sous la responsabilité de la métropole et pas de la ville.
-Je m&amp;#8217;en vais donc pour le site de Nantes Métropole.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;En parcourant le menu, je vois rapidement qu&amp;#8217;il existe une rubrique &quot;Pratique&quot; avec une entrée &quot;Déchets&quot;.
-Vais-je enfin trouver ma réponse ?&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Et ba non &amp;#8230;&amp;#8203;  je retrouve encore une fois mes écopoints, mais aussi tout un tas d&amp;#8217;informations générale sur le recyclage (ce qui est intéressant en soi).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je trouve quand même un numéro vert ( 0 800 344 000 ) qui est &quot;dédié aux questions de collecte&quot;.
-Je me demande si ce numéro pourrait répondre à ma demande. J&amp;#8217;essayerai demain !&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;le-site-opendata&quot;&gt;Le site opendata&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Après avoir fait ce que chaque citoyen aurait fait,  je me décide de pencher sur l&amp;#8217;opendata en allant sur le site &lt;a href=&quot;http://data.nantes.fr&quot; class=&quot;bare&quot;&gt;http://data.nantes.fr&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc me voilà reparti à lancer des recherches.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il y a 37 jeux de données sur la thématique &quot;Environnement&quot;, et en y associant le mot &quot;déchet&quot;, j&amp;#8217;en obtiens plus que 8.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;En les parcourant je tombe sur les jours de collecte, le tonnage des déchets en 2012, la fréquentation des déchetteries et encore la liste des écopoints, mais toujours pas ce que je veux.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je commence à être désespéré &amp;#8230;&amp;#8203;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;open-street-map&quot;&gt;Open Street Map&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Bon, là je sors l&amp;#8217;artillerie lourde, mais je suis sûr d&amp;#8217;y trouver ma donnée, enfin j&amp;#8217;espère &amp;#8230;&amp;#8203;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Première chose à faire, une requête dans le wiki d&amp;#8217;OSM pour trouver le bon tag pour les points de collecte : &lt;a href=&quot;http://wiki.openstreetmap.org/w/index.php?search=recyclage&amp;amp;title=Special%3ASearch&quot; class=&quot;bare&quot;&gt;http://wiki.openstreetmap.org/w/index.php?search=recyclage&amp;amp;title=Special%3ASearch&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Bingo, en regardant le 7ème résultat, je trouve le nom du tag et sa valeur : &lt;code&gt;amenity=recycling&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dernier pas, se rendre sur le site &lt;a href=&quot;http://overpass-turbo.eu&quot; class=&quot;bare&quot;&gt;http://overpass-turbo.eu&lt;/a&gt; pour y faire ma requête sur Nantes :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;osm-script&amp;gt;
-    &amp;lt;!-- query part for: “amenity=recycling” --&amp;gt;
-    &amp;lt;query type=&quot;node&quot;&amp;gt;
-      &amp;lt;has-kv k=&quot;amenity&quot; v=&quot;recycling&quot;/&amp;gt;
-      &amp;lt;bbox-query {{bbox}}/&amp;gt;
-    &amp;lt;/query&amp;gt;
-  &amp;lt;!-- print results --&amp;gt;
-  &amp;lt;print mode=&quot;body&quot;/&amp;gt;
-&amp;lt;/osm-script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Et voilà, j&amp;#8217;ai enfin mes données, et en plus sur une carte ! Vous pouvez voir le résultat en suivant ce lien : &lt;a href=&quot;http://overpass-turbo.eu/s/2z2&quot; class=&quot;bare&quot;&gt;http://overpass-turbo.eu/s/2z2&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Temps passé : &lt;strong&gt;environ 5 minutes&lt;/strong&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;De nos jours où on nous dit qu&amp;#8217;il faut trier, faire attention à la planète et être écolo, je trouve dommage qu&amp;#8217;à l&amp;#8217;heure du numérique et de l&amp;#8217;opendata il soit aussi difficile de trouver une information simple et pratique.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Si je n&amp;#8217;étais pas informaticien, geek et passionné par l&amp;#8217;opendata, je n&amp;#8217;aurais sans doute jamais trouvé la réponse à ma question.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Si l&amp;#8217;information c&amp;#8217;est le pouvoir, alors les data geek ont une bonne longueur d&amp;#8217;avance&amp;#8230;&amp;#8203;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Tue, 18 Feb 2014 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</link>
-        <guid isPermaLink="true">http://www.bsimard.com//A-la-recherche-des-points-de-collecte-pour-recycler</guid>
-        
-        <category>opendata, osm</category>
         
         
       </item>
