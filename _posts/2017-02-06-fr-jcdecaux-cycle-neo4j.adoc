@@ -12,17 +12,17 @@ Benoit Simard <contact@bsimard.com>
 
 Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.
 
-Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.
+Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requêtes Cypher et finir sur une petite application web pour afficher le tout.
 
 C'est parti !
 
 == Le modèle de JCDecaux 
 
-JCDecaux fournit une APIpour les informations sur leur services de vélos. La documentation est disponible ici : https://developer.jcdecaux.com
+JCDecaux fournit une API pour les informations sur leur services de vélos. La documentation est disponible ici : https://developer.jcdecaux.com
 
-INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer `@JCD_TOKEN_API@` par la votre.
+INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer `@JCD_TOKEN_API@` par le votre.
 
-En lisant https://developer.jcdecaux.com/#/opendata/vls?page=dynamic[la document 'real-time'], on peut en définir que JCD utilise le mod̀le sivant :
+En lisant https://developer.jcdecaux.com/#/opendata/vls?page=dynamic[la document 'real-time'], on peut en définir que JCD utilise le mod̀le suivant :
 
 [graphviz]
 ----
@@ -44,14 +44,14 @@ digraph finite_state_machine {
 }
 ----
 
-Il y a deux entitées, liées ensemble : c'est le début d'un graphe ! Mais on peut faire mieux ...
+Il y a deux entités, liées ensemble : c'est le début d'un graphe ! Mais on peut faire mieux ...
 
 Si on regarde l'entité `Contact`, on voit :
 
 * une dépendance à un pays
 * une liste de ville
 
-Donc explosons le !
+Donc explosons la !
 
 [graphviz]
 ----
@@ -99,7 +99,7 @@ digraph finite_state_machine {
 ----
 
 Mais que fait-on si on a envie de garder l'historique des données ?
-Et bien il suffit de créer une chaine de noeud `State`.
+Et bien il suffit de créer une chaine de noeuds `State`.
 
 [graphviz]
 ----
@@ -122,9 +122,9 @@ digraph finite_state_machine {
 ----
 
 J'ai choisi cette modélisation car mon principal objectif est d'obtenir les derniéres données (ie. l'état courant de la station). 
-Avec ce système je n'ai qu'a traverser une seule relation, et je garde l'historique.
+Avec ce système je n'ai qu'à traverser une seule relation, et je garde l'historique.
 
-Donc mon schéma finale ressemble à cela :
+Donc mon schéma final ressemble à cela :
 
 [graphviz]
 ----
@@ -158,7 +158,7 @@ A présent que nous avons notre modèle, passons à l'étape d'import.
 
 === Pré-requis
 
-Avant de commencer, il vous faut installer https://neo4j-contrib.github.io/neo4j-apoc-procedures[APOC]. Il s'agit d'une collection de procédures stockées très utilise, dont je ne peux plus me passer.
+Avant de commencer, il vous faut installer https://neo4j-contrib.github.io/neo4j-apoc-procedures[APOC]. Il s'agit d'une collection de procédures stockées très utiles, dont je ne peux plus me passer.
 
 Voici la procédure de son installation : 
 
@@ -180,7 +180,7 @@ $> bin/neo4j restart
 
 === Les contraintes
 
-Dans Neo4j nous pouvons créer des contraintes d'unicité, ce qui permet de s'assurer de la cohérence de nos données, mais aussi d'qccélèrer la recherche d'un noeud via son identifiant.
+Dans Neo4j nous pouvons créer des contraintes d'unicité, ce qui permet de s'assurer de la cohérence de nos données, mais aussi d'accélèrer la recherche d'un noeud via son identifiant.
 
 Ceci va être utile pour la phase d'import pour s'assurer qu'on ne crée pas deux fois le même noeud.
 
@@ -200,8 +200,8 @@ CREATE CONSTRAINT ON (n:Station) ASSERT n.id IS UNIQUE;
 CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;
 ----
 
-Il est a noter qu'ici je n'ai pas crée de contrainte sur les villes. C'est juste parceque deux pays peuvent avoir une ville avec le même nom.
-Mais si on veut on peut créer un index dessus, pour accélérer nos recherches de ville per leur nom .
+Il est a noter qu'ici je n'ai pas créé de contrainte sur les villes. C'est juste parce que deux pays peuvent avoir une ville avec le même nom.
+Mais si on le souhaite, on peut créer un index dessus, pour accélérer nos recherches de ville par leur nom.
 
 [source,cypher]
 ----
@@ -228,7 +228,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 
 === Importer les stations et leur état
 
-Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l'endpoint suivant : `https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@`
+Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce au endpoint suivant : `https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@`
 
 `@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d'obtenir la liste des stations de celui-ci.
 
@@ -273,15 +273,15 @@ CALL apoc.periodic.iterate(
     {batchSize:1,parallel:true}) YIELD batches, total, errorMessages
 ----
 
-La première instruction est `apoc.periodic.iterate`. Il s'agit d'une procédure stockée qui prend 3 paramêtre :
+La première instruction est `apoc.periodic.iterate`. Il s'agit d'une procédure stockée qui prend 3 paramêtres :
 
-  * Une requête cyphe qui permet d'obtenir une première collection de résultat 
+  * Une requête cypher qui permet d'obtenir une première collection de résultat 
   * Une autre requête qui va s'appliquer sur chacun des résultats de la première
   * De la configuration (ici `{batchSize:1,parallel:true}`)
 
-Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d'une requête), mais avec des possiblités de batches (basé sur le nombre d'itération de la première requêete), et de parallélisation.
+Basiquement, cela ressemble à un WITH  (ie. itérer sur les résultats d'une requête), mais avec des possiblités de batch (basé sur le nombre d'itération de la première requêete), et de parallélisation.
 
-Donc ici je crée juste un job par `Contrat` pour créer les stations.
+Donc ici, je crée juste un job par `Contrat` pour créer les stations.
 
 Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l'état des stations, vu que j'utilise l'instruction `MERGE`, qui permet de selectionner une noeud et de le créer s'il n'exsite pas.
 
@@ -293,7 +293,7 @@ image::/public/images/neo4j-bicloo/graph-example.png[]
 
 == Amusons-nous maintenant !
 
-Maintenant que nous avons une base opérationnelle avec les donnéesm pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :
+Maintenant que nous avons une base opérationnelle avec les données, pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :
 
 [source,cypher]
 ----
@@ -319,7 +319,7 @@ CREATE INDEX ON :State(status);
 ----
 
 Ok, et si je veux afficher ces données sur une carte avec du geojson ?
-Ba Cypher sait construire du json, il suffit de lui dire comment :
+Cypher sachant construire du json, il suffit de lui dire comment :
 
 [source,cypher]
 ----
@@ -348,7 +348,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson
 
 Pour voir le résultat (et vérifier la validité du geoJson), vous pouvez copier/coller le résultat de la requête dans http://geojson.io/
 
-Ou si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a http://leafletjs.com/[Leaflet] : https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
+Ou, si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a http://leafletjs.com/[Leaflet] : https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
 
 Voici le rendu finale :
 
