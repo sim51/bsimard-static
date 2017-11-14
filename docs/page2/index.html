@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <title>Blog</title>
+  <head>
+    <title>Accueil - page 2</title>
 <meta charset="UTF-8">
-<meta name="author" content="{"fr"=>"Author", "en"=>"Auteur"}"/>
+<meta name="author" content="site.author"/>
 <meta name="robots" content="index, follow" />
-<meta name="description" content="{"fr"=>"Site de Benoit Simard", "en"=>"Benoit 's Blog"}" />
-<meta name="keywords" content="{"fr"=>"Mot-Clefs", "en"=>"Tags"}" />
+<meta name="description" content="site.description[page.locale]" />
+<meta name="keywords" content="site.keywords[page.locale]" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
@@ -18,10 +18,10 @@
 <!-- RSS feed -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
 
-</head>
-<body class="search">
+  </head>
+  <body class="home" itemscope itemtype="http://schema.org/WebPage">
 
-  <!-- Navbar -->
+    <!-- Navbar -->
 <header class="navbar navbar-inverse navbar-fixed-top hidden-print">
     <div class="navbar-inner">
         <div class="container">
@@ -63,11 +63,11 @@
                   
                   
                     <li>
-                      <a href="/en/blog/" class="en">en</a> 
+                      <a href="/en/" class="en">en</a> 
                     <li>
-                      <a href="/blog/" class="fr">fr</a> 
+                      <a href="/" class="fr">fr</a> 
                     <li>
-                      <a href="/blog/page/2/" class="fr">fr</a> 
+                      <a href="/page2/" class="fr">fr</a> 
                     </li>
                 </ul>
             </nav>
@@ -75,126 +75,85 @@
     </div>
 </header>
 
+    <!-- header-->
+<section id="overview" class="blockDefault firstBlock">
+  <div class="container">
+    <h1 itemprop="name">Benoît Simard</h1>
+    <!-- Mes valeurs -->
+    <div id="valeurs" class="row-fluid">
+      <ul class="inline span12">
+        <li class="span3" id="free"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Je suis un libriste convaincu ! (et même parfois un peu extrémiste)"><i class="icon-linux"></i> <div>Libriste</div></a></li>
+        <li class="span3" id="webdev"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Développeur et fier de l'être, vive les artisans du web !"><i class="iconmoon-earth"></i> <div>Développeur web</div></a></li>
+        <li class="span3" id="java"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Le java c'est bien , en abuser ça craint !"><i class="icon-coffee"></i><div>Amaint le café</div></a></li>
+        <li class="span3" id="data"><a class="tooltip span2" data-placement="bottom" data-toggle="tooltip" href="index.html#" title="Quelles soient big, linked ou open, j'aime les data !"><i class="iconmoon-stack"></i> <div>Et les données</div></a></li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <main class="firstBlock blockDefault mainContainer container">
-    <section>
-      <div class="span12">
-        <h1 itemprop="name"></h1>
+<!-- follow -->
+<section id="follow" class="blockEven">
+  <div class="container">
+    <div class="row-fluid ">
+      <div class="span6">
+        <h2>Retrouvez-moi sur le web</h2>
+      </div>
+      <div class="span6">
+        <ul class="inline pull-right">
+          <li>
+            <div>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter"><i class="icon-twitter"></i></a>
+            </div>
+          </li>
+          <li>
+            <div>
+              <a href="https://www.github.com/sim51" title="Mon compte github"><i class="icon-github-alt"></i></a>
+            </div>
+          </li>
+          <li>
+            <div>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title=""><i class="icon-linkedin"></i></a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- This loops through the paginated posts -->
-        
-          <article class="resultItem">
-  <a href="/2017/11/13/fr-neo4j-ldap.html" title="">
+    
+    <section id="blog" class="block">
+  <div class="container">
+    <h2>
+      <a href="/feed.xml" title="Flux RSS">
+        <i class="icon-rss"></i>
+      </a>
+      Mes derniers billet
+    </h2>
+    <div class="row-fluid">
+      <!-- This loops through the paginated posts -->
+      
+        <article class="resultItem">
+  <a href="/A-la-recherche-des-points-de-collecte-pour-recycler" title="">
     <header>
-      <h3>Connecter Neo4j à un annuaire LDAP</h3>
+      <h3>A la recherche des points de collecte pour recycler</h3>
     </header>
     <div class="row-fluid">
       <div class="span2">
-        <img src="/public/images/neo4j-ldap/banner.png" width="100"/>
+        <img src="/public/images/opendata-collect/banner.png" width="100"/>
       </div>
       <div class="span8">
-        Venez découvrir comment on peut déléguer à un annuaire LDAP, l'authenfication et les authorisations de Neo4j
+        Ce midi on m'a pose une question simple : ou je peux trouver le point de recyclage de verre le plus proche de chez moi ? Question simple, mais pas evident de trouver la donnee...
       </div>
     </div>
   </a>
 </article>
 
-        
-          <article class="resultItem">
-  <a href="/2017/02/06/fr-jcdecaux-cycle-neo4j.html" title="">
-    <header>
-      <h3>Importer de l&#8217;API opendata de JCDécaux dans Neo4j</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/neo4j-bicloo/banner.jpg" width="100"/>
-      </div>
-      <div class="span8">
-        A travers de l'utlisation de l'API de JCDecaux, vous allez voir comment modéliser en graph, charger les données et faire quelque reqûetes Cypher.
-      </div>
+      
     </div>
-  </a>
-</article>
+  </div>
+</section>
 
-        
-          <article class="resultItem">
-  <a href="/Les-icones-du-passe" title="">
-    <header>
-      <h3>Les icônes du passé</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/icones/obsolete.png" width="100"/>
-      </div>
-      <div class="span8">
-        Lorsque je vois un graphiste mettre une disquette a cote du bouton save cela me fait toujours rire ! J'ai donc deide de faire un petit florilege des icones obsoletes.
-      </div>
-    </div>
-  </a>
-</article>
-
-        
-          <article class="resultItem">
-  <a href="/Stresser-facilement-votre-base-Neo4j-avec-gatling" title="">
-    <header>
-      <h3>Stresser facilement votre base Neo4j avec gatling</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/neo4j-gatling/banner.png" width="100"/>
-      </div>
-      <div class="span8">
-        Dans cet article nous allons voir comment créer simplement des tests de performance sur Neo4j en utilisant Gatling et les logs HTTP.
-      </div>
-    </div>
-  </a>
-</article>
-
-        
-          <article class="resultItem">
-  <a href="/Comment-SolR-decoupe-vos-phrases" title="">
-    <header>
-      <h3>Comment SolR découpe vos phrases</h3>
-    </header>
-    <div class="row-fluid">
-      <div class="span2">
-        <img src="/public/images/solr/banner.jpg" width="100"/>
-      </div>
-      <div class="span8">
-        Dans cet article je vais vous presenter par quelle moulinette vos phrases sont hachees par Solr
-      </div>
-    </div>
-  </a>
-</article>
-
-        
-
-        
-        <nav id="pagination" class="blockDefault">
-          <div class="span12 pagination">
-            <ul>
-              
-
-              
-                
-                  <li><a class="current" href="#" title="Page n° 1">1</a></li>
-                
-              
-                
-                  <li><a href="/blog/page/2/" title="Page n° 2">2</a></li>
-                
-              
-
-              
-                <li><a href="/blog/page/2/">&gt;</a></li>
-              
-            </ul>
-          </div>
-          
-
-        </div>
-      </section>
-    </main>
     <footer id="footer" class="hidden-print">
   <div class=" blockOdd">
     <div class="container">
@@ -282,5 +241,6 @@
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
+
   </body>
-  </html>
+</html>

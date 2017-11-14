@@ -5,8 +5,8 @@
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 14 Nov 2017 11:09:45 +0100</pubDate>
-    <lastBuildDate>Tue, 14 Nov 2017 11:09:45 +0100</lastBuildDate>
+    <pubDate>Tue, 14 Nov 2017 13:39:27 +0100</pubDate>
+    <lastBuildDate>Tue, 14 Nov 2017 13:39:27 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -15,7 +15,7 @@
 &lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
 &lt;ul class=&quot;sectlevel1&quot;&gt;
 &lt;li&gt;&lt;a href=&quot;#goals&quot;&gt;Goals&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#an-openldap-server&quot;&gt;An Openldap server&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#setup-an-openldap-server&quot;&gt;Setup an Openldap server&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#neo4j-configuration&quot;&gt;Neo4j configuration&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#how-it-works&quot;&gt;How it works ?&lt;/a&gt;
 &lt;ul class=&quot;sectlevel2&quot;&gt;
@@ -30,12 +30,12 @@
 &lt;h2 id=&quot;goals&quot;&gt;Goals&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In this tutorial you will see how to connect Neo4j to an LDAP server for authentication and authorization (only available with the Enterprise Edition).&lt;/p&gt;
+&lt;p&gt;In this tutorial you will see how to connect Neo4j to a LDAP server for authentication and authorization (only available with the Enterprise Edition).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;an-openldap-server&quot;&gt;An Openldap server&lt;/h2&gt;
+&lt;h2 id=&quot;setup-an-openldap-server&quot;&gt;Setup an Openldap server&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;We need to have a LDAP server with some data.
@@ -45,10 +45,10 @@ For this purpose, I will use a docker with the following image : &lt;a href=&quo
 &lt;p&gt;By default the domain is &lt;code&gt;dc=example,dc=org&lt;/code&gt; and the admin is &lt;code&gt;cn=admin,dc=example,dc=org&lt;/code&gt; with the password &lt;code&gt;admin&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;We can also pass as an argument to docker, an &lt;strong&gt;ldif&lt;/strong&gt; folder for initiate the ldap server with some data.&lt;/p&gt;
+&lt;p&gt;We can pass an argument to docker to add a &lt;strong&gt;ldif&lt;/strong&gt; folder for initiate the ldap server with some data.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This is the ldif file that I will use :&lt;/p&gt;
+&lt;p&gt;This is the ldif file that I use :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -198,10 +198,10 @@ memberOf: cn=admin,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In my case, I have stored this ldif file here : /home/bsimard/ldif&lt;/p&gt;
+&lt;p&gt;INFO: users are also linked to groups via the &lt;code&gt;memberOf&lt;/code&gt; attribut&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This is the command to start our ldap container with the ldif file :&lt;/p&gt;
+&lt;p&gt;In my case, I have stored this ldif file in this folder &lt;code&gt;/home/bsimard/ldif&lt;/code&gt;, so the command to start the ldap container is the following :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -218,10 +218,8 @@ memberOf: cn=admin,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&quot;neo4j-configuration&quot;&gt;Neo4j configuration&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now we have to tell to Neo4j how to connect to the LDAP.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For this, you just have to edit the &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt; and put those properties :&lt;/p&gt;
+&lt;p&gt;Now we have to configure Neo4j to use the LDAP.
+For this, edit the &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt; and put those properties :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -392,24 +390,24 @@ dbms.security.ldap.authorization.group_to_role_mapping=\
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;authentication&quot;&gt;authentication&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The authentication is made by a direct bind of the user with the following &lt;strong&gt;DN&lt;/strong&gt; : Neo4j replace the user login (ie .&lt;code&gt;{0}&lt;/code&gt;) in the properties &lt;code&gt;dbms.security.ldap.authentication.user_dn_template&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The authentication is made by a direct bind of the user with the &lt;strong&gt;DN&lt;/strong&gt; defined like this : Neo4j replace the user login (ie .&lt;code&gt;{0}&lt;/code&gt;) in the property &lt;code&gt;dbms.security.ldap.authentication.user_dn_template&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In the example, if you try to connect with the user &lt;code&gt;admin&lt;/code&gt;, Neo4j will do a bind with &lt;strong&gt;DN&lt;/strong&gt; &lt;code&gt;uid=admin,ou=Users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;In the example, if you try to connect with the user &lt;code&gt;admin&lt;/code&gt;, Neo4j will do a bind with &lt;code&gt;uid=admin,ou=Users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;authorization&quot;&gt;Authorization&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Neo4j knows that the user is valid, so it can search for its groups.&lt;/p&gt;
+&lt;p&gt;Neo4j knows that the user is valid, so it can search his groups.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Neo4j will use a &lt;strong&gt;system  account&lt;/strong&gt; to searh the authorization of users. To do it, it performs :
+&lt;p&gt;For this, it need a &lt;strong&gt;system  account&lt;/strong&gt; to searh the authorization of users. To do it, it performs :
   * the ldap query configure by &lt;strong&gt;dbms.security.ldap.authorization.user_search_filter&lt;/strong&gt; by replacing the &lt;code&gt;{0}&lt;/code&gt; with the user&amp;#8217;s login : &lt;code&gt;(&amp;amp;(objectClass=*)(uid={0}))&lt;/code&gt;
-  * in the DN configure by &lt;strong&gt;dbms.security.ldap.authorization.user_search_base&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+  * inside the DN configure by &lt;strong&gt;dbms.security.ldap.authorization.user_search_base&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Once it has found the object correspondig to the user, Neo4j will take the attribute configure by &lt;strong&gt;dbms.security.ldap.authorization.group_membership_attributes&lt;/strong&gt; (so &lt;code&gt;memberOf&lt;/code&gt; in our example) to have the list of all the user&amp;#8217;s group, and make the &lt;strong&gt;role&lt;/strong&gt; mapping as defined in &lt;strong&gt;dbms.security.ldap.authorization.group_to_role_mapping&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Once it has found the object correspondig to the user, Neo4j will take the attribute configure by &lt;strong&gt;dbms.security.ldap.authorization.group_membership_attributes&lt;/strong&gt; (so &lt;code&gt;memberOf&lt;/code&gt; in our example) to have the list of all the user&amp;#8217;s group, and then he makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined in &lt;strong&gt;dbms.security.ldap.authorization.group_to_role_mapping&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -439,7 +437,443 @@ dbms.security.ldap.authorization.group_to_role_mapping=\
         <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
         
-        <category>opendata, jcdecaux, neo4j</category>
+        <category>neo4j, ldap connection, authentication, authorization</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Connecter Neo4j à un annuaire LDAP</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#objectif&quot;&gt;Objectif&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#installation-d-un-serveur-openldap&quot;&gt;Installation d&amp;#8217;un serveur OpenLDAP&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-configuration-de-neo4j&quot;&gt;La configuration de Neo4j&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#détail-du-fonctionnement&quot;&gt;Détail du fonctionnement&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#l-authentification&quot;&gt;L&amp;#8217;authentification&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#la-gestion-des-accès&quot;&gt;La gestion des accès&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#en-bref&quot;&gt;En bref&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;objectif&quot;&gt;Objectif&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Vous allez découvrir comment connecter un annuaire LDAP à Neo4j pour lui confier la gestion de l&amp;#8217;authentification et des accès.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;installation-d-un-serveur-openldap&quot;&gt;Installation d&amp;#8217;un serveur OpenLDAP&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Au lieu d&amp;#8217;installer un serveur OpenLDAP sur ma machine, je vais utiliser Docker avec l&amp;#8217;image suivante : &lt;a href=&quot;https://github.com/osixia/docker-openldap&quot; class=&quot;bare&quot;&gt;https://github.com/osixia/docker-openldap&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Celle-ci me permet de lancer un serveur OpenLDAP pré-configurer où :
+  * le domaine par défault est  &lt;code&gt;dc=example,dc=org&lt;/code&gt;
+  * l&amp;#8217;administrateur &lt;code&gt;cn=admin,dc=example,dc=org&lt;/code&gt; (avec le password &lt;code&gt;admin&lt;/code&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;De plus je peux lui passer en paramètre le chemin d&amp;#8217;accès d&amp;#8217;un répertoire contenant des fichiers LDIF, qui vont être éxécutés à son lancement.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ainsi, voici le fichier LDIF que j&amp;#8217;ai réalisé pour créer la structure de mon LDAP&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ldif&quot; data-lang=&quot;ldif&quot;&gt;dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+
+dn: cn=reader,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: reader
+member:uid=reader,ou=users,dc=example,dc=org
+
+dn: cn=publisher,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: publisher
+member:uid=publisher,ou=users,dc=example,dc=org
+
+dn: cn=architect,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: architect
+member:uid=architect,ou=users,dc=example,dc=org
+
+dn: cn=admin,ou=groups,dc=example,dc=org
+objectClass: groupOfNames
+objectClass: top
+cn: admin
+member:uid=admin,ou=users,dc=example,dc=org
+
+dn: uid=reader,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Reader User
+givenName: Reader
+sn: reader
+uid: reader
+mail: reader@example.com
+ou: users
+userpassword: test
+memberOf: cn=reader,ou=groups,dc=example,dc=org
+
+dn: uid=publisher,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Publisher User
+givenName: Publisher
+sn: publisher
+uid: publisher
+mail: publisher@example.com
+ou: users
+userpassword: test
+memberOf: cn=publisher,ou=groups,dc=example,dc=org
+
+dn: uid=architect,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Architect User
+givenName: Architect
+sn: architect
+uid: architect
+mail: architect@example.com
+ou: users
+userpassword: test
+memberOf: cn=architect,ou=groups,dc=example,dc=org
+
+dn: uid=admin,ou=users,dc=example,dc=org
+objectClass: organizationalPerson
+objectClass: person
+objectClass: extensibleObject
+objectClass: uidObject
+objectClass: inetOrgPerson
+objectClass: top
+cn: Admin User
+givenName: Architect
+sn: admin
+uid: admin
+mail: admin@example.com
+ou: users
+userpassword: test
+memberOf: cn=admin,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Comme vous pouvez le constater, j&amp;#8217;y définis les éléments suivants :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;une &lt;em&gt;organization unit&lt;/em&gt;  &lt;strong&gt;groups&lt;/strong&gt; : &lt;code&gt;ou=groups,dc=example,dc=org&lt;/code&gt;, contenant la définition des groupes suivants&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;groupe &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;cn=admin,ou=groupss,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;groupe &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;cn=architect,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;groupe &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;cn=publisher,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;groupe &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;cn=reader,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;une &lt;em&gt;organization unit&lt;/em&gt; &lt;strong&gt;users&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;, contenant la définition des utilisateurs suivants&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;uid=admin,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;uid=architect,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;uid=publisher,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;uid=reader,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;INFO: les utilisateurs doivent être liés a leurs groupes via l&amp;#8217;attribut &lt;code&gt;memberOf&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Dans mon cas, j&amp;#8217;ai sauvegardé ce fichier dans le répertoire &lt;code&gt;/home/bsimard/ldif&lt;/code&gt;, ce qui donne la commande suivante pour démarrer le container docker :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker run \
+   --volume /home/bsimard/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom \
+   osixia/openldap:1.1.10 \
+   --copy-service \
+   --loglevel debug&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;la-configuration-de-neo4j&quot;&gt;La configuration de Neo4j&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;La configuration de Neo4j est centralisée dans le fichier &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt;. Ainsi il suffit de l&amp;#8217;éditer et d&amp;#8217;y ajouter les propriétés suivantes :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;#********************************************************************
+# Security Configuration
+#********************************************************************
+
+# The authentication and authorization provider that contains both users and roles.
+# This can be one of the built-in `native` or `ldap` auth providers,
+# or it can be an externally provided plugin, with a custom name prefixed by `plugin`,
+# i.e. `plugin-&amp;lt;AUTH_PROVIDER_NAME&amp;gt;`.
+dbms.security.auth_provider=ldap
+
+# The time to live (TTL) for cached authentication and authorization info when using
+# external auth providers (LDAP or plugin). Setting the TTL to 0 will
+# disable auth caching.
+#dbms.security.auth_cache_ttl=10m
+
+# The maximum capacity for authentication and authorization caches (respectively).
+#dbms.security.auth_cache_max_capacity=10000
+
+# Set to log successful authentication events to the security log.
+# If this is set to `false` only failed authentication events will be logged, which
+# could be useful if you find that the successful events spam the logs too much,
+# and you do not require full auditing capability.
+#dbms.security.log_successful_authentication=true
+
+#================================================
+# LDAP Auth Provider Configuration
+#================================================
+
+# URL of LDAP server to use for authentication and authorization.
+# The format of the setting is `&amp;lt;protocol&amp;gt;://&amp;lt;hostname&amp;gt;:&amp;lt;port&amp;gt;`, where hostname is the only required field.
+# The supported values for protocol are `ldap` (default) and `ldaps`.
+# The default port for `ldap` is 389 and for `ldaps` 636.
+# For example: `ldaps://ldap.example.com:10389`.
+#
+# NOTE: You may want to consider using STARTTLS (`dbms.security.ldap.use_starttls`) instead of LDAPS
+# for secure connections, in which case the correct protocol is `ldap`.
+dbms.security.ldap.host=172.17.0.2
+
+# Use secure communication with the LDAP server using opportunistic TLS.
+# First an initial insecure connection will be made with the LDAP server, and then a STARTTLS command
+# will be issued to negotiate an upgrade of the connection to TLS before initiating authentication.
+#dbms.security.ldap.use_starttls=false
+
+# The LDAP referral behavior when creating a connection. This is one of `follow`, `ignore` or `throw`.
+# `follow` automatically follows any referrals
+# `ignore` ignores any referrals
+# `throw` throws an exception, which will lead to authentication failure
+#dbms.security.ldap.referral=follow
+
+# The timeout for establishing an LDAP connection. If a connection with the LDAP server cannot be
+# established within the given time the attempt is aborted.
+# A value of 0 means to use the network protocol's (i.e., TCP's) timeout value.
+#dbms.security.ldap.connection_timeout=30s
+
+# The timeout for an LDAP read request (i.e. search). If the LDAP server does not respond within
+# the given time the request will be aborted. A value of 0 means wait for a response indefinitely.
+#dbms.security.ldap.read_timeout=30s
+
+#----------------------------------
+# LDAP Authentication Configuration
+#----------------------------------
+
+# LDAP authentication mechanism. This is one of `simple` or a SASL mechanism supported by JNDI,
+# for example `DIGEST-MD5`. `simple` is basic username
+# and password authentication and SASL is used for more advanced mechanisms. See RFC 2251 LDAPv3
+# documentation for more details.
+dbms.security.ldap.authentication.mechanism=simple
+
+# LDAP user DN template. An LDAP object is referenced by its distinguished name (DN), and a user DN is
+# an LDAP fully-qualified unique user identifier. This setting is used to generate an LDAP DN that
+# conforms with the LDAP directory's schema from the user principal that is submitted with the
+# authentication token when logging in.
+# The special token {0} is a placeholder where the user principal will be substituted into the DN string.
+dbms.security.ldap.authentication.user_dn_template=uid={0},ou=users,dc=example,dc=org
+
+# Determines if the result of authentication via the LDAP server should be cached or not.
+# Caching is used to limit the number of LDAP requests that have to be made over the network
+# for users that have already been authenticated successfully. A user can be authenticated against
+# an existing cache entry (instead of via an LDAP server) as long as it is alive
+# (see `dbms.security.auth_cache_ttl`).
+# An important consequence of setting this to `true` is that
+# Neo4j then needs to cache a hashed version of the credentials in order to perform credentials
+# matching. This hashing is done using a cryptographic hash function together with a random salt.
+# Preferably a conscious decision should be made if this method is considered acceptable by
+# the security standards of the organization in which this Neo4j instance is deployed.
+dbms.security.ldap.authentication.cache_enabled=false
+
+#----------------------------------
+# LDAP Authorization Configuration
+#----------------------------------
+# Authorization is performed by searching the directory for the groups that
+# the user is a member of, and then map those groups to Neo4j roles.
+
+# Perform LDAP search for authorization info using a system account instead of the user's own account.
+#
+# If this is set to `false` (default), the search for group membership will be performed
+# directly after authentication using the LDAP context bound with the user's own account.
+# The mapped roles will be cached for the duration of `dbms.security.auth_cache_ttl`,
+# and then expire, requiring re-authentication. To avoid frequently having to re-authenticate
+# sessions you may want to set a relatively long auth cache expiration time together with this option.
+# NOTE: This option will only work if the users are permitted to search for their
+# own group membership attributes in the directory.
+#
+# If this is set to `true`, the search will be performed using a special system account user
+# with read access to all the users in the directory.
+# You need to specify the username and password using the settings
+# `dbms.security.ldap.authorization.system_username` and
+# `dbms.security.ldap.authorization.system_password` with this option.
+# Note that this account only needs read access to the relevant parts of the LDAP directory
+# and does not need to have access rights to Neo4j, or any other systems.
+dbms.security.ldap.authorization.use_system_account=true
+
+# An LDAP system account username to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+# Note that the `dbms.security.ldap.authentication.user_dn_template` will not be applied to this username,
+# so you may have to specify a full DN.
+dbms.security.ldap.authorization.system_username=cn=admin,dc=example,dc=org
+
+# An LDAP system account password to use for authorization searches when
+# `dbms.security.ldap.authorization.use_system_account` is `true`.
+dbms.security.ldap.authorization.system_password=admin
+
+# The name of the base object or named context to search for user objects when LDAP authorization is enabled.
+# A common case is that this matches the last part of `dbms.security.ldap.authentication.user_dn_template`.
+dbms.security.ldap.authorization.user_search_base=ou=users,dc=example,dc=org
+
+# The LDAP search filter to search for a user principal when LDAP authorization is
+# enabled. The filter should contain the placeholder token {0} which will be substituted for the
+# user principal.
+dbms.security.ldap.authorization.user_search_filter=(&amp;amp;(objectClass=*)(uid={0}))
+
+# A list of attribute names on a user object that contains groups to be used for mapping to roles
+# when LDAP authorization is enabled.
+dbms.security.ldap.authorization.group_membership_attributes=memberOf
+
+# An authorization mapping from LDAP group names to Neo4j role names.
+# The map should be formatted as a semicolon separated list of key-value pairs, where the
+# key is the LDAP group name and the value is a comma separated list of corresponding role names.
+# For example: group1=role1;group2=role2;group3=role3,role4,role5
+#
+# You could also use whitespaces and quotes around group names to make this mapping more readable,
+# for example: dbms.security.ldap.authorization.group_to_role_mapping=\
+#          &quot;cn=Neo4j Read Only,cn=users,dc=example,dc=com&quot;      = reader;    \
+#          &quot;cn=Neo4j Read-Write,cn=users,dc=example,dc=com&quot;     = publisher; \
+#          &quot;cn=Neo4j Schema Manager,cn=users,dc=example,dc=com&quot; = architect; \
+#          &quot;cn=Neo4j Administrator,cn=users,dc=example,dc=com&quot;  = admin
+dbms.security.ldap.authorization.group_to_role_mapping=\
+          &quot;cn=reader,ou=groups,dc=example,dc=org&quot;  = reader; \
+          &quot;cn=publisher,ou=groups,dc=example,dc=org&quot;  = publisher; \
+          &quot;cn=architect,ou=groups,dc=example,dc=org&quot;  = architect; \
+          &quot;cn=admin,ou=groups,dc=example,dc=org&quot;  = admin&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Après un redémarrage du service, la nouvelle configuration est prise en charge, et on peut tester la connection LDAP directement avec le navigateur Ne4j : &lt;a href=&quot;http://localhost:7474/browser&quot; class=&quot;bare&quot;&gt;http://localhost:7474/browser&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;détail-du-fonctionnement&quot;&gt;Détail du fonctionnement&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Il y a deux étapes dans le processus : l&amp;#8217;authentification et la gestion des accès&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;l-authentification&quot;&gt;L&amp;#8217;authentification&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Celle-ci est réalisée directement par un &lt;code&gt;BIND&lt;/code&gt; sur le LDAP avec le &lt;strong&gt;DN&lt;/strong&gt; de l&amp;#8217;utilisateur.
+Le &lt;strong&gt;DN&lt;/strong&gt; est calculé par Neo4j grâce à la clef de configuration &lt;code&gt;dbms.security.ldap.authentication.user_dn_template&lt;/code&gt;. Le &lt;code&gt;{0}&lt;/code&gt; est remplacé par le login de l&amp;#8217;utilisateur.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ainsi dans notre exemple, si on essaye de se connecter avec l&amp;#8217;utilisateur &lt;code&gt;admin&lt;/code&gt;, le &lt;code&gt;BIND&lt;/code&gt; sera effectué avec le DN &lt;code&gt;uid=admin,ou=Users,dc=example,dc=org&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;la-gestion-des-accès&quot;&gt;La gestion des accès&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Une fois que le couple login/password est validé, on peut passer à la gestion des accès.
+Ceci est délégué à un utilisateur système qui va effecuter une recherche dans le LDAP pour retrouver l&amp;#8217;utilisateur et ses groupes associés.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ainsi il effectue :
+  * la requête LDAP configurée via la clef &lt;strong&gt;dbms.security.ldap.authorization.user_search_filter&lt;/strong&gt; (dans notre cas &lt;code&gt;(&amp;amp;(objectClass=*)(uid={0}))&lt;/code&gt;). Neo4j remplace &lt;code&gt;{0}&lt;/code&gt; par le login de l&amp;#8217;utilisateur.
+  * dans le sous-arbre définit vi la clef&lt;strong&gt;dbms.security.ldap.authorization.user_search_base&lt;/strong&gt; (dans notre cas &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ceci lui permet de retrouver l&amp;#8217;utilisateur dans l&amp;#8217;annuaire, puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &lt;strong&gt;dbms.security.ldap.authorization.group_membership_attributes&lt;/strong&gt; (donc &lt;code&gt;memberOf&lt;/code&gt; dans l&amp;#8217;exemple).
+Pour finir, la correspondance entre les groupes LDAP et les roles Neo4j est effectué en respectant les règles définie dans la clef de configuration &lt;strong&gt;dbms.security.ldap.authorization.group_to_role_mapping&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;en-bref&quot;&gt;En bref&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Le connecteur LDAP est uniquement présent dans l&amp;#8217;édition &lt;strong&gt;Entreprise&lt;/strong&gt; de Neo4j&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;La configuratin est simple et permet de gérer ala fois l&amp;#8217;authentification et les accès&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Les utilisateurs &lt;strong&gt;doivent impérativement&lt;/strong&gt; être liés aux groupes via un attribut comme &lt;strong&gt;memberOf&lt;/strong&gt; (relation utilisateur &amp;#8594; groupes, et pas l&amp;#8217;inverse)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;L&amp;#8217;exemple utilise un utilisateur système, mais ce n&amp;#8217;est pas une obligation. Il est possible de modifier la configuration pour que l&amp;#8217;utilisateur effectue à la fois l&amp;#8217;authenfication et les droits d&amp;#8217;accès.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
+        
+        <category>neo4j, ldap, authenfication, authorisation</category>
         
         
       </item>
@@ -831,7 +1265,7 @@ like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.&lt;/p&gt;
+&lt;p&gt;Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requêtes Cypher et finir sur une petite application web pour afficher le tout.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;C&amp;#8217;est parti !&lt;/p&gt;
@@ -842,13 +1276,13 @@ like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;h2 id=&quot;le-modèle-de-jcdecaux&quot;&gt;Le modèle de JCDecaux&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;JCDecaux fournit une APIpour les informations sur leur services de vélos. La documentation est disponible ici : &lt;a href=&quot;https://developer.jcdecaux.com&quot; class=&quot;bare&quot;&gt;https://developer.jcdecaux.com&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;JCDecaux fournit une API pour les informations sur leur services de vélos. La documentation est disponible ici : &lt;a href=&quot;https://developer.jcdecaux.com&quot; class=&quot;bare&quot;&gt;https://developer.jcdecaux.com&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer &lt;code&gt;@JCD_TOKEN_API@&lt;/code&gt; par la votre.&lt;/p&gt;
+&lt;p&gt;INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer &lt;code&gt;@JCD_TOKEN_API@&lt;/code&gt; par le votre.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;En lisant &lt;a href=&quot;https://developer.jcdecaux.com/#/opendata/vls?page=dynamic&quot;&gt;la document 'real-time'&lt;/a&gt;, on peut en définir que JCD utilise le mod̀le sivant :&lt;/p&gt;
+&lt;p&gt;En lisant &lt;a href=&quot;https://developer.jcdecaux.com/#/opendata/vls?page=dynamic&quot;&gt;la document 'real-time'&lt;/a&gt;, on peut en définir que JCD utilise le mod̀le suivant :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -856,7 +1290,7 @@ like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il y a deux entitées, liées ensemble : c&amp;#8217;est le début d&amp;#8217;un graphe ! Mais on peut faire mieux &amp;#8230;&amp;#8203;&lt;/p&gt;
+&lt;p&gt;Il y a deux entités, liées ensemble : c&amp;#8217;est le début d&amp;#8217;un graphe ! Mais on peut faire mieux &amp;#8230;&amp;#8203;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Si on regarde l&amp;#8217;entité &lt;code&gt;Contact&lt;/code&gt;, on voit :&lt;/p&gt;
@@ -872,7 +1306,7 @@ like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc explosons le !&lt;/p&gt;
+&lt;p&gt;Donc explosons la !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -899,7 +1333,7 @@ like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Mais que fait-on si on a envie de garder l&amp;#8217;historique des données ?
-Et bien il suffit de créer une chaine de noeud &lt;code&gt;State&lt;/code&gt;.&lt;/p&gt;
+Et bien il suffit de créer une chaine de noeuds &lt;code&gt;State&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -908,10 +1342,10 @@ Et bien il suffit de créer une chaine de noeud &lt;code&gt;State&lt;/code&gt;.&
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;J&amp;#8217;ai choisi cette modélisation car mon principal objectif est d&amp;#8217;obtenir les derniéres données (ie. l&amp;#8217;état courant de la station).
-Avec ce système je n&amp;#8217;ai qu&amp;#8217;a traverser une seule relation, et je garde l&amp;#8217;historique.&lt;/p&gt;
+Avec ce système je n&amp;#8217;ai qu&amp;#8217;à traverser une seule relation, et je garde l&amp;#8217;historique.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc mon schéma finale ressemble à cela :&lt;/p&gt;
+&lt;p&gt;Donc mon schéma final ressemble à cela :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -929,7 +1363,7 @@ Avec ce système je n&amp;#8217;ai qu&amp;#8217;a traverser une seule relation,
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;pré-requis&quot;&gt;Pré-requis&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Avant de commencer, il vous faut installer &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt;. Il s&amp;#8217;agit d&amp;#8217;une collection de procédures stockées très utilise, dont je ne peux plus me passer.&lt;/p&gt;
+&lt;p&gt;Avant de commencer, il vous faut installer &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt;. Il s&amp;#8217;agit d&amp;#8217;une collection de procédures stockées très utiles, dont je ne peux plus me passer.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Voici la procédure de son installation :&lt;/p&gt;
@@ -964,7 +1398,7 @@ $&amp;gt; wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/d
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;les-contraintes&quot;&gt;Les contraintes&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans Neo4j nous pouvons créer des contraintes d&amp;#8217;unicité, ce qui permet de s&amp;#8217;assurer de la cohérence de nos données, mais aussi d&amp;#8217;qccélèrer la recherche d&amp;#8217;un noeud via son identifiant.&lt;/p&gt;
+&lt;p&gt;Dans Neo4j nous pouvons créer des contraintes d&amp;#8217;unicité, ce qui permet de s&amp;#8217;assurer de la cohérence de nos données, mais aussi d&amp;#8217;accélèrer la recherche d&amp;#8217;un noeud via son identifiant.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Ceci va être utile pour la phase d&amp;#8217;import pour s&amp;#8217;assurer qu&amp;#8217;on ne crée pas deux fois le même noeud.&lt;/p&gt;
@@ -986,8 +1420,8 @@ CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il est a noter qu&amp;#8217;ici je n&amp;#8217;ai pas crée de contrainte sur les villes. C&amp;#8217;est juste parceque deux pays peuvent avoir une ville avec le même nom.
-Mais si on veut on peut créer un index dessus, pour accélérer nos recherches de ville per leur nom .&lt;/p&gt;
+&lt;p&gt;Il est a noter qu&amp;#8217;ici je n&amp;#8217;ai pas créé de contrainte sur les villes. C&amp;#8217;est juste parce que deux pays peuvent avoir une ville avec le même nom.
+Mais si on le souhaite, on peut créer un index dessus, pour accélérer nos recherches de ville par leur nom.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -1019,7 +1453,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;importer-les-stations-et-leur-état&quot;&gt;Importer les stations et leur état&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l&amp;#8217;endpoint suivant : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce au endpoint suivant : &lt;code&gt;&lt;a href=&quot;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&quot; class=&quot;bare&quot;&gt;https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@&lt;/a&gt;&lt;/code&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;`@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d&amp;#8217;obtenir la liste des stations de celui-ci.&lt;/p&gt;
@@ -1067,12 +1501,12 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;La première instruction est &lt;code&gt;apoc.periodic.iterate&lt;/code&gt;. Il s&amp;#8217;agit d&amp;#8217;une procédure stockée qui prend 3 paramêtre :&lt;/p&gt;
+&lt;p&gt;La première instruction est &lt;code&gt;apoc.periodic.iterate&lt;/code&gt;. Il s&amp;#8217;agit d&amp;#8217;une procédure stockée qui prend 3 paramêtres :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;Une requête cyphe qui permet d&amp;#8217;obtenir une première collection de résultat&lt;/p&gt;
+&lt;p&gt;Une requête cypher qui permet d&amp;#8217;obtenir une première collection de résultat&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Une autre requête qui va s&amp;#8217;appliquer sur chacun des résultats de la première&lt;/p&gt;
@@ -1083,10 +1517,10 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&amp;#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&amp;#8217;itération de la première requêete), et de parallélisation.&lt;/p&gt;
+&lt;p&gt;Basiquement, cela ressemble à un WITH  (ie. itérer sur les résultats d&amp;#8217;une requête), mais avec des possiblités de batch (basé sur le nombre d&amp;#8217;itération de la première requêete), et de parallélisation.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Donc ici je crée juste un job par &lt;code&gt;Contrat&lt;/code&gt; pour créer les stations.&lt;/p&gt;
+&lt;p&gt;Donc ici, je crée juste un job par &lt;code&gt;Contrat&lt;/code&gt; pour créer les stations.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&amp;#8217;état des stations, vu que j&amp;#8217;utilise l&amp;#8217;instruction &lt;code&gt;MERGE&lt;/code&gt;, qui permet de selectionner une noeud et de le créer s&amp;#8217;il n&amp;#8217;exsite pas.&lt;/p&gt;
@@ -1109,7 +1543,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 &lt;h2 id=&quot;amusons-nous-maintenant&quot;&gt;Amusons-nous maintenant !&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Maintenant que nous avons une base opérationnelle avec les donnéesm pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :&lt;/p&gt;
+&lt;p&gt;Maintenant que nous avons une base opérationnelle avec les données, pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -1145,7 +1579,7 @@ CREATE INDEX ON :State(status);&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Ok, et si je veux afficher ces données sur une carte avec du geojson ?
-Ba Cypher sait construire du json, il suffit de lui dire comment :&lt;/p&gt;
+Cypher sachant construire du json, il suffit de lui dire comment :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -1176,7 +1610,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;p&gt;Pour voir le résultat (et vérifier la validité du geoJson), vous pouvez copier/coller le résultat de la requête dans &lt;a href=&quot;http://geojson.io/&quot; class=&quot;bare&quot;&gt;http://geojson.io/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ou si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt; : &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Ou, si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a &lt;a href=&quot;http://leafletjs.com/&quot;&gt;Leaflet&lt;/a&gt; : &lt;a href=&quot;https://gist.github.com/sim51/409c769d0501956549221449ca845360&quot;&gt;like this one&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Voici le rendu finale :&lt;/p&gt;
@@ -3138,249 +3572,6 @@ $&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
         <guid isPermaLink="true">http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
         
         <category>neo4j, postgresql, foreign data wrapper</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>How to communicate with Neo4j through ODBC</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#market-solutions&quot;&gt;Market solutions&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#easysoft&quot;&gt;Easysoft&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#jvm-configuration&quot;&gt;JVM Configuration&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#neo4j-jdbc-configuration&quot;&gt;NEO4J JDBC Configuration&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#annexe&quot;&gt;Annexe&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#how-to-enabled-log-for-odbc&quot;&gt;How to enabled log for ODBC&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#some-usefull-links&quot;&gt;Some usefull links&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;market-solutions&quot;&gt;Market solutions&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;There are two market solutions to make an ODBC-JDBC bridge :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Easysoft with their ODBC-JDBC Gateway&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Openlink with thier Single/Multi Tier ODBC-JDBC bridge&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In this documentation, we will only talk about &lt;strong&gt;easysoft&lt;/strong&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;easysoft&quot;&gt;Easysoft&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Easysoft&lt;/strong&gt; is a solution that make an ODBC-JDBC bridge on your computer.
-So you have to install it on each machine.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/odbc/easysoft-diag.png&quot; alt=&quot;easysoft diag&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;It costs &lt;strong&gt;375 GBD / year&lt;/strong&gt;, but prices depend on the number of machines where we install software.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Go to download trial version : &lt;a href=&quot;http://www.easysoft.com/cgi-bin/productdownload.cgi?p=26&quot; class=&quot;bare&quot;&gt;http://www.easysoft.com/cgi-bin/productdownload.cgi?p=26&lt;/a&gt; (you must create an account)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Download the windows version&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Run the executable and follow the wizard. For more information, read the installation guide of easysoft&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;jvm-configuration&quot;&gt;JVM Configuration&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Go to Programs &amp;gt; Easysoft &amp;gt;ODBC-JDBC Gateway &amp;gt; Configure Java Interface&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Configure where is your JDK&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Click on Test and Save if OK&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;neo4j-jdbc-configuration&quot;&gt;NEO4J JDBC Configuration&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Go to the Control Panel&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Then in Administrative Tools&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Click on Data Sources (ODBC)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Check if Easysoft driver is really installed&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/odbc/check-driver.png&quot; alt=&quot;check driver&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Download the neo4j jdbc driver (with all its dependencies) here : &lt;a href=&quot;https://m2.neo4j.org/content/groups/public/org/neo4j/neo4j-jdbc/2.1.4/&quot; class=&quot;bare&quot;&gt;https://m2.neo4j.org/content/groups/public/org/neo4j/neo4j-jdbc/2.1.4/&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Create a new ODBC connection, and select Easysoft ODBC-JDBC Gateway&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/odbc/create-connection.png&quot; alt=&quot;create connection&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Configure the connection where :&lt;/p&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;DSN :&lt;/strong&gt; The name of your new database, for example NEO4J&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Description :&lt;/strong&gt; you can put here the description of your connection&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;User name :&lt;/strong&gt; The login of the neo4j user&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Password :&lt;/strong&gt; the password of the neo4j user&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Driver Class :&lt;/strong&gt; org.neo4j.jdbc.Driver&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Class Path :&lt;/strong&gt; Click on the Add button, and select the jar you have download at step 5&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;URL :&lt;/strong&gt; The JDBC connection URL for neo4j : jdbc:neo4j://localhost:7474 (if you server is on your local machine)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/odbc/configuration.png&quot; alt=&quot;configuration&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;When you have fullfil this form, you can click on the &lt;code&gt;Test&lt;/code&gt;, to check that is everyting is good (your neo4j server must running of course).&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Well done, you  have your ODBC-JDBC Bridge installed for neo4j !&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;annexe&quot;&gt;Annexe&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;how-to-enabled-log-for-odbc&quot;&gt;How to enabled log for ODBC&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This feature can be (very) usefull for debugging purpose, but it (really) slowing the ODBC connection.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Go to the &lt;code&gt;Control Panel&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Then in &lt;code&gt;Administrative Tools&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Click on &lt;code&gt;Data Sources (ODBC)&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Click on the &lt;code&gt;Tracing&lt;/code&gt; tab&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Click on &lt;code&gt;Start Tracing Now&lt;/code&gt;. You can also configure where the log file is generated with the &lt;code&gt;Log File Path&lt;/code&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/odbc/enable-log.png&quot; alt=&quot;enable log&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;some-usefull-links&quot;&gt;Some usefull links&lt;/h3&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/5352956/odbc-jdbc-bridge-that-maps-its-own-calls-to-jdbc-driver&quot; class=&quot;bare&quot;&gt;http://stackoverflow.com/questions/5352956/odbc-jdbc-bridge-that-maps-its-own-calls-to-jdbc-driver&lt;/a&gt; : Stackoverflow threadabout ODBC/JDBC bridge&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.4d.com/4d_docstatic/4D%20ODBC%20Pro/12/ODBC-Results.201-371921.en.html&quot; class=&quot;bare&quot;&gt;http://www.4d.com/4d_docstatic/4D%20ODBC%20Pro/12/ODBC-Results.201-371921.en.html&lt;/a&gt; : Explain each ODBC operation&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.gpoulose.com/&quot; class=&quot;bare&quot;&gt;http://www.gpoulose.com/&lt;/a&gt; : To download a Query Tool that use ODBC&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&quot; class=&quot;bare&quot;&gt;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&lt;/a&gt; : How to enable neo4j HTTP log file (usefull to debug REST query)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2015/06/04/neo4j-odbc.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2015/06/04/neo4j-odbc.html</guid>
-        
-        <category>neo4j, odbc, jdbc</category>
         
         
       </item>

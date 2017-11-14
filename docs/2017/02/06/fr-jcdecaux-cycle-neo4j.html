@@ -42,7 +42,11 @@
                     
                   
                     
+                  
+                    
                       <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
                     
                   
                     
@@ -102,7 +106,7 @@
 <p>Durant ce billet, nous allons utiliser Neo4j sur les données ouvertes de JCDecaux pour trouver les 5 stations de Vélo-partage les plus proches de ma position, ayant un vélo disponible.</p>
 </div>
 <div class="paragraph">
-<p>Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requête Cypher et finir sur une petite application web pour afficher le tout.</p>
+<p>Je vais vous montrer comment réaliser un modèle en graphe, charger les données depuis l’API JSON, faire quelques requêtes Cypher et finir sur une petite application web pour afficher le tout.</p>
 </div>
 <div class="paragraph">
 <p>C&#8217;est parti !</p>
@@ -113,13 +117,13 @@
 <h2 id="le-modèle-de-jcdecaux">Le modèle de JCDecaux</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>JCDecaux fournit une APIpour les informations sur leur services de vélos. La documentation est disponible ici : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
+<p>JCDecaux fournit une API pour les informations sur leur services de vélos. La documentation est disponible ici : <a href="https://developer.jcdecaux.com" class="bare">https://developer.jcdecaux.com</a></p>
 </div>
 <div class="paragraph">
-<p>INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer <code>@JCD_TOKEN_API@</code> par la votre.</p>
+<p>INFO: vous devez créer un token pour utiliser leur API. Dans mes examples, vous devrez remplacer <code>@JCD_TOKEN_API@</code> par le votre.</p>
 </div>
 <div class="paragraph">
-<p>En lisant <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">la document 'real-time'</a>, on peut en définir que JCD utilise le mod̀le sivant :</p>
+<p>En lisant <a href="https://developer.jcdecaux.com/#/opendata/vls?page=dynamic">la document 'real-time'</a>, on peut en définir que JCD utilise le mod̀le suivant :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -127,7 +131,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Il y a deux entitées, liées ensemble : c&#8217;est le début d&#8217;un graphe ! Mais on peut faire mieux &#8230;&#8203;</p>
+<p>Il y a deux entités, liées ensemble : c&#8217;est le début d&#8217;un graphe ! Mais on peut faire mieux &#8230;&#8203;</p>
 </div>
 <div class="paragraph">
 <p>Si on regarde l&#8217;entité <code>Contact</code>, on voit :</p>
@@ -143,7 +147,7 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>Donc explosons le !</p>
+<p>Donc explosons la !</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -170,7 +174,7 @@
 </div>
 <div class="paragraph">
 <p>Mais que fait-on si on a envie de garder l&#8217;historique des données ?
-Et bien il suffit de créer une chaine de noeud <code>State</code>.</p>
+Et bien il suffit de créer une chaine de noeuds <code>State</code>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -179,10 +183,10 @@ Et bien il suffit de créer une chaine de noeud <code>State</code>.</p>
 </div>
 <div class="paragraph">
 <p>J&#8217;ai choisi cette modélisation car mon principal objectif est d&#8217;obtenir les derniéres données (ie. l&#8217;état courant de la station).
-Avec ce système je n&#8217;ai qu&#8217;a traverser une seule relation, et je garde l&#8217;historique.</p>
+Avec ce système je n&#8217;ai qu&#8217;à traverser une seule relation, et je garde l&#8217;historique.</p>
 </div>
 <div class="paragraph">
-<p>Donc mon schéma finale ressemble à cela :</p>
+<p>Donc mon schéma final ressemble à cela :</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -200,7 +204,7 @@ Avec ce système je n&#8217;ai qu&#8217;a traverser une seule relation, et je g
 <div class="sect2">
 <h3 id="pré-requis">Pré-requis</h3>
 <div class="paragraph">
-<p>Avant de commencer, il vous faut installer <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures">APOC</a>. Il s&#8217;agit d&#8217;une collection de procédures stockées très utilise, dont je ne peux plus me passer.</p>
+<p>Avant de commencer, il vous faut installer <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures">APOC</a>. Il s&#8217;agit d&#8217;une collection de procédures stockées très utiles, dont je ne peux plus me passer.</p>
 </div>
 <div class="paragraph">
 <p>Voici la procédure de son installation :</p>
@@ -235,7 +239,7 @@ $&gt; wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/downl
 <div class="sect2">
 <h3 id="les-contraintes">Les contraintes</h3>
 <div class="paragraph">
-<p>Dans Neo4j nous pouvons créer des contraintes d&#8217;unicité, ce qui permet de s&#8217;assurer de la cohérence de nos données, mais aussi d&#8217;qccélèrer la recherche d&#8217;un noeud via son identifiant.</p>
+<p>Dans Neo4j nous pouvons créer des contraintes d&#8217;unicité, ce qui permet de s&#8217;assurer de la cohérence de nos données, mais aussi d&#8217;accélèrer la recherche d&#8217;un noeud via son identifiant.</p>
 </div>
 <div class="paragraph">
 <p>Ceci va être utile pour la phase d&#8217;import pour s&#8217;assurer qu&#8217;on ne crée pas deux fois le même noeud.</p>
@@ -257,8 +261,8 @@ CREATE CONSTRAINT ON (n:State) ASSERT n.id IS UNIQUE;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Il est a noter qu&#8217;ici je n&#8217;ai pas crée de contrainte sur les villes. C&#8217;est juste parceque deux pays peuvent avoir une ville avec le même nom.
-Mais si on veut on peut créer un index dessus, pour accélérer nos recherches de ville per leur nom .</p>
+<p>Il est a noter qu&#8217;ici je n&#8217;ai pas créé de contrainte sur les villes. C&#8217;est juste parce que deux pays peuvent avoir une ville avec le même nom.
+Mais si on le souhaite, on peut créer un index dessus, pour accélérer nos recherches de ville par leur nom.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -290,7 +294,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 <div class="sect2">
 <h3 id="importer-les-stations-et-leur-état">Importer les stations et leur état</h3>
 <div class="paragraph">
-<p>Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce a l&#8217;endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
+<p>Maintenant que nous avons les contrats, nous allons pouvoir importer les stations avec leur état, grâce au endpoint suivant : <code><a href="https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@" class="bare">https://api.jcdecaux.com/vls/v1/stations?contract=@contract_name@</a></code></p>
 </div>
 <div class="paragraph">
 <p>`@contract_name@ ` doit simplement être remplacé par le nom commercial du contrat afin d&#8217;obtenir la liste des stations de celui-ci.</p>
@@ -338,12 +342,12 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </div>
 </div>
 <div class="paragraph">
-<p>La première instruction est <code>apoc.periodic.iterate</code>. Il s&#8217;agit d&#8217;une procédure stockée qui prend 3 paramêtre :</p>
+<p>La première instruction est <code>apoc.periodic.iterate</code>. Il s&#8217;agit d&#8217;une procédure stockée qui prend 3 paramêtres :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Une requête cyphe qui permet d&#8217;obtenir une première collection de résultat</p>
+<p>Une requête cypher qui permet d&#8217;obtenir une première collection de résultat</p>
 </li>
 <li>
 <p>Une autre requête qui va s&#8217;appliquer sur chacun des résultats de la première</p>
@@ -354,10 +358,10 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 </ul>
 </div>
 <div class="paragraph">
-<p>Basiquement, cela ressemble un WITH  (ie. itérer sur les résultats d&#8217;une requête), mais avec des possiblités de batches (basé sur le nombre d&#8217;itération de la première requêete), et de parallélisation.</p>
+<p>Basiquement, cela ressemble à un WITH  (ie. itérer sur les résultats d&#8217;une requête), mais avec des possiblités de batch (basé sur le nombre d&#8217;itération de la première requêete), et de parallélisation.</p>
 </div>
 <div class="paragraph">
-<p>Donc ici je crée juste un job par <code>Contrat</code> pour créer les stations.</p>
+<p>Donc ici, je crée juste un job par <code>Contrat</code> pour créer les stations.</p>
 </div>
 <div class="paragraph">
 <p>Vous pouvez rejouer ce script toutes les 5 minutes afin de mettre à jour l&#8217;état des stations, vu que j&#8217;utilise l&#8217;instruction <code>MERGE</code>, qui permet de selectionner une noeud et de le créer s&#8217;il n&#8217;exsite pas.</p>
@@ -380,7 +384,7 @@ CALL apoc.load.json('https://api.jcdecaux.com/vls/v1/contracts?apiKey=' + key) Y
 <h2 id="amusons-nous-maintenant">Amusons-nous maintenant !</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Maintenant que nous avons une base opérationnelle avec les donnéesm pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :</p>
+<p>Maintenant que nous avons une base opérationnelle avec les données, pourquoi ne pas lui demander la liste des stations les plus proches avec un vélo disponible :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -416,7 +420,7 @@ CREATE INDEX ON :State(status);</code></pre>
 </div>
 <div class="paragraph">
 <p>Ok, et si je veux afficher ces données sur une carte avec du geojson ?
-Ba Cypher sait construire du json, il suffit de lui dire comment :</p>
+Cypher sachant construire du json, il suffit de lui dire comment :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -447,7 +451,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson</code></pre
 <p>Pour voir le résultat (et vérifier la validité du geoJson), vous pouvez copier/coller le résultat de la requête dans <a href="http://geojson.io/" class="bare">http://geojson.io/</a></p>
 </div>
 <div class="paragraph">
-<p>Ou si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a <a href="http://leafletjs.com/">Leaflet</a> : <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
+<p>Ou, si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a <a href="http://leafletjs.com/">Leaflet</a> : <a href="https://gist.github.com/sim51/409c769d0501956549221449ca845360">like this one</a>.</p>
 </div>
 <div class="paragraph">
 <p>Voici le rendu finale :</p>
