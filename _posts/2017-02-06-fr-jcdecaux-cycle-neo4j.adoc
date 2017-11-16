@@ -16,7 +16,7 @@ Je vais vous montrer comment réaliser un modèle en graphe, charger les donné
 
 C'est parti !
 
-== Le modèle de JCDecaux 
+== Le modèle de JCDecaux
 
 JCDecaux fournit une API pour les informations sur leur services de vélos. La documentation est disponible ici : https://developer.jcdecaux.com
 
@@ -121,7 +121,7 @@ digraph finite_state_machine {
 }
 ----
 
-J'ai choisi cette modélisation car mon principal objectif est d'obtenir les derniéres données (ie. l'état courant de la station). 
+J'ai choisi cette modélisation car mon principal objectif est d'obtenir les derniéres données (ie. l'état courant de la station).
 Avec ce système je n'ai qu'à traverser une seule relation, et je garde l'historique.
 
 Donc mon schéma final ressemble à cela :
@@ -160,9 +160,9 @@ A présent que nous avons notre modèle, passons à l'étape d'import.
 
 Avant de commencer, il vous faut installer https://neo4j-contrib.github.io/neo4j-apoc-procedures[APOC]. Il s'agit d'une collection de procédures stockées très utiles, dont je ne peux plus me passer.
 
-Voici la procédure de son installation : 
+Voici la procédure de son installation :
 
-* Télécharger la dernière version de la librairie à l'adresse suivante : 
+* Télécharger la dernière version de la librairie à l'adresse suivante :
 https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.0.4.1/apoc-3.0.4.1-all.jar
 
 [source, shell]
@@ -275,7 +275,7 @@ CALL apoc.periodic.iterate(
 
 La première instruction est `apoc.periodic.iterate`. Il s'agit d'une procédure stockée qui prend 3 paramêtres :
 
-  * Une requête cypher qui permet d'obtenir une première collection de résultat 
+  * Une requête cypher qui permet d'obtenir une première collection de résultat
   * Une autre requête qui va s'appliquer sur chacun des résultats de la première
   * De la configuration (ici `{batchSize:1,parallel:true}`)
 
@@ -348,7 +348,7 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson
 
 Pour voir le résultat (et vérifier la validité du geoJson), vous pouvez copier/coller le résultat de la requête dans http://geojson.io/
 
-Ou, si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a http://leafletjs.com/[Leaflet] : https://gist.github.com/sim51/409c769d0501956549221449ca845360[like this one].
+Ou, si vous avez suivi les differentes étapes, vous pouvez utiliser cette petite page web qui affiche les résultats grace a http://leafletjs.com/[Leaflet] : https://gist.github.com/sim51/409c769d0501956549221449ca845360[Comme ici].
 
 Voici le rendu finale :
 
