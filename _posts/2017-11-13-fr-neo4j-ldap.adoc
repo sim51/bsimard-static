@@ -16,13 +16,13 @@ Vous allez découvrir comment connecter un annuaire LDAP à Neo4j pour lui conf
 
 Au lieu d'installer un serveur OpenLDAP sur ma machine, je vais utiliser Docker avec l'image suivante : https://github.com/osixia/docker-openldap
 
-Celle-ci me permet de lancer un serveur OpenLDAP pré-configurer où :
+Celle-ci me permet de lancer un serveur OpenLDAP pré-configuré où :
   * le domaine par défault est  `dc=example,dc=org`
-  * l'administrateur `cn=admin,dc=example,dc=org` (avec le password `admin`).
+  * l'administrateur est `cn=admin,dc=example,dc=org` avec le password `admin`.
 
-De plus je peux lui passer en paramètre le chemin d'accès d'un répertoire contenant des fichiers LDIF, qui vont être éxécutés à son lancement.
+De plus on peut lui passer en paramètre le chemin d'accès d'un répertoire contenant des fichiers LDIF, qui vont être éxécutés à son lancement.
 
-Ainsi, voici le fichier LDIF que j'ai réalisé pour créer la structure de mon LDAP
+Ainsi, voici le fichier LDIF que j'ai réalisé pour créer la structure de mon LDAP et importer les données au démarrage du serveur :
 
 
 [source,ldif]
@@ -47,7 +47,8 @@ Comme vous pouvez le constater, j'y définis les éléments suivants :
 INFO: les utilisateurs doivent être liés a leurs groupes via l'attribut `memberOf`.
 
 
-Dans mon cas, j'ai sauvegardé ce fichier dans le répertoire `/home/bsimard/ldif`, ce qui donne la commande suivante pour démarrer le container docker :
+Dans mon cas, j'ai sauvegardé ce fichier dans le répertoire `/home/bsimard/ldif`,
+ce qui donne la commande suivante pour démarrer le container docker :
 
 [source,bash]
 ----
@@ -60,14 +61,16 @@ docker run \
 
 == La configuration de Neo4j
 
-La configuration de Neo4j est centralisée dans le fichier `NEO4J_HOME/conf/neo4j.conf`. Ainsi il suffit de l'éditer et d'y ajouter les propriétés suivantes :
+La configuration de Neo4j est centralisée dans le fichier `NEO4J_HOME/conf/neo4j.conf`.
+Ainsi il suffit de l'éditer et d'y ajouter les propriétés suivantes :
 
 [source,properties]
 ----
 include::../public/images/neo4j-ldap/neo4j.conf[]
 ----
 
-Après un redémarrage du service, la nouvelle configuration est prise en charge, et on peut tester la connection LDAP directement avec le navigateur Ne4j : http://localhost:7474/browser
+Après un redémarrage du service, la nouvelle configuration est prise en compte,
+et on peut tester la connection LDAP directement avec le navigateur Neo4j : http://localhost:7474/browser
 
 == Détail du fonctionnement
 
@@ -76,25 +79,31 @@ Il y a deux étapes dans le processus : l'authentification et la gestion des acc
 === L'authentification
 
 Celle-ci est réalisée directement par un `BIND` sur le LDAP avec le **DN** de l'utilisateur.
-Le **DN** est calculé par Neo4j grâce à la clef de configuration `dbms.security.ldap.authentication.user_dn_template`. Le `{0}` est remplacé par le login de l'utilisateur.
+Le **DN** est calculé par Neo4j grâce à la clef de configuration **dbms.security.ldap.authentication.user_dn_template**.
+Le `{0}` est remplacé par le login de l'utilisateur.
 
-Ainsi dans notre exemple, si on essaye de se connecter avec l'utilisateur `admin`, le `BIND` sera effectué avec le DN `uid=admin,ou=Users,dc=example,dc=org`.
+Ainsi dans notre exemple, si on essaye de se connecter avec l'utilisateur `admin`,
+le `BIND` sera effectué avec le DN `uid=admin,ou=Users,dc=example,dc=org`.
 
 === La gestion des accès
 
 Une fois que le couple login/password est validé, on peut passer à la gestion des accès.
-Ceci est délégué à un utilisateur système qui va effecuter une recherche dans le LDAP pour retrouver l'utilisateur et ses groupes associés.
+Celle-ci est déléguée à un utilisateur système qui va effecuter une recherche dans le LDAP pour retrouver l'utilisateur et ses groupes associés.
 
 Ainsi il effectue :
   * la requête LDAP configurée via la clef **dbms.security.ldap.authorization.user_search_filter** (dans notre cas `(&(objectClass=*)(uid={0}))`). Neo4j remplace `{0}` par le login de l'utilisateur.
-  * dans le sous-arbre définit vi la clef**dbms.security.ldap.authorization.user_search_base** (dans notre cas `ou=users,dc=example,dc=org`).
+  * dans le sous-arbre définit vi la clef **dbms.security.ldap.authorization.user_search_base** (dans notre cas `ou=users,dc=example,dc=org`).
 
-Ceci lui permet de retrouver l'utilisateur dans l'annuaire, puis de récupérer ses groupe via l'attribut configuré par la clef **dbms.security.ldap.authorization.group_membership_attributes** (donc `memberOf` dans l'exemple).
-Pour finir, la correspondance entre les groupes LDAP et les roles Neo4j est effectué en respectant les règles définie dans la clef de configuration **dbms.security.ldap.authorization.group_to_role_mapping**.
+Ceci lui permet de retrouver l'utilisateur dans l'annuaire,
+puis de récupérer ses groupe via l'attribut configuré par la clef **dbms.security.ldap.authorization.group_membership_attributes**
+(donc `memberOf` dans l'exemple).
+
+Pour finir, la correspondance entre les groupes LDAP et les roles Neo4j est effectué en respectant les règles définie dans la clef de configuration
+**dbms.security.ldap.authorization.group_to_role_mapping**.
 
 == En bref
 
  * Le connecteur LDAP est uniquement présent dans l'édition **Entreprise** de Neo4j
- * La configuratin est simple et permet de gérer ala fois l'authentification et les accès
+ * La configuratin est simple et permet de gérer à la fois l'authentification et les accès
  * Les utilisateurs **doivent impérativement** être liés aux groupes via un attribut comme **memberOf** (relation utilisateur -> groupes, et pas l'inverse)
  * L'exemple utilise un utilisateur système, mais ce n'est pas une obligation. Il est possible de modifier la configuration pour que l'utilisateur effectue à la fois l'authenfication et les droits d'accès.

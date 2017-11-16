@@ -15,11 +15,11 @@ In this tutorial you will see how to connect Neo4j to a LDAP server for authenti
 == Setup an Openldap server
 
 We need to have a LDAP server with some data.
-For this purpose, I will use a docker with the following image : https://github.com/osixia/docker-openldap
+For this purpose, I will use the following docker image : https://github.com/osixia/docker-openldap
 
 By default the domain is `dc=example,dc=org` and the admin is `cn=admin,dc=example,dc=org` with the password `admin`.
 
-We can pass an argument to docker to add a **ldif** folder for initiate the ldap server with some data.
+We can pass an argument to docker to add a **ldif** folder for initiate the ldap server with some data at the startup.
 
 This is the ldif file that I use :
 
@@ -42,9 +42,9 @@ As you can see, it only defines :
 ** user **publisher** `uid=publisher,ou=users,dc=example,dc=org`
 ** user **reader** `uid=reader,ou=users,dc=example,dc=org`
 
-INFO: users are also linked to groups via the `memberOf` attribut
+INFO: users are must be linked to groups via the `memberOf` attribut
 
-In my case, I have stored this ldif file in this folder `/home/bsimard/ldif`, so the command to start the ldap container is the following :
+In my case, I have stored this ldif file in this folder `/home/bsimard/ldif`, so the command to start the docker image is the following :
 
 [source,bash]
 ----
@@ -65,7 +65,7 @@ For this, edit the `NEO4J_HOME/conf/neo4j.conf` and put those properties :
 include::../public/images/neo4j-ldap/neo4j.conf[]
 ----
 
-Now you can restart Neo4j, and go to the browser to test the connection.
+Now you can restart Neo4j, and open the Neo4j browser (http://localhost:7474) to test the connection.
 
 == How it works ?
 
@@ -73,19 +73,20 @@ There is two steps : authentication and authorization.
 
 === authentication
 
-The authentication is made by a direct bind of the user with the **DN** defined like this : Neo4j replace the user login (ie .`{0}`) in the property `dbms.security.ldap.authentication.user_dn_template`.
+The authentication is made by a direct bind of the user with the **DN** defined like this : Neo4j replace the user login (ie .`{0}`) in the configuration key **dbms.security.ldap.authentication.user_dn_template**.
 
 In the example, if you try to connect with the user `admin`, Neo4j will do a bind with `uid=admin,ou=Users,dc=example,dc=org`
 
 === Authorization
 
-Neo4j knows that the user is valid, so it can search his groups.
+Now Neo4j knows that the user is valid, so it looks up for the user's groups.
 
-For this, it need a **system  account** to searh the authorization of users. To do it, it performs :
+For this, it needs a **system  account** to searh the authorizations. To do it, it performs :
   * the ldap query configure by **dbms.security.ldap.authorization.user_search_filter** by replacing the `{0}` with the user's login : `(&(objectClass=*)(uid={0}))`
   * inside the DN configure by **dbms.security.ldap.authorization.user_search_base** : `ou=users,dc=example,dc=org`
 
-Once it has found the object correspondig to the user, Neo4j will take the attribute configure by **dbms.security.ldap.authorization.group_membership_attributes** (so `memberOf` in our example) to have the list of all the user's group, and then he makes the **role** mapping as defined in **dbms.security.ldap.authorization.group_to_role_mapping**.
+Once it has found the correspondig user, it will take the attribute configure by **dbms.security.ldap.authorization.group_membership_attributes** (so `memberOf` in our example) to have the list of all the user's group.
+Finally, it can makes the **role** mapping as defined in **dbms.security.ldap.authorization.group_to_role_mapping**.
 
 == Good to know
 
