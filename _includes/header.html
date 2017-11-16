@@ -23,15 +23,21 @@
                 <ul class="nav navbar-nav navbar-right">
                   {% assign posts=site.posts | where:"ref", page.ref | sort: 'locale' %}
                   {% for post in posts %}
-                    <li>
-                      <a href="{{ post.url | prepend: site.baseurl }}" class="{{ post.locale }}">{{ post.locale }}</a> {% endfor %}
-                    </li>
+                    {% if page.autogen == null %}
+                        <li>
+                        <a href="{{ post.url | prepend: site.baseurl }}" class="{{ post.locale }}">{{ post.locale }}</a>
+                        </li>
+                    {% endif %}
+                  {% endfor %}
 
                   {% assign pages=site.pages | where:"ref", page.ref | sort: 'locale' %}
                   {% for page in pages %}
-                    <li>
-                      <a href="{{ page.url | prepend: site.baseurl }}" class="{{ page.locale }}">{{ page.locale }}</a> {% endfor %}
-                    </li>
+                    {% if page.autogen == null %}
+                        <li>
+                        <a href="{{ page.url | prepend: site.baseurl }}" class="{{ page.locale }}">{{ page.locale }}</a>
+                        </li>
+                    {% endif %}
+                  {% endfor %}
                 </ul>
             </nav>
         </div>
