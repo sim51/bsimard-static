@@ -5,9 +5,180 @@
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 16 Nov 2017 17:35:09 +0100</pubDate>
-    <lastBuildDate>Thu, 16 Nov 2017 17:35:09 +0100</lastBuildDate>
+    <pubDate>Thu, 23 Nov 2017 12:12:23 +0100</pubDate>
+    <lastBuildDate>Thu, 23 Nov 2017 12:12:23 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
+    
+      <item>
+        <title>Importer une matrice d&amp;#8217;adjacence</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#le-fichier-csv&quot;&gt;Le fichier CSV&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-processus&quot;&gt;Le processus&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#pré-requis-apoc&quot;&gt;Pré-requis: APOC&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-schema&quot;&gt;Le schema&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#le-script-d-import&quot;&gt;Le script d&amp;#8217;import&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;L&amp;#8217;objectif ici est de créer un graphe à partir d&amp;#8217;un fichier CSV correspondant a une &lt;a href=&quot;https://fr.wikipedia.org/wiki/Matrice_d&amp;#8217;adjacence&quot;&gt;matrice d&amp;#8217;adjacence&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-fichier-csv&quot;&gt;Le fichier CSV&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici un exemple de fichier CSV :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-csv&quot; data-lang=&quot;csv&quot;&gt;1;1;0;0;1;0
+1;0;1;0;1;0
+0;1;0;1;0;0
+0;0;1;0;1;1
+1;1;0;1;0;0
+1;0;0;1;0;0&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Chaque indice de ligne et de colonne correspond a un noeud du graph.
+Si l&amp;#8217;intersection da la ligne &lt;code&gt;i&lt;/code&gt; avec la colonne &lt;code&gt;j&lt;/code&gt; vaut &lt;code&gt;1&lt;/code&gt;, cela signifie que le noeud &lt;code&gt;i&lt;/code&gt; et le noeud &lt;code&gt;j&lt;/code&gt; sont reliés.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;le-processus&quot;&gt;Le processus&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;pré-requis-apoc&quot;&gt;Pré-requis: APOC&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Pour réaliser le script d&amp;#8217;import, je vais utiliser certaines procédures de la librairie &lt;code&gt;APOC&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici les étapes pour son installation :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Télécharger le JAR ici : &lt;a href=&quot;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.3.0.1/apoc-3.3.0.1-all.jar&quot; class=&quot;bare&quot;&gt;https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.3.0.1/apoc-3.3.0.1-all.jar&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Copier le JAR dans le répertoire &lt;code&gt;NEO4j_HOME/plugins&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Editer le fichier de configuration de Neo4j &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ajouter les propriétés suivantes :&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;# To be able to execute APOC procedures
+dbms.security.procedures.unrestricted=apoc.*
+# To allow APOC procedure to import files
+apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Redémarrer le serveur Neo4j&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;le-schema&quot;&gt;Le schema&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Le schéma de la base est ici tout simple :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;des noeuds avec le label &lt;code&gt;Node&lt;/code&gt;, qui possèdent un attribut &lt;code&gt;id&lt;/code&gt; de type &lt;code&gt;entier&lt;/code&gt; correspondant a leur indice dans la matrice&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;les noeuds seront reliés entre eux par une relation de type &lt;code&gt;LINKED_TO&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ainsi pour améliorer les performances de la base et assurer la cohérence des données, on va créer une contrainte d&amp;#8217;unicité sur le champs &lt;code&gt;id&lt;/code&gt; des noeuds &lt;code&gt;Node&lt;/code&gt; :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE CONSTRAINT ON (n:Node) ASSERT n.id IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;le-script-d-import&quot;&gt;Le script d&amp;#8217;import&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici le script permettant d&amp;#8217;importer le graph :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.load.csv('file:///home/bsimard/Applications/neo4j/current/import/matrice.csv',{}) YIELD lineNo AS lineNumber, list AS line
+
+    MERGE (lineNode:Node { id:lineNumber})
+
+    WITH lineNode, line
+    UNWIND range(0,size(line)-1, 1) AS colNumber
+
+    MERGE (colNode:Node { id:colNumber})
+    WITH line, colNode, lineNode, colNumber
+
+      CALL apoc.do.when(
+        line[colNumber] = '1',
+        'MERGE (lineNode)-[:LINKED_TO]-(colNode)',
+        '',
+        {lineNode:lineNode, colNode:colNode}
+      ) YIELD value
+
+      RETURN *&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A la ligne &lt;code&gt;1&lt;/code&gt;, permet de lire le fichier CSV correspondant a la matrice d&amp;#8217;adjacence ligne par ligne.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A la ligne &lt;code&gt;3&lt;/code&gt; on crée le noeud correspondant a la ligne en cours, si celui-ci n&amp;#8217;existe pas grâce a l&amp;#8217;instruction &lt;code&gt;MERGE&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;La ligne &lt;code&gt;6&lt;/code&gt; permet d&amp;#8217;itérer sur les colonnes de la ligne.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A la ligne &lt;code&gt;8&lt;/code&gt; on crée le noeud correspondant a la colonne en cours, si celui-ci n&amp;#8217;existe pas grâce a l&amp;#8217;instruction &lt;code&gt;MERGE&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;De la ligne &lt;code&gt;11&lt;/code&gt; a &lt;code&gt;16&lt;/code&gt;, on vérifie le contenu de la cellule &lt;code&gt;(lineNumber, colNumber)&lt;/code&gt;. Si celui-ci vaut &lt;code&gt;1&lt;/code&gt;, on crée la relation entre les deux noeuds si celle-ci n&amp;#8217;existe pas déjà.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et voilà, la matrice d&amp;#8217;adjacence est chargé dans Neo4j !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;/public/images/matrice-adjacence/graph.png&quot; alt=&quot;graph&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        
+        <category>neo4j, import, apoc, matrice</category>
+        
+        
+      </item>
     
       <item>
         <title>Connect Neo4j to a LDAP</title>
@@ -3133,455 +3304,6 @@ C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
         <guid isPermaLink="true">http://localhost:4000/Comment-SolR-decoupe-vos-phrases</guid>
         
         <category>solr, lucene, full text search</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>Connecting Neo4j to any SQL tool with the power of Postgresql</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#install-multicorn&quot;&gt;Install Multicorn&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#requirements&quot;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#installing-multicorn-from-source&quot;&gt;Installing Multicorn from source&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#neo4j-fwd&quot;&gt;Neo4j FWD&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#how-to-use-neo4j-foreign-data-wrapper&quot;&gt;How to use Neo4j Foreign Data Wrapper&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#make-cypher-query-into-a-sql-select&quot;&gt;Make cypher query into a sql select&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#create-the-function-into-your-database&quot;&gt;Create the function into your database&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#how-to-use-it&quot;&gt;How to use it&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#the-power-of-pg-json&quot;&gt;The power of PG &amp;amp; JSON&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#annexe&quot;&gt;Annexe&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#some-usefull-links&quot;&gt;Some usefull links&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#install-postgresql-9-4-for-wheezy&quot;&gt;Install postgresql 9.4 for wheezy&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;implement-a-neo4j-foreign-data-wrapper&quot;&gt;Implement A neo4j foreign data wrapper&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To produce a FDW, there is two possibilities :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Writing a pure postgresql extension in C&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Uinge Multicorn extension that make FDW develompent easy by giving us a Python wrapper to implement it&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For this tutorial, I have choose to use Multicorn, because I prefer Python rather than C.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;install-multicorn&quot;&gt;Install Multicorn&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;requirements&quot;&gt;Requirements&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;There is some Postgresql &amp;amp; Python requirements to use Multicorn :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Postgresql &amp;gt;= 9.1&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Postgresql development packages&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Python development packages&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;python 2.7 or &amp;gt;= python 3.3 as your default python with pip&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;On a debian system, you can directly type this command :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; apt-get install build-essential postgresql-server-dev-9.4 python-dev python-setuptools python-pip postgresql-plpython-9.4&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;installing-multicorn-from-source&quot;&gt;Installing Multicorn from source&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The first step is to compile and install Multicorn on our server.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock note&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-If you are using PG 9.1, you should use version 0.9.X version (&lt;code&gt;git checkout v0.9.3&lt;/code&gt;) NOTE: If you are using PG 9.2, you should use version 1.0.X version (&lt;code&gt;git checkout v01.0.4&lt;/code&gt;)
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; cd /tmp
-$&amp;gt; git clone git://github.com/Kozea/Multicorn.git
-$&amp;gt; cd Multicorn
-$&amp;gt; make &amp;amp;&amp;amp; make install&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now Multicorn is operational on our PG instance.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;neo4j-fwd&quot;&gt;Neo4j FWD&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You can find my Neo4j FDW here : &lt;a href=&quot;https://github.com/Progsima/neo4j-fwd&quot; class=&quot;bare&quot;&gt;https://github.com/Progsima/neo4j-fwd&lt;/a&gt; It’s based on py2neo for the Neo4j communication.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Clone the repository&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; git clone https://github.com/sim51/neo4j-fwd
-Install project dependencies : py2neo
-$&amp;gt; pip install py2neo&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Install the FDW&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; cd neo4j-fdw
-$&amp;gt; python setup.py install&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now, you have a Postgresql server with the Multicorn extension, and neo4j FDW.
-At this point, everything is done to use Neo4j in Postgresql !&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;how-to-use-neo4j-foreign-data-wrapper&quot;&gt;How to use Neo4j Foreign Data Wrapper&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;First step, it’s to create a database for testing&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; su - postgres
-$&amp;gt; psql
-postgres=# CREATE DATABASE fdw;
-postgres=# \connect fdw
-fdw=#&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;We can now enable the extension in our PG instance&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; su - postgres
-$&amp;gt; psql
-postgres=# CREATE EXTENSION multicorn;
-CREATE EXTENSION
-postgres=# \q&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;After we must define a Neo4j server&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# CREATE SERVER multicorn_neo4j FOREIGN DATA WRAPPER multicorn
-  OPTIONS (
-      wrapper  'neo4jPg.neo4jfdw.Neo4jForeignDataWrapper',
-      server   'localhost',
-      port     '7474',
-      user     'neo4j',
-      password 'admin'
-  );&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Then, declare a Neo4j foreign table into Postgresql :&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# CREATE FOREIGN TABLE neo4j_movie (
-    movie varchar
-) SERVER multicorn_neo4j OPTIONS (
-    cypher 'MATCH (n:Movie) RETURN n.title as movie'
-);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Finally, you can do some SQL query on the neo4j_movie table&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;fdw=# SELECT * FROM neo4j_movie;
-fdw=# SELECT count(*) FROM neo4j_movie;
-fdw=# SELECT count(*) FROM neo4j_movie WHERE movie LIKE '%Matrix%';&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;make-cypher-query-into-a-sql-select&quot;&gt;Make cypher query into a sql select&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This project also define a cool postgres function &lt;code&gt;cypher&lt;/code&gt;, that allow you to make some directly a cypher query into a select.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Example : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10')&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Select return a &lt;code&gt;cypher&lt;/code&gt; attribute that is a typed as a postgres JSON and represent the result of your query&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;create-the-function-into-your-database&quot;&gt;Create the function into your database&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You have to declare those functions into your database, before to use it.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
-CREATE EXTENSION plpythonu;
-
-mydatabase=#
-CREATE OR REPLACE FUNCTION cypher(query text) RETURNS SETOF json
-LANGUAGE plpythonu
-AS $$
-from neo4jPg import neo4jPGFunction
-for result in neo4jPGFunction.cypher_default_server(plpy, query):
-    yield result
-$$;
-CREATE OR REPLACE FUNCTION cypher(query text, server text) RETURNS SETOF json
-LANGUAGE plpythonu
-AS $$
-from neo4jPg import neo4jPGFunction
-for result in neo4jPGFunction.cypher_with_server(plpy, query, server):
-    yield result
-$$;
-CREATE OR REPLACE FUNCTION cypher(query text, server text, port text, login text, password text) RETURNS SETOF json
-LANGUAGE plpythonu
-AS $$
-from neo4jPg import neo4jPGFunction
-for result in neo4jPGFunction.cypher(plpy, query, server, port, login, password):
-    yield result
-$$;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This define three functions :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;cypher(query, server, port, login, password) :&lt;/strong&gt; make a cypher query on the specify server : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin')&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;cypher(query, server) :&lt;/strong&gt; make a cypher query on the foreign server specify (server is the name of the foreign server. Example multicorn_neo4j) : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10', 'multicorn_neo4j')&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;cypher(query) :&lt;/strong&gt; make a cypher query on the first foreign server define : &lt;code&gt;SELECT * FROM cypher('MATCH (n)-[r]&amp;#8594;(m) RETURN n,r,m LIMIT 10')&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;how-to-use-it&quot;&gt;How to use it&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The JSON produced follow your cypher return statement : the key of the first json level correspond to you the name of yours returns, and the value to json serialisation fo the object.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;If the return object is a Node, it’s serialize as a JSON object like this : &lt;code&gt;&lt;code&gt;{ labels : [], properties: { object } }&lt;/code&gt;&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Example :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
-SELECT cypher  FROM cypher('MATCH (n:Location) RETURN n LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
-                                                            cypher
-------------------------------------------------------------------------------------------------------------------------------
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1906520.0, &quot;x&quot;: 1158953.0, &quot;name&quot;: &quot;025XX W AUGUSTA BLVD&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1842294.0, &quot;x&quot;: 1175702.0, &quot;name&quot;: &quot;094XX S HARVARD AVE&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1931163.0, &quot;x&quot;: 1152905.0, &quot;name&quot;: &quot;047XX N KIMBALL AVE&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1887355.0, &quot;x&quot;: 1149049.0, &quot;name&quot;: &quot;041XX W 24TH PL&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1869892.0, &quot;x&quot;: 1176061.0, &quot;name&quot;: &quot;001XX W 53RD ST&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1862782.0, &quot;x&quot;: 1180056.0, &quot;name&quot;: &quot;063XX S DR MARTIN LUTHER KING JR DR&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1908312.0, &quot;x&quot;: 1175281.0, &quot;name&quot;: &quot;001XX W DIVISION ST&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1899998.0, &quot;x&quot;: 1139456.0, &quot;name&quot;: &quot;0000X N PINE AVE&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1908407.0, &quot;x&quot;: 1176113.0, &quot;name&quot;: &quot;012XX N STATE PKWY&quot;}}}
- {&quot;n&quot;:{&quot;labels&quot;: [&quot;Location&quot;],&quot;properties&quot;: {&quot;y&quot;: 1888098.0, &quot;x&quot;: 1148713.0, &quot;name&quot;: &quot;023XX S KEELER AVE&quot;}}}
-(10 lignes)&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;If the return object is a relation, it’s serialize as a JSON object like this : &lt;code&gt;{ type : &quot;MY_TYPE&quot;, properties: { object } }&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Example :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
-SELECT cypher  FROM cypher('MATCH (n)-[r]-&amp;gt;(m) RETURN r AS relation LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
-                          cypher
------------------------------------------------------------
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_LOCALIZED_AT&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;HAS_ARREST&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_DOMESTIC&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_IN_CATEGORY&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
- {&quot;relation&quot;:{&quot;type&quot;: &quot;IS_TYPE_OF&quot;,&quot;properties&quot;: {}}}
-(10 lignes)&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Of course, primitive types are also supported, and you can mix all of this : &lt;code&gt;SELECT cypher FROM cypher(MATCH (y:Year)-[r]→(m) RETURN y.value AS year, r, mLIMIT 10, localhost, 7474, neo4j, admin);&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
-SELECT cypher  FROM cypher('MATCH (y:Year)-[r]-&amp;gt;(m) RETURN y.value AS year, r, m LIMIT 10', 'localhost', '7474', 'neo4j', 'admin');
-                                                      cypher
--------------------------------------------------------------------------------------------------------------------
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10016718&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017521&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10018383&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10087834&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017190&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017379&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017246&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017248&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017208&quot;}}}
- {&quot;year&quot;:2015,&quot;r&quot;:{&quot;type&quot;: &quot;IN_YEAR&quot;,&quot;properties&quot;: {}},&quot;m&quot;:{&quot;labels&quot;: [&quot;Crime&quot;],&quot;properties&quot;: {&quot;id&quot;: &quot;10017211&quot;}}}
-(10 lignes)&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;the-power-of-pg-json&quot;&gt;The power of PG &amp;amp; JSON&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;PG 9.4 have a function name json_to_record, that convert our json into a collection of typed tuple !&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;mydatabase=#
-SELECT year, id  FROM cypher('MATCH (y:Year)&amp;lt;-[r]-(m) RETURN y.value AS year, m.id AS id LIMIT 10', 'localhost', '7474', 'neo4j', 'admin') , json_to_record(cypher) as x(year int, id varchar)
- year |    id
-------+----------
- 2015 | 10016718
- 2015 | 10017521
- 2015 | 10018383
- 2015 | 10087834
- 2015 | 10017190
- 2015 | 10017379
- 2015 | 10017246
- 2015 | 10017248
- 2015 | 10017208
- 2015 | 10017211
-(10 lignes)&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;annexe&quot;&gt;Annexe&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;some-usefull-links&quot;&gt;Some usefull links&lt;/h3&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://www.postgresql.org/download/linux/debian/&quot; class=&quot;bare&quot;&gt;http://www.postgresql.org/download/linux/debian/&lt;/a&gt; : How to install Postgresql 9.4 with apt&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;https://wiki.postgresql.org/wiki/Foreign_data_wrappers&quot; class=&quot;bare&quot;&gt;https://wiki.postgresql.org/wiki/Foreign_data_wrappers&lt;/a&gt; : Postgresql wiki page about foreign data wrapper&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://multicorn.readthedocs.org/en/latest/implementing-tutorial.html&quot; class=&quot;bare&quot;&gt;http://multicorn.readthedocs.org/en/latest/implementing-tutorial.html&lt;/a&gt; : How to write a FDW with multicorn&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;http://leopard.in.ua/2013/09/28/postgresql-multicorn/&quot; class=&quot;bare&quot;&gt;http://leopard.in.ua/2013/09/28/postgresql-multicorn/&lt;/a&gt; : Good article on how to use FDW&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;install-postgresql-9-4-for-wheezy&quot;&gt;Install postgresql 9.4 for wheezy&lt;/h3&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; echo &quot;deb http://apt.postgresql.org/pub/repos/apt/ wheezy-pgdg main&quot; &amp;gt; /etc/apt/sources.list.d/pgdg.list
-$&amp;lt; wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-$&amp;gt; apt-get update
-$&amp;gt; apt-get install postgresql-9.4&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Thu, 04 Jun 2015 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</link>
-        <guid isPermaLink="true">http://localhost:4000/Connecting-Neo4j-to-any-SQL-tool-with-the-power-of-Postgresql</guid>
-        
-        <category>neo4j, postgresql, foreign data wrapper</category>
         
         
       </item>

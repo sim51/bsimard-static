@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Importer une matrice d&#8217;adjacence</title>
+<meta charset="UTF-8">
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="Comment charger dans Neo4j une matrice d'adjacence à partir d'un fichier CSV." />
+<meta name="keywords" content="neo4j, import, apoc, matrice" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2017/11/23/fr-import-matrice-adjacence.html" class="fr">fr</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Importer une matrice d&#8217;adjacence</h1>
+            <meta itemprop="description" content=" Comment charger dans Neo4j une matrice d'adjacence à partir d'un fichier CSV.">
+            <img itemprop="image" src="/public/images/matrice-adjacence/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#le-fichier-csv">Le fichier CSV</a></li>
+<li><a href="#le-processus">Le processus</a>
+<ul class="sectlevel2">
+<li><a href="#pré-requis-apoc">Pré-requis: APOC</a></li>
+<li><a href="#le-schema">Le schema</a></li>
+<li><a href="#le-script-d-import">Le script d&#8217;import</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>L&#8217;objectif ici est de créer un graphe à partir d&#8217;un fichier CSV correspondant a une <a href="https://fr.wikipedia.org/wiki/Matrice_d&#8217;adjacence">matrice d&#8217;adjacence</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="le-fichier-csv">Le fichier CSV</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Voici un exemple de fichier CSV :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-csv" data-lang="csv">1;1;0;0;1;0
+1;0;1;0;1;0
+0;1;0;1;0;0
+0;0;1;0;1;1
+1;1;0;1;0;0
+1;0;0;1;0;0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Chaque indice de ligne et de colonne correspond a un noeud du graph.
+Si l&#8217;intersection da la ligne <code>i</code> avec la colonne <code>j</code> vaut <code>1</code>, cela signifie que le noeud <code>i</code> et le noeud <code>j</code> sont reliés.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="le-processus">Le processus</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="pré-requis-apoc">Pré-requis: APOC</h3>
+<div class="paragraph">
+<p>Pour réaliser le script d&#8217;import, je vais utiliser certaines procédures de la librairie <code>APOC</code>.</p>
+</div>
+<div class="paragraph">
+<p>Voici les étapes pour son installation :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Télécharger le JAR ici : <a href="https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.3.0.1/apoc-3.3.0.1-all.jar" class="bare">https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/3.3.0.1/apoc-3.3.0.1-all.jar</a></p>
+</li>
+<li>
+<p>Copier le JAR dans le répertoire <code>NEO4j_HOME/plugins</code></p>
+</li>
+<li>
+<p>Editer le fichier de configuration de Neo4j <code>NEO4J_HOME/conf/neo4j.conf</code></p>
+</li>
+<li>
+<p>Ajouter les propriétés suivantes :</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-properties" data-lang="properties"># To be able to execute APOC procedures
+dbms.security.procedures.unrestricted=apoc.*
+# To allow APOC procedure to import files
+apoc.import.file.enabled=true</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Redémarrer le serveur Neo4j</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="le-schema">Le schema</h3>
+<div class="paragraph">
+<p>Le schéma de la base est ici tout simple :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>des noeuds avec le label <code>Node</code>, qui possèdent un attribut <code>id</code> de type <code>entier</code> correspondant a leur indice dans la matrice</p>
+</li>
+<li>
+<p>les noeuds seront reliés entre eux par une relation de type <code>LINKED_TO</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ainsi pour améliorer les performances de la base et assurer la cohérence des données, on va créer une contrainte d&#8217;unicité sur le champs <code>id</code> des noeuds <code>Node</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE CONSTRAINT ON (n:Node) ASSERT n.id IS UNIQUE;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="le-script-d-import">Le script d&#8217;import</h3>
+<div class="paragraph">
+<p>Voici le script permettant d&#8217;importer le graph :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.load.csv('file:///home/bsimard/Applications/neo4j/current/import/matrice.csv',{}) YIELD lineNo AS lineNumber, list AS line
+
+    MERGE (lineNode:Node { id:lineNumber})
+
+    WITH lineNode, line
+    UNWIND range(0,size(line)-1, 1) AS colNumber
+
+    MERGE (colNode:Node { id:colNumber})
+    WITH line, colNode, lineNode, colNumber
+
+      CALL apoc.do.when(
+        line[colNumber] = '1',
+        'MERGE (lineNode)-[:LINKED_TO]-(colNode)',
+        '',
+        {lineNode:lineNode, colNode:colNode}
+      ) YIELD value
+
+      RETURN *</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A la ligne <code>1</code>, permet de lire le fichier CSV correspondant a la matrice d&#8217;adjacence ligne par ligne.</p>
+</div>
+<div class="paragraph">
+<p>A la ligne <code>3</code> on crée le noeud correspondant a la ligne en cours, si celui-ci n&#8217;existe pas grâce a l&#8217;instruction <code>MERGE</code>.</p>
+</div>
+<div class="paragraph">
+<p>La ligne <code>6</code> permet d&#8217;itérer sur les colonnes de la ligne.</p>
+</div>
+<div class="paragraph">
+<p>A la ligne <code>8</code> on crée le noeud correspondant a la colonne en cours, si celui-ci n&#8217;existe pas grâce a l&#8217;instruction <code>MERGE</code>.</p>
+</div>
+<div class="paragraph">
+<p>De la ligne <code>11</code> a <code>16</code>, on vérifie le contenu de la cellule <code>(lineNumber, colNumber)</code>. Si celui-ci vaut <code>1</code>, on crée la relation entre les deux noeuds si celle-ci n&#8217;existe pas déjà.</p>
+</div>
+<div class="paragraph">
+<p>Et voilà, la matrice d&#8217;adjacence est chargé dans Neo4j !</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="/public/images/matrice-adjacence/graph.png" alt="graph"></span></p>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Mot-Clefs :</span>
+                <span>
+                  neo4j, import, apoc, matrice
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Author :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2017-11-23">Nov 23, 2017</time>
+              </li>
+              <li><a href="" title="Permalien : Importer une matrice d&#8217;adjacence" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2017/11/13/neo4j-ldap.html" title="Connect Neo4j to a LDAP">&lt; Connect Neo4j to a LDAP</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2017/11/23/fr-import-matrice-adjacence';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>
