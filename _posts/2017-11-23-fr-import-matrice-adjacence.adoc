@@ -66,7 +66,7 @@ CREATE CONSTRAINT ON (n:Node) ASSERT n.id IS UNIQUE;
 
 === Le script d'import
 
-Voici le script permettant d'importer le graph :
+Voici le script permettant d'importer le graphe :
 
 
 [source,cypher]

@@ -5,8 +5,8 @@
     <description>{&quot;fr&quot;=&gt;&quot;Site de Benoit Simard&quot;, &quot;en&quot;=&gt;&quot;Benoit 's Blog&quot;}</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 23 Nov 2017 12:12:23 +0100</pubDate>
-    <lastBuildDate>Thu, 23 Nov 2017 12:12:23 +0100</lastBuildDate>
+    <pubDate>Thu, 30 Nov 2017 15:25:42 +0100</pubDate>
+    <lastBuildDate>Thu, 30 Nov 2017 15:25:42 +0100</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
     
       <item>
@@ -123,7 +123,7 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;le-script-d-import&quot;&gt;Le script d&amp;#8217;import&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Voici le script permettant d&amp;#8217;importer le graph :&lt;/p&gt;
+&lt;p&gt;Voici le script permettant d&amp;#8217;importer le graphe :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
