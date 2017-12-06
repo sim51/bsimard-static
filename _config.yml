@@ -4,10 +4,9 @@ description:
   fr: Site de Benoit Simard
   en: Benoit 's Blog
 keywords:
-  fr:
-  en:
-baseurl: ""
-url: "http://www.bsimard.com/"
+  fr: blog, java, neo4j, graph, benoit, simard
+  en: blog, java, neo4j, graph, benoit, simard
+url: http://www.bsimard.com
 twitter_username: logisima
 github_username:  sim51
 discuss_shortname: bsimard

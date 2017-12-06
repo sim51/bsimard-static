@@ -1,7 +1,7 @@
 <section id="blog" class="block">
   <div class="container">
     <h2>
-      <a href="/feed.xml" title="Flux RSS">
+      <a href="{{ '/' | append: page.locale | append: '/feed.xml'}}" title="Flux RSS">
         <i class="icon-rss"></i>
       </a>
       {{site.last-blog-post[page.locale]}}

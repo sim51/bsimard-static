@@ -14,7 +14,7 @@
                 <ul class="nav navbar-nav">
                   {% assign pages=site.pages | where:"locale", page.locale  | sort: 'order'%}
                   {% for my_page in pages %}
-                    {% if my_page.title and my_page.autogen == nil %}
+                    {% if my_page.title and my_page.autogen == nil and my_page.layout != 'feed' %}
                       <li><a href="{{ my_page.url | prepend: site.baseurl }}" title="{{ my_page.title }}">{{ my_page.title }}</a></li>
                     {% endif %}
                   {% endfor %}
