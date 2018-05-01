@@ -83,7 +83,7 @@ At the end, you should have something like that :
 </html>
 ----
 
-=== How to choose between SVG, canvas and webgl ?
+=== How to choose between SVG, Canvas and Webgl ?
 
 http://sigmajs.org[SigmaJS] can used one this technology to display your graph : *svg*, *canvas* & *webgl*.
 
@@ -122,7 +122,7 @@ To resume :
 | JS Code > OpenGL rendering
 
 | *Performance* +
-_to display a large graph (more than 1000 elements)
+to display a large graph (more than 1000 elements)
 | Slow
 | Normal
 | Performant
@@ -247,8 +247,6 @@ Once it's done, we need to tell sigma to draw the graph by calling its `refresh`
 
 === Live example
 
-If you want to see a live example :
-
 ++++
 <script async src="http://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
 ++++
@@ -301,20 +299,18 @@ This creates a https://developer.mozilla.org/fr/docs/Utilisation_des_web_workers
 
 * *Step 3 (optional) : Stop it*
 
-The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);
+The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : `window.setTimeout(function() {s.killForceAtlas2()}, 10000)`;
 
 === Live example
-
-If you want to see a live example :
 
 ++++
 <script async src="https://jsfiddle.net/sim51/xck9a7yf/embed/result,js/"></script>
 ++++
 
-== Two useful plugins
+== Plugins
 
 http://sigmajs.org[SigmaJS] has a lot of plugins, you can see the list https://github.com/jacomyal/sigma.js/tree/master/plugins[here].
-I will not show you all of them, so I have done a list of my favorites plugins.
+I will not show you all of them, so I have done a list of my most used plugins.
 
 === Edge labels
 
