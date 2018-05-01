@@ -13,7 +13,7 @@ Benoit Simard <contact@bsimard.com>
 In this article, I will show how to display and customize a graph in a browser with the help of http://sigmajs.org[SigmaJS],
 a JS library dedicated to graph drawing delivered under the https://opensource.org/licenses/MIT[MIT licence].
 
-Initially, SigmaJS has been developped for https://gephi.org/[Gephi] to export a graph on the web.
+Initially, SigmaJS has been developed for https://gephi.org/[Gephi] to export a graph on the web.
 Today, http://sigmajs.org[SigmaJS] is a thin, full features, highly configurable graph library
 and the small "plus" that make the difference is its compatibility with touch screen.
 
@@ -30,11 +30,11 @@ http://sigmajs.org[SigmaJS] can be found on :
 * https://www.npmjs.com/package/sigma[NPM] : you just have to type : `npm sigma --save-dev`
 * https://github.com/jacomyal/sigma.js/releases[Github] : download the `build.zip` from a release like https://github.com/jacomyal/sigma.js/releases/download/v1.2.0/build.zip[this]
 
-*Step 2 : Import the javascript library in your web page*
+*Step 2 : Import the JavaScript library in your web page*
 
 The minimal script you have to load is : `<script src="./build/sigma.min.js"></script>`.
 
-Personnally, I prefer to import all the source files, it permits to lighten the libary by removing the unused source files (ex: I don't need SVG & Webgl renderers if I use canvas).
+Personally, I prefer to import all the source files, it permits to lighten the library by removing the unused source files (ex: I don't need SVG & Webgl renderers if I use canvas).
 
 *Step 3 :  Create an HTML container*
 
@@ -45,7 +45,7 @@ This easily done with some CSS : `#sigma-container { width:100%, height:100%}`
 
 *Step 4: Initialise SigmaJS*
 
-To initialise SigmaJS, you need to call the function `sigma` with thoses arguments :
+To initialise SigmaJS, you need to call the function `sigma` with those arguments :
 
 * A render : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)
 * sigma's settings : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available https://github.com/jacomyal/sigma.js/wiki/Settings[here]
@@ -89,16 +89,16 @@ http://sigmajs.org[SigmaJS] can used one this technology to display your graph :
 
 *SVG* is a markup language, directly interpreted by your browser,
 so it's easy to customize the style of nodes & edges, you just have to add some CSS rules.
-But when you apply a layout algorithm on the graph, you continously change the DOM of the SVG,
+But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
 and if this DOM is heavy, the result is slow and can freeze your browser.
 
 *Canvas* is an HTML5 element compatible with all the modern browsers.
-It defines a space on your web page where you can draw some pixels by using a javascript PI.
-The javascript code is directly interpreted by your browser and it decide to what render and when.
+It defines a space on your web page where you can draw some pixels by using a JavaScript PI.
+The JavaScript code is directly interpreted by your browser and it decide to what render and when.
 Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.
 
 On the other hand, there is *WebGL*, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
-As in Canvas, you need to write some javascript code to render your visaulization (it's not the same Javascript API),
+As in Canvas, you need to write some JavaScript code to render your visualisation (it's not the same JavaScript API),
 but this time, its computation is delegated to *OpenGL* so to your *GPU*.
 
 To resume :
@@ -122,7 +122,7 @@ To resume :
 | JS Code > OpenGL rendering
 
 | *Performance* +
-_to display a large graph (more than 1000 elements_)
+_to display a large graph (more than 1000 elements)
 | Slow
 | Normal
 | Performant
@@ -205,7 +205,7 @@ It structure is simple : an object with an array of nodes and an array of edges.
 
 - do you want to display an oriented graph ? if so, you need an arrow type.
 
-- do you want to display many edges betwen two edges ? If so you need a arrow type.
+- do you want to display many edges between two edges ? If so you need a arrow type.
 
 | `size`
 | Float
@@ -239,7 +239,7 @@ var graph = {
 
 === Loading graph in sigma
 
-Sigma has a complete API to manage its graph ata. I let you see the https://github.com/jacomyal/sigma.js/wiki/Graph-API[API documentation].
+Sigma has a complete API to manage its graph data. I let you see the https://github.com/jacomyal/sigma.js/wiki/Graph-API[API documentation].
 
 To load a graph in sigma, you just have to call the method `read` on the sigma graph instance : `s.graph.read(graph)`
 
@@ -257,7 +257,7 @@ If you want to see a live example :
 
 === Definition
 
-What is hard in displaying a graph is to rapidely display it in such a way
+What is hard in displaying a graph is to rapidly display it in such a way
 that we can see all nodes and their edges without overlaps (in fact the less as possible).
 To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the **force-directed** algorithms.
 
@@ -270,7 +270,7 @@ The principle is simple, you need to consider two forces :
 | Attractive
 
 | Each node repulse the others. You can consider nodes like particle with the same electric charge.
-| Two nodes with an edge, attract themself. You can consider an edge as a spring
+| Two nodes with an edge, attract themselves. You can consider an edge as a spring
 
 | image::/public/images/sigmajs/repulsion.png[]
 | image::/public/images/sigmajs/attraction.png[]
@@ -280,9 +280,9 @@ The principle is simple, you need to consider two forces :
 Then you run an algorithm that compute on each iteration, the sum of the applied forces on each node, and move them in consequence.
 After a number of iteration, you will see that graph is in a stable state.
 
-=== Force-Atlas2 in sigma
+=== Force-Atlas2
 
-http://sigmajs.org[SigmaJS] include (as a plugin) a forced-directed algorithm called *Force-Atalas2*.
+http://sigmajs.org[SigmaJS] include (as a plugin) a forced-directed algorithm called *Force-Atlas2*.
 
 To use it, you need to :
 
@@ -301,7 +301,7 @@ This creates a https://developer.mozilla.org/fr/docs/Utilisation_des_web_workers
 
 * *Step 3 (optional) : Stop it*
 
-The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconde in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);
+The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);
 
 === Live example
 
@@ -313,7 +313,7 @@ If you want to see a live example :
 
 == Two useful plugins
 
-SigmaJS has a lot of plugins, you can see the list https://github.com/jacomyal/sigma.js/tree/master/plugins[here].
+http://sigmajs.org[SigmaJS] has a lot of plugins, you can see the list https://github.com/jacomyal/sigma.js/tree/master/plugins[here].
 I will not show you all of them, so I have done a list of my favorites plugins.
 
 === Edge labels
@@ -332,7 +332,7 @@ To use it :
 === Relative size
 
 This plugin is really useful when you want to see which node is most connected.
-The size of the node depends of its degree, ie. its number of ingoing & outgoing edges.
+The size of the node depends of its degree, ie. its number of in-going & outgoing edges.
 
 ++++
 <script async src="https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/"></script>

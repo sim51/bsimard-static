@@ -88,7 +88,7 @@
 <li><a href="#graph-layout-algorithm">Graph layout algorithm</a>
 <ul class="sectlevel2">
 <li><a href="#definition-2">Definition</a></li>
-<li><a href="#force-atlas2-in-sigma">Force-Atlas2 in sigma</a></li>
+<li><a href="#force-atlas2">Force-Atlas2</a></li>
 <li><a href="#live-example-2">Live example</a></li>
 </ul>
 </li>
@@ -109,7 +109,7 @@
 a JS library dedicated to graph drawing delivered under the <a href="https://opensource.org/licenses/MIT">MIT licence</a>.</p>
 </div>
 <div class="paragraph">
-<p>Initially, SigmaJS has been developped for <a href="https://gephi.org/">Gephi</a> to export a graph on the web.
+<p>Initially, SigmaJS has been developed for <a href="https://gephi.org/">Gephi</a> to export a graph on the web.
 Today, <a href="http://sigmajs.org">SigmaJS</a> is a thin, full features, highly configurable graph library
 and the small "plus" that make the difference is its compatibility with touch screen.</p>
 </div>
@@ -140,13 +140,13 @@ and the small "plus" that make the difference is its compatibility with touch sc
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>Step 2 : Import the javascript library in your web page</strong></p>
+<p><strong>Step 2 : Import the JavaScript library in your web page</strong></p>
 </div>
 <div class="paragraph">
 <p>The minimal script you have to load is : <code>&lt;script src="./build/sigma.min.js"&gt;&lt;/script&gt;</code>.</p>
 </div>
 <div class="paragraph">
-<p>Personnally, I prefer to import all the source files, it permits to lighten the libary by removing the unused source files (ex: I don&#8217;t need SVG &amp; Webgl renderers if I use canvas).</p>
+<p>Personally, I prefer to import all the source files, it permits to lighten the library by removing the unused source files (ex: I don&#8217;t need SVG &amp; Webgl renderers if I use canvas).</p>
 </div>
 <div class="paragraph">
 <p><strong>Step 3 :  Create an HTML container</strong></p>
@@ -162,7 +162,7 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
 <p><strong>Step 4: Initialise SigmaJS</strong></p>
 </div>
 <div class="paragraph">
-<p>To initialise SigmaJS, you need to call the function <code>sigma</code> with thoses arguments :</p>
+<p>To initialise SigmaJS, you need to call the function <code>sigma</code> with those arguments :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -217,18 +217,18 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
 <div class="paragraph">
 <p><strong>SVG</strong> is a markup language, directly interpreted by your browser,
 so it&#8217;s easy to customize the style of nodes &amp; edges, you just have to add some CSS rules.
-But when you apply a layout algorithm on the graph, you continously change the DOM of the SVG,
+But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
 and if this DOM is heavy, the result is slow and can freeze your browser.</p>
 </div>
 <div class="paragraph">
 <p><strong>Canvas</strong> is an HTML5 element compatible with all the modern browsers.
-It defines a space on your web page where you can draw some pixels by using a javascript PI.
-The javascript code is directly interpreted by your browser and it decide to what render and when.
+It defines a space on your web page where you can draw some pixels by using a JavaScript PI.
+The JavaScript code is directly interpreted by your browser and it decide to what render and when.
 Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.</p>
 </div>
 <div class="paragraph">
 <p>On the other hand, there is <strong>WebGL</strong>, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
-As in Canvas, you need to write some javascript code to render your visaulization (it&#8217;s not the same Javascript API),
+As in Canvas, you need to write some JavaScript code to render your visualisation (it&#8217;s not the same JavaScript API),
 but this time, its computation is delegated to <strong>OpenGL</strong> so to your <strong>GPU</strong>.</p>
 </div>
 <div class="paragraph">
@@ -264,7 +264,7 @@ but this time, its computation is delegated to <strong>OpenGL</strong> so to you
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Performance</strong><br>
-<em>to display a large graph (more than 1000 elements</em>)</p></td>
+_to display a large graph (more than 1000 elements)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Slow</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Normal</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Performant</p></td>
@@ -379,7 +379,7 @@ It structure is simple : an object with an array of nodes and an array of edges.
 <td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(line)</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Edge type for its render. The choice will depend on :
 </p><p class="tableblock">- do you want to display an oriented graph ? if so, you need an arrow type.
-</p><p class="tableblock">- do you want to display many edges betwen two edges ? If so you need a arrow type.</p></td>
+</p><p class="tableblock">- do you want to display many edges between two edges ? If so you need a arrow type.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
@@ -418,7 +418,7 @@ It structure is simple : an object with an array of nodes and an array of edges.
 <div class="sect2">
 <h3 id="loading-graph-in-sigma">Loading graph in sigma</h3>
 <div class="paragraph">
-<p>Sigma has a complete API to manage its graph ata. I let you see the <a href="https://github.com/jacomyal/sigma.js/wiki/Graph-API">API documentation</a>.</p>
+<p>Sigma has a complete API to manage its graph data. I let you see the <a href="https://github.com/jacomyal/sigma.js/wiki/Graph-API">API documentation</a>.</p>
 </div>
 <div class="paragraph">
 <p>To load a graph in sigma, you just have to call the method <code>read</code> on the sigma graph instance : <code>s.graph.read(graph)</code></p>
@@ -442,7 +442,7 @@ It structure is simple : an object with an array of nodes and an array of edges.
 <div class="sect2">
 <h3 id="definition-2">Definition</h3>
 <div class="paragraph">
-<p>What is hard in displaying a graph is to rapidely display it in such a way
+<p>What is hard in displaying a graph is to rapidly display it in such a way
 that we can see all nodes and their edges without overlaps (in fact the less as possible).
 To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the <strong>force-directed</strong> algorithms.</p>
 </div>
@@ -466,7 +466,7 @@ To do it, we need an algorithm that will compute the position of each nodes, and
 <p>Each node repulse the others. You can consider nodes like particle with the same electric charge.</p>
 </div></div></td>
 <td class="tableblock halign-left valign-top"><div><div class="paragraph">
-<p>Two nodes with an edge, attract themself. You can consider an edge as a spring</p>
+<p>Two nodes with an edge, attract themselves. You can consider an edge as a spring</p>
 </div></div></td>
 </tr>
 <tr>
@@ -489,9 +489,9 @@ After a number of iteration, you will see that graph is in a stable state.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="force-atlas2-in-sigma">Force-Atlas2 in sigma</h3>
+<h3 id="force-atlas2">Force-Atlas2</h3>
 <div class="paragraph">
-<p><a href="http://sigmajs.org">SigmaJS</a> include (as a plugin) a forced-directed algorithm called <strong>Force-Atalas2</strong>.</p>
+<p><a href="http://sigmajs.org">SigmaJS</a> include (as a plugin) a forced-directed algorithm called <strong>Force-Atlas2</strong>.</p>
 </div>
 <div class="paragraph">
 <p>To use it, you need to :</p>
@@ -528,7 +528,7 @@ This creates a <a href="https://developer.mozilla.org/fr/docs/Utilisation_des_we
 </ul>
 </div>
 <div class="paragraph">
-<p>The algorithm won&#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconde in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);</p>
+<p>The algorithm won&#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);</p>
 </div>
 </div>
 <div class="sect2">
@@ -544,7 +544,7 @@ This creates a <a href="https://developer.mozilla.org/fr/docs/Utilisation_des_we
 <h2 id="two-useful-plugins">Two useful plugins</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>SigmaJS has a lot of plugins, you can see the list <a href="https://github.com/jacomyal/sigma.js/tree/master/plugins">here</a>.
+<p><a href="http://sigmajs.org">SigmaJS</a> has a lot of plugins, you can see the list <a href="https://github.com/jacomyal/sigma.js/tree/master/plugins">here</a>.
 I will not show you all of them, so I have done a list of my favorites plugins.</p>
 </div>
 <div class="sect2">
@@ -571,7 +571,7 @@ I will not show you all of them, so I have done a list of my favorites plugins.<
 <h3 id="relative-size">Relative size</h3>
 <div class="paragraph">
 <p>This plugin is really useful when you want to see which node is most connected.
-The size of the node depends of its degree, ie. its number of ingoing &amp; outgoing edges.</p>
+The size of the node depends of its degree, ie. its number of in-going &amp; outgoing edges.</p>
 </div>
 <script async src="https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/"></script>
 </div>
