@@ -3,12 +3,14 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 06 Dec 2017 16:23:50 +0100</pubDate>
-    <lastBuildDate>Wed, 06 Dec 2017 16:23:50 +0100</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 01 May 2018 23:18:33 +0200</pubDate>
+    <lastBuildDate>Tue, 01 May 2018 23:18:33 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
     
      
       <item>
@@ -174,8 +176,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         <category>neo4j, import, apoc, matrice</category>
         
@@ -624,8 +626,8 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
         
         <category>neo4j, ldap, authenfication, authorisation</category>
         
@@ -1019,8 +1021,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -1156,8 +1158,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/Les-icones-du-passe</link>
-        <guid isPermaLink="true">http://www.bsimard.com/Les-icones-du-passe</guid>
+        <link>http://localhost:4000/Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1449,324 +1451,10 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
-        <guid isPermaLink="true">http://www.bsimard.com/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
-        
-        
-      </item>
-      
-    
-     
-      <item>
-        <title>Comment SolR découpe vos phrases</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#le-traitement-du-texte-et-des-mots&quot;&gt;Le traitement du texte et des mots&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#les-filtres&quot;&gt;Les filtres&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#les-tokenizers&quot;&gt;Les tokenizers&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#la-définition-des-types&quot;&gt;La définition des types&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#texte-général&quot;&gt;Texte Général&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#texte-exact&quot;&gt;Texte exact&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#la-recherche&quot;&gt;La recherche&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#les-types-de-recherche&quot;&gt;Les types de recherche&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#les-coefficients-boost&quot;&gt;Les coefficients / boost&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;le-traitement-du-texte-et-des-mots&quot;&gt;Le traitement du texte et des mots&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans un moteur de recherche, le traitement du texte et des mots s’effectue à deux endroits :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;lors de l’indexation, pour la construction des ses indexes&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;lors d’une requête, pour traiter les mots recherchés&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;INFO: Généralement on fait en sorte que le traitement effectué lors de l’indexation soit le même que celui de la requêtes, mais ce n’est pas une obligation.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il existe deux familles de traitement :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;les &lt;strong&gt;filters&lt;/strong&gt; qui permettent de manipuler et modifier le texte. Exemple : supprimer tous les accent du texte.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;les &lt;strong&gt;tokenizers&lt;/strong&gt; qui permettent de découper le texte en mot. Exemple : découper le texte selon les espaces et la ponctuation&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Lorsqu’on définit un champs dans Solr, on y définit la liste des filtres et des tokenizers qu’on veut utiliser, ainsi que l’ordre dans lequel ils vont être exécuté.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;les-filtres&quot;&gt;Les filtres&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans cette section nous allons voir une série de filtres que SolR met à notre disposition.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;patternreplacecharfilterfactory&quot;&gt;PatternReplaceCharFilterFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce filtre nous permet de spécifier une liste de caractère afin de les supprimer du texte. Généralement on demande de supprimer les caractères spéciaux comme &lt;code&gt;()[]{}'|?!.&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;Pomme a des pépins&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;stopfilterfactory&quot;&gt;StopFilterFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce filtre permet de supprimer du texte ce qu’on nomme les stopwords, c’est à dire tous les mots usuels de la langue comme &lt;code&gt;de, le, la, les, dans, pour, …​&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ces &lt;strong&gt;stopwords&lt;/strong&gt; sont paramétrables via un fichier texte. Vous pouvez retrouver une liste de stopword pour la langue française à l’adresse suivante : &lt;a href=&quot;http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt&quot; class=&quot;bare&quot;&gt;http://svn.tartarus.org/snowball/trunk/website/algorithms/french/stop.txt&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme} pépins !&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;lowercasefilterfactory&quot;&gt;LowerCaseFilterFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce filtre permet de mettre tout le texte en minuscule.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;frenchlightstemfilterfactory&quot;&gt;FrenchLightStemFilterFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce filtre permet de trouver automatiquement la racine du mot. Il doit êre appliqué sur des mots et non des phrases entières. C’est pourquoi il est toujours positionné après un tokenizer. En outre, il supprime aussi tous les caractères accentués et spéciaux de la langue française.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;planetarirum&lt;/code&gt; devient &lt;code&gt;planet&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;asciifoldingfilterfactory&quot;&gt;ASCIIFoldingFilterFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce filtre permet de remplacer tous les caractères accentués et les caractères spécifiques de la langues française, par une représentation universelle (en ASCII) :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;é, ê, è → e&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;ç → c&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;ù → u&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;…​&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Exemple : {Pomme} a des pépins ! devient {Pomme} a des pepins !&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;les-tokenizers&quot;&gt;Les tokenizers&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans cette section nous allons voir la liste des tokenizers que SolR met a notre disposition.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;standardtokenizerfactory&quot;&gt;StandardTokenizerFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce tokernizer sépare le texte en fonction des espaces et de la ponctuation (qu’il supprime).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme}, a, des, pépins&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;keywordtokenizerfactory&quot;&gt;KeywordTokenizerFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce tokenizer ne fait rien, puisqu’il renvoie le texte qu’on lui donne tel quel. Il sert surtout lorsqu’on veut faire de la recherche exact.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt; devient &lt;code&gt;{Pomme} a des pépins !&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;whitespacetokenizerfactory&quot;&gt;WhitespaceTokenizerFactory&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce tokernizer sépare le texte uniquement en fonction des espaces, il ne prend pas en compte la ponctuation.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;{Pomme} a des pépins, et c’est pas marrant.&lt;/code&gt; devient &lt;code&gt;{Pomme}, a, des, pépins,, et, c’est, pas, marrant.&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;la-définition-des-types&quot;&gt;La définition des types&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans tous mes projets, il y a deux types qui reviennent régulièrement.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;texte-général&quot;&gt;Texte Général&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce type permet de stocker dans les indexes, la racine des mots sans accent et en minuscule.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Voici la liste des filtres/tokenizers utilisés pour ce champ :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;PatternReplaceCharFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;StandardTokenizerFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;LowerCaseFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;FrenchLightStemFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;texte-exact&quot;&gt;Texte exact&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce type permet de stocker dans les indexes les mots exacts mais sans accent et en minuscule.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;PatternReplaceCharFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;StandardTokenizerFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;LowerCaseFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;ASCIIFoldingFilterFactory&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;la-recherche&quot;&gt;La recherche&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Lorsqu’on effectue une recherche, il est possible de spécifier un algorithme de recherche.
-Nous allons détailler dans les paragraphes à quoi cela correspond.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;les-types-de-recherche&quot;&gt;Les types de recherche&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;la-recherche-standard&quot;&gt;La recherche standard&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;La recherche standard est simple, elle correspond à la recherche du terme exact (après son traitement comme vu précédemment).&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;la-recherche-wildcard&quot;&gt;La recherche wildcard&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Avec un wildcard, on recherche dans les indexes tout les mots commençant par le pattern de la recherche.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;plan*&lt;/code&gt; permet de trouver &lt;code&gt;plan, planète, planétarium, …​&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock important&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;la-recherche-floue&quot;&gt;La recherche floue&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Avec une recherche floue, on recherche dans les indexes tous les mots qui sont proches du pattern de la recherche.
-Derrière la notion de proche/voisin se trouve un algorithme basé sur la distance de Levenshtein.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ce type de recherche permet d’être tolérant aux fautes orthographiques / frappes&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Exemple :&lt;/strong&gt; &lt;code&gt;cosmik~&lt;/code&gt; permet de trouver &lt;code&gt;cosmique&lt;/code&gt; | &lt;code&gt;plannette&lt;/code&gt; permet de trouver &lt;code&gt;planète&lt;/code&gt; | &lt;code&gt;renconrte~&lt;/code&gt; permet de trouver &lt;code&gt;rencontre&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock note&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-Il est possible de définir le taux de similarité minimum, compris entre 0 &amp;amp; 1 (1 étant le plus proche possible): &lt;code&gt;comisk~0.8&lt;/code&gt;
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock important&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-Aucun traitement de texte n’est effecuté sur les recherches de type wildcard
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;les-coefficients-boost&quot;&gt;Les coefficients / boost&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Lorsqu’on effectue une recherche sur plusieurs critères, il est possible de définir pour chaque critère quel est son incidence sur le resultat de recherche.
-C’est ce que l’on nomme les &lt;strong&gt;boost&lt;/strong&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Par exemple cela permet de donner un score plus élévé aux documents possédant le pattern de recherche dans le titre que dans la description.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/Comment-SolR-decoupe-vos-phrases</link>
-        <guid isPermaLink="true">http://www.bsimard.com/Comment-SolR-decoupe-vos-phrases</guid>
-        
-        <category>solr, lucene, full text search</category>
         
         
       </item>

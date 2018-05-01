@@ -3,12 +3,14 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Benoit 's Blog</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 06 Dec 2017 16:23:50 +0100</pubDate>
-    <lastBuildDate>Wed, 06 Dec 2017 16:23:50 +0100</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 01 May 2018 23:18:33 +0200</pubDate>
+    <lastBuildDate>Tue, 01 May 2018 23:18:33 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
     
      
     
@@ -439,8 +441,8 @@ Finally, it can makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
         
         <category>neo4j, ldap connection, authentication, authorization</category>
         
@@ -804,8 +806,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -1288,8 +1290,8 @@ WITH s,
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2016/12/04/lego-project.html</guid>
+        <link>http://localhost:4000/2016/12/04/lego-project.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/12/04/lego-project.html</guid>
         
         <category>neo4j, load csv, lego</category>
         
@@ -1572,16 +1574,14 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/How-to-use-JRebel-with-Neo4j</link>
-        <guid isPermaLink="true">http://www.bsimard.com/How-to-use-JRebel-with-Neo4j</guid>
+        <link>http://localhost:4000/How-to-use-JRebel-with-Neo4j</link>
+        <guid isPermaLink="true">http://localhost:4000/How-to-use-JRebel-with-Neo4j</guid>
         
         <category>neo4j, jrebel</category>
         
         
       </item>
       
-    
-     
     
      
     

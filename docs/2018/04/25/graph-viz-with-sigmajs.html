@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <title>How to use Sigmajs to display your graph ?</title>
+<meta charset="UTF-8">
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="" />
+<meta name="keywords" content="neo4j, graph, visualisation, dataviz" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="//feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2018/04/25/graph-viz-with-sigmajs.html" class=""></a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> How to use Sigmajs to display your graph ?</h1>
+            <meta itemprop="description" content=" ">
+            <img itemprop="image" src="/public/images/sigmajs/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#installation">Installation</a>
+<ul class="sectlevel2">
+<li><a href="#how-to">How-to</a></li>
+<li><a href="#how-to-choose-between-svg-canvas-and-webgl">How to choose between SVG, canvas and webgl ?</a></li>
+</ul>
+</li>
+<li><a href="#the-sigmajs-graph-structure">The SigmaJS graph structure</a>
+<ul class="sectlevel2">
+<li><a href="#definition">Definition</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#loading-graph-in-sigma">Loading graph in sigma</a></li>
+<li><a href="#live-example">Live example</a></li>
+</ul>
+</li>
+<li><a href="#graph-layout-algorithm">Graph layout algorithm</a>
+<ul class="sectlevel2">
+<li><a href="#definition-2">Definition</a></li>
+<li><a href="#force-atlas2-in-sigma">Force-Atlas2 in sigma</a></li>
+<li><a href="#live-example-2">Live example</a></li>
+</ul>
+</li>
+<li><a href="#two-useful-plugins">Two useful plugins</a>
+<ul class="sectlevel2">
+<li><a href="#edge-labels">Edge labels</a></li>
+<li><a href="#relative-size">Relative size</a></li>
+</ul>
+</li>
+<li><a href="#sigma-neo4j">Sigma + Neo4j</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this article, I will show how to display and customize a graph in a browser with the help of <a href="http://sigmajs.org">SigmaJS</a>,
+a JS library dedicated to graph drawing delivered under the <a href="https://opensource.org/licenses/MIT">MIT licence</a>.</p>
+</div>
+<div class="paragraph">
+<p>Initially, SigmaJS has been developped for <a href="https://gephi.org/">Gephi</a> to export a graph on the web.
+Today, <a href="http://sigmajs.org">SigmaJS</a> is a thin, full features, highly configurable graph library
+and the small "plus" that make the difference is its compatibility with touch screen.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installation">Installation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="how-to">How-to</h3>
+<div class="paragraph">
+<p>There are four steps to follow :</p>
+</div>
+<div class="paragraph">
+<p><strong>Step 1 : Install SigmaJS binaries</strong></p>
+</div>
+<div class="paragraph">
+<p><a href="http://sigmajs.org">SigmaJS</a> can be found on :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.npmjs.com/package/sigma">NPM</a> : you just have to type : <code>npm sigma --save-dev</code></p>
+</li>
+<li>
+<p><a href="https://github.com/jacomyal/sigma.js/releases">Github</a> : download the <code>build.zip</code> from a release like <a href="https://github.com/jacomyal/sigma.js/releases/download/v1.2.0/build.zip">this</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Step 2 : Import the javascript library in your web page</strong></p>
+</div>
+<div class="paragraph">
+<p>The minimal script you have to load is : <code>&lt;script src="./build/sigma.min.js"&gt;&lt;/script&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>Personnally, I prefer to import all the source files, it permits to lighten the libary by removing the unused source files (ex: I don&#8217;t need SVG &amp; Webgl renderers if I use canvas).</p>
+</div>
+<div class="paragraph">
+<p><strong>Step 3 :  Create an HTML container</strong></p>
+</div>
+<div class="paragraph">
+<p>You have to create an HTML element, for example a <code>div</code> with an <code>id</code> like this : <code>&lt;div id='sigma-container'&gt;&lt;/div&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>Moreover, you also need to give an <code>height</code> and <code>width</code> to it, otherwise it will has a size of 0 pixel.
+This easily done with some CSS : <code>#sigma-container { width:100%, height:100%}</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Step 4: Initialise SigmaJS</strong></p>
+</div>
+<div class="paragraph">
+<p>To initialise SigmaJS, you need to call the function <code>sigma</code> with thoses arguments :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A render : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)</p>
+</li>
+<li>
+<p>sigma&#8217;s settings : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available <a href="https://github.com/jacomyal/sigma.js/wiki/Settings">here</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>At the end, you should have something like that :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;SigmaJS example&lt;/title&gt;
+    &lt;script src="./build/sigma.min.js"&gt;&lt;/script&gt;
+    &lt;style&gt;
+      html { height:100%;}
+      body {height: 100%;}
+      #sigma-container { width:100%; height:100%; background-color:#E1E1E1}
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id='sigma-container'&gt;&lt;/div&gt;
+    &lt;script&gt;
+      ...
+      // Initialise sigma:
+      var s = new sigma(
+        {
+           renderer: {
+             container: document.getElementById('sigma-container'),
+             type: 'canvas'
+           },
+           settings: {}
+         }
+       );
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="how-to-choose-between-svg-canvas-and-webgl">How to choose between SVG, canvas and webgl ?</h3>
+<div class="paragraph">
+<p><a href="http://sigmajs.org">SigmaJS</a> can used one this technology to display your graph : <strong>svg</strong>, <strong>canvas</strong> &amp; <strong>webgl</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong>SVG</strong> is a markup language, directly interpreted by your browser,
+so it&#8217;s easy to customize the style of nodes &amp; edges, you just have to add some CSS rules.
+But when you apply a layout algorithm on the graph, you continously change the DOM of the SVG,
+and if this DOM is heavy, the result is slow and can freeze your browser.</p>
+</div>
+<div class="paragraph">
+<p><strong>Canvas</strong> is an HTML5 element compatible with all the modern browsers.
+It defines a space on your web page where you can draw some pixels by using a javascript PI.
+The javascript code is directly interpreted by your browser and it decide to what render and when.
+Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, there is <strong>WebGL</strong>, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
+As in Canvas, you need to write some javascript code to render your visaulization (it&#8217;s not the same Javascript API),
+but this time, its computation is delegated to <strong>OpenGL</strong> so to your <strong>GPU</strong>.</p>
+</div>
+<div class="paragraph">
+<p>To resume :</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top"><strong>SVG</strong></th>
+<th class="tableblock halign-left valign-top"><strong>Canvas</strong></th>
+<th class="tableblock halign-left valign-top"><strong>WebGL</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Browser compatibility</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ALL (even old one)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ALL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modern browsers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Render phases</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SVG creation &gt; Browser parsing &gt; Browser rendering</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JS code &gt; Browser rendering</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JS Code &gt; OpenGL rendering</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Performance</strong><br>
+<em>to display a large graph (more than 1000 elements</em>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Slow</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Normal</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Performant</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>So the choice will depend of your needs, and also of the <a href="http://sigmajs.org">SigmaJS</a> plugins you want to use (plugins are not compatible with every formats).</p>
+</div>
+<div class="paragraph">
+<p>I suggest you to choose <strong>Canvas</strong> or <strong>Webgl</strong> if you want to really display a big graph.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-sigmajs-graph-structure">The SigmaJS graph structure</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="definition">Definition</h3>
+<div class="paragraph">
+<p>Now that sigma is initiate, we need to give it a graph.
+It structure is simple : an object with an array of nodes and an array of edges.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Node definition</caption>
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Node identifier, must be unique across all the node</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>label</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>x</code> &amp; <code>y</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Float</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Position of the node in 2D. Can be initialize with <code>Math.random()</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Float</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No  <em>(0)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the node that is use to render it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>color</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color RGB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(<code>defaultNodeColor</code>)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color used to display the node.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Edge definition</caption>
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Edge identifier, must be unique across all the edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>source</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Starting node&#8217;s identifier of the edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Any</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ending node&#8217;s identifier of the edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>line</code>, <code>curve</code>, <code>arrow</code> or <code>curvedArrow</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(line)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Edge type for its render. The choice will depend on :
+</p><p class="tableblock">- do you want to display an oriented graph ? if so, you need an arrow type.
+</p><p class="tableblock">- do you want to display many edges betwen two edges ? If so you need a arrow type.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Float</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(<code>minEdgeSize</code>)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the edge that is use to render it.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>color</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color RGB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(<code>defaultEdgeColor</code>)</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Color used to display the edge.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="example">Example</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var graph = {
+  nodes: [
+    { id: "n0", label: "A node", x: 0, y: 0, size: 3, color: '#008cc2' },
+    { id: "n1", label: "Another node", x: 3, y: 1, size: 2, color: '#008cc2' },
+    { id: "n2", label: "And a last one", x: 1, y: 3, size: 1, color: '#E57821' }
+  ],
+  edges: [
+    { id: "e0", source: "n0", target: "n1", color: '#282c34', type:'line', size:0.5 },
+    { id: "e1", source: "n1", target: "n2", color: '#282c34', type:'curve', size:1},
+    { id: "e2", source: "n2", target: "n0", color: '#FF0000', type:'line', size:2}
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="loading-graph-in-sigma">Loading graph in sigma</h3>
+<div class="paragraph">
+<p>Sigma has a complete API to manage its graph ata. I let you see the <a href="https://github.com/jacomyal/sigma.js/wiki/Graph-API">API documentation</a>.</p>
+</div>
+<div class="paragraph">
+<p>To load a graph in sigma, you just have to call the method <code>read</code> on the sigma graph instance : <code>s.graph.read(graph)</code></p>
+</div>
+<div class="paragraph">
+<p>Once it&#8217;s done, we need to tell sigma to draw the graph by calling its <code>refresh</code> function : <code>s.refresh()</code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="live-example">Live example</h3>
+<div class="paragraph">
+<p>If you want to see a live example :</p>
+</div>
+<script async src="http://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="graph-layout-algorithm">Graph layout algorithm</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="definition-2">Definition</h3>
+<div class="paragraph">
+<p>What is hard in displaying a graph is to rapidely display it in such a way
+that we can see all nodes and their edges without overlaps (in fact the less as possible).
+To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the <strong>force-directed</strong> algorithms.</p>
+</div>
+<div class="paragraph">
+<p>The principle is simple, you need to consider two forces :</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Repulsive</th>
+<th class="tableblock halign-left valign-top">Attractive</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Each node repulse the others. You can consider nodes like particle with the same electric charge.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Two nodes with an edge, attract themself. You can consider an edge as a spring</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="imageblock">
+<div class="content">
+<img src="/public/images/sigmajs/repulsion.png" alt="repulsion">
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="imageblock">
+<div class="content">
+<img src="/public/images/sigmajs/attraction.png" alt="attraction">
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Then you run an algorithm that compute on each iteration, the sum of the applied forces on each node, and move them in consequence.
+After a number of iteration, you will see that graph is in a stable state.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="force-atlas2-in-sigma">Force-Atlas2 in sigma</h3>
+<div class="paragraph">
+<p><a href="http://sigmajs.org">SigmaJS</a> include (as a plugin) a forced-directed algorithm called <strong>Force-Atalas2</strong>.</p>
+</div>
+<div class="paragraph">
+<p>To use it, you need to :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 1 : import the plugin files</strong></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="./build/plugins/sigma.layout.forceAtlas2/supervisor.js"&gt;&lt;/script&gt;
+&lt;script src="./build/plugins/sigma.layout.forceAtlas2/worker.js"&gt;&lt;/script&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 2 : Run it</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Now that the plugin is loaded, we can directly call it on the sigma instance : <code>s.startForceAtlas2()</code>;
+This creates a <a href="https://developer.mozilla.org/fr/docs/Utilisation_des_web_workers">web worker</a> where all the algorithm iterations will be calculated.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 3 (optional) : Stop it</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The algorithm won&#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconde in my example) : window.setTimeout(function() {s.killForceAtlas2()}, 10000);</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="live-example-2">Live example</h3>
+<div class="paragraph">
+<p>If you want to see a live example :</p>
+</div>
+<script async src="https://jsfiddle.net/sim51/xck9a7yf/embed/result,js/"></script>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="two-useful-plugins">Two useful plugins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SigmaJS has a lot of plugins, you can see the list <a href="https://github.com/jacomyal/sigma.js/tree/master/plugins">here</a>.
+I will not show you all of them, so I have done a list of my favorites plugins.</p>
+</div>
+<div class="sect2">
+<h3 id="edge-labels">Edge labels</h3>
+<div class="paragraph">
+<p>This plugin allows you to add a label on each edge. I mainly use it to display the Neo4j&#8217;s relationship type.</p>
+</div>
+<div class="paragraph">
+<p>To use it :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>import the needed script (in my case <code>settings.js</code>, <code>sigma.canvas.edges.labels.def.js</code> &amp; <code>sigma.canvas.edges.labels.curvedArrow.js</code>)</p>
+</li>
+<li>
+<p>Add a <code>label</code> property on yours edges</p>
+</li>
+</ul>
+</div>
+<script async src="http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
+</div>
+<div class="sect2">
+<h3 id="relative-size">Relative size</h3>
+<div class="paragraph">
+<p>This plugin is really useful when you want to see which node is most connected.
+The size of the node depends of its degree, ie. its number of ingoing &amp; outgoing edges.</p>
+</div>
+<script async src="https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/"></script>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sigma-neo4j">Sigma + Neo4j</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>TODO</p>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata"> :</span>
+                <span>
+                  neo4j, graph, visualisation, dataviz
+                </span>,
+              </li>
+              <li >
+                <span class="metadata"> :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata"> :</span>
+                <time itemprop="dateCreated" datetime="2018-04-25">Apr 25, 2018</time>
+              </li>
+              <li><a href="" title="Permalien : How to use Sigmajs to display your graph ?" itemprop="url"></a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2017/11/23/fr-import-matrice-adjacence.html" title="Importer une matrice d&#8217;adjacence">&lt; Importer une matrice d&#8217;adjacence</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2018/04/25/graph-viz-with-sigmajs';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

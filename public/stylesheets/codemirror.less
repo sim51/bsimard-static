@@ -1,27 +1,33 @@
 @import (inline) "../codemirror/lib/codemirror.css";
 @import (inline) "../codemirror/theme/neo.css";
 
-.CodeMirror {
-  height: auto !important;
-  padding: 9.5px;
-  margin: 0 0 10px;
-  font-size: 13px;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  z-index: 0;
-}
- 
 pre.highlight {
     border: none;
 }
 
-.cm-s-neo .CodeMirror-linenumber {
-color:#000;
-}
+.cm-s-neo {
 
-.cm-s-neo pre.CodeMirror-line {
-    margin-left:5px;
+  &.CodeMirror {
+    height: auto !important;
+    margin: 0;
+    font-size: 13px;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #F5F5F5 !important;
+    border-radius: 4px;
+    z-index: 0;
+  }
+  
+ .CodeMirror-linenumber {
+    color:#000;
+  }
+  
+  .CodeMirror-sizer {
+  border-left: 2px solid #FFF;
+  }
+
+  pre.CodeMirror-line {
+      margin-left:5px;
+  }
+
 }
