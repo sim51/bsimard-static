@@ -6,7 +6,7 @@
 <meta name="author" content="Benoit Simard"/>
 <meta name="robots" content="index, follow" />
 <meta name="description" content="" />
-<meta name="keywords" content="neo4j, graph, visualisation, dataviz" />
+<meta name="keywords" content="sigma, graph, visualisation, dataviz" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
@@ -95,10 +95,10 @@
 <li><a href="#plugins">Plugins</a>
 <ul class="sectlevel2">
 <li><a href="#edge-labels">Edge labels</a></li>
+<li><a href="#edge-paralleledges">Edge parallelEdges</a></li>
 <li><a href="#relative-size">Relative size</a></li>
 </ul>
 </li>
-<li><a href="#sigma-neo4j">Sigma + Neo4j</a></li>
 </ul>
 </div>
 <div class="sect1">
@@ -110,8 +110,8 @@ a JS library dedicated to graph drawing delivered under the <a href="https://ope
 </div>
 <div class="paragraph">
 <p>Initially, SigmaJS has been developed for <a href="https://gephi.org/">Gephi</a> to export a graph on the web.
-Today, <a href="http://sigmajs.org">SigmaJS</a> is a thin, full features, highly configurable graph library
-and the small "plus" that make the difference is its compatibility with touch screen.</p>
+Today, <a href="http://sigmajs.org">SigmaJS</a> is a stable, full features and highly configurable graph library.
+Moreover, the small "plus" that makes the difference is its compatibility with touch screens.</p>
 </div>
 </div>
 </div>
@@ -167,10 +167,10 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
 <div class="ulist">
 <ul>
 <li>
-<p>A render : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)</p>
+<p>A <strong>render</strong> : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)</p>
 </li>
 <li>
-<p>sigma&#8217;s settings : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available <a href="https://github.com/jacomyal/sigma.js/wiki/Settings">here</a></p>
+<p>sigma&#8217;s <strong>settings</strong> : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available <a href="https://github.com/jacomyal/sigma.js/wiki/Settings">here</a></p>
 </li>
 </ul>
 </div>
@@ -192,7 +192,6 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
   &lt;body&gt;
     &lt;div id='sigma-container'&gt;&lt;/div&gt;
     &lt;script&gt;
-      ...
       // Initialise sigma:
       var s = new sigma(
         {
@@ -286,7 +285,7 @@ to display a large graph (more than 1000 elements)</p></td>
 <div class="sect2">
 <h3 id="definition">Definition</h3>
 <div class="paragraph">
-<p>Now that sigma is initiate, we need to give it a graph.
+<p>Now that sigma is initialised, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
@@ -375,11 +374,14 @@ It structure is simple : an object with an array of nodes and an array of edges.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>line</code>, <code>curve</code>, <code>arrow</code> or <code>curvedArrow</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>line</code>,<br>
+<code>curve</code>,<br>
+<code>arrow</code> or<br>
+<code>curvedArrow</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No <em>(line)</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Edge type for its render. The choice will depend on :
-</p><p class="tableblock">- do you want to display an oriented graph ? if so, you need an arrow type.
-</p><p class="tableblock">- do you want to display many edges between two edges ? If so you need a arrow type.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Edge type for its render.<br>
+The choice will depend on if you want to display an oriented graph. If so, you need an arrow type.
+And if you want to display a high number of edges, it&#8217;s faster to use a line type (ie. line or arrow).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
@@ -552,7 +554,7 @@ I will not show you all of them, so I have done a list of my most used plugins.<
 <div class="ulist">
 <ul>
 <li>
-<p>import the needed script (in my case <code>settings.js</code>, <code>sigma.canvas.edges.labels.def.js</code> &amp; <code>sigma.canvas.edges.labels.curvedArrow.js</code>)</p>
+<p>Import the needed script (in my case <code>settings.js</code>, <code>sigma.canvas.edges.labels.def.js</code> &amp; <code>sigma.canvas.edges.labels.curvedArrow.js</code>)</p>
 </li>
 <li>
 <p>Add a <code>label</code> property on yours edges</p>
@@ -560,6 +562,42 @@ I will not show you all of them, so I have done a list of my most used plugins.<
 </ul>
 </div>
 <script async src="http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
+</div>
+<div class="sect2">
+<h3 id="edge-paralleledges">Edge parallelEdges</h3>
+<div class="paragraph">
+<p>If you want parallel edges (ie. to have multiple relationship between two nodes), it&#8217;s the plugin you must have.</p>
+</div>
+<div class="paragraph">
+<p>To use it :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Import the needed script :</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>utils.js</code></p>
+</li>
+<li>
+<p><code>sigma.canvas.edges.curvedArrow.js</code>  &amp; <code>sigma.canvas.edgehovers.curvedArrow.js</code> if you have a directed graph.</p>
+</li>
+<li>
+<p><code>sigma.canvas.edgehovers.curve.js</code> &amp; <code>sigma.canvas.edges.curve.js</code>  if you want the an undirected graph.</p>
+</li>
+<li>
+<p><code>sigma.canvas.edges.labels.curve.js</code>  if you have enabled label on edges</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Add a property <code>count</code> that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.</p>
+</li>
+</ul>
+</div>
+<script async src="//jsfiddle.net/sim51/ep6g95st/embed/result,js/"></script>
 </div>
 <div class="sect2">
 <h3 id="relative-size">Relative size</h3>
@@ -571,21 +609,13 @@ The size of the node depends of its degree, ie. its number of in-going &amp; out
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="sigma-neo4j">Sigma + Neo4j</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>TODO</p>
-</div>
-</div>
-</div>
           </section>
           <footer>
             <ul class="inline pull-right metadata">
               <li >
                 <span class="metadata"> :</span>
                 <span>
-                  neo4j, graph, visualisation, dataviz
+                  sigma, graph, visualisation, dataviz
                 </span>,
               </li>
               <li >
@@ -615,6 +645,10 @@ The size of the node depends of its degree, ie. its number of in-going &amp; out
               <a class="btn btn-primary" href="/2017/11/23/fr-import-matrice-adjacence.html" title="Importer une matrice d&#8217;adjacence">&lt; Importer une matrice d&#8217;adjacence</a>
             </li>
             
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2018/05/02/neo4j-viz-with-sigmajs.html" title="How to display a Neo4j graph with SigmaJS ?">How to display a Neo4j graph with SigmaJS ? &gt;</a>
+            </li>
             
           </ul>
         </div>

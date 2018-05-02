@@ -4,7 +4,7 @@ Benoit Simard <contact@bsimard.com>
 //:page-locale: en
 :page-description:
 :page-image: /public/images/sigmajs/banner.png
-:page-tags: neo4j, graph, visualisation, dataviz
+:page-tags: sigma, graph, visualisation, dataviz
 :page-ref: how-to-use-sigmajs
 :toc:
 
@@ -14,8 +14,8 @@ In this article, I will show how to display and customize a graph in a browser w
 a JS library dedicated to graph drawing delivered under the https://opensource.org/licenses/MIT[MIT licence].
 
 Initially, SigmaJS has been developed for https://gephi.org/[Gephi] to export a graph on the web.
-Today, http://sigmajs.org[SigmaJS] is a thin, full features, highly configurable graph library
-and the small "plus" that make the difference is its compatibility with touch screen.
+Today, http://sigmajs.org[SigmaJS] is a stable, full features and highly configurable graph library.
+Moreover, the small "plus" that makes the difference is its compatibility with touch screens.
 
 == Installation
 
@@ -47,8 +47,8 @@ This easily done with some CSS : `#sigma-container { width:100%, height:100%}`
 
 To initialise SigmaJS, you need to call the function `sigma` with those arguments :
 
-* A render : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)
-* sigma's settings : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available https://github.com/jacomyal/sigma.js/wiki/Settings[here]
+* A *render* : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)
+* sigma's *settings* : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available https://github.com/jacomyal/sigma.js/wiki/Settings[here]
 
 At the end, you should have something like that :
 
@@ -67,7 +67,6 @@ At the end, you should have something like that :
   <body>
     <div id='sigma-container'></div>
     <script>
-      ...
       // Initialise sigma:
       var s = new sigma(
         {
@@ -137,7 +136,7 @@ I suggest you to choose *Canvas* or *Webgl* if you want to really display a big 
 
 === Definition
 
-Now that sigma is initiate, we need to give it a graph.
+Now that sigma is initialised, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.
 
 [%header,cols='1,1,2,3',title='Node definition']
@@ -199,13 +198,14 @@ It structure is simple : an object with an array of nodes and an array of edges.
 | Ending node's identifier of the edge.
 
 | `type`
-| `line`, `curve`, `arrow` or `curvedArrow`
+| `line`, +
+`curve`, +
+`arrow` or +
+`curvedArrow`
 | No _(line)_
-| Edge type for its render. The choice will depend on :
-
-- do you want to display an oriented graph ? if so, you need an arrow type.
-
-- do you want to display many edges between two edges ? If so you need a arrow type.
+| Edge type for its render. +
+The choice will depend on if you want to display an oriented graph. If so, you need an arrow type.
+And if you want to display a high number of edges, it's faster to use a line type (ie. line or arrow).
 
 | `size`
 | Float
@@ -318,11 +318,28 @@ This plugin allows you to add a label on each edge. I mainly use it to display t
 
 To use it :
 
-* import the needed script (in my case `settings.js`, `sigma.canvas.edges.labels.def.js` & `sigma.canvas.edges.labels.curvedArrow.js`)
+* Import the needed script (in my case `settings.js`, `sigma.canvas.edges.labels.def.js` & `sigma.canvas.edges.labels.curvedArrow.js`)
 * Add a `label` property on yours edges
 
 ++++
 <script async src="http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
+++++
+
+=== Edge parallelEdges
+
+If you want parallel edges (ie. to have multiple relationship between two nodes), it's the plugin you must have.
+
+To use it :
+
+* Import the needed script :
+** `utils.js`
+** `sigma.canvas.edges.curvedArrow.js`  & `sigma.canvas.edgehovers.curvedArrow.js` if you have a directed graph.
+** `sigma.canvas.edgehovers.curve.js` & `sigma.canvas.edges.curve.js`  if you want the an undirected graph.
+** `sigma.canvas.edges.labels.curve.js`  if you have enabled label on edges
+* Add a property `count` that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.
+
+++++
+<script async src="//jsfiddle.net/sim51/ep6g95st/embed/result,js/"></script>
 ++++
 
 === Relative size
@@ -333,7 +350,3 @@ The size of the node depends of its degree, ie. its number of in-going & outgoin
 ++++
 <script async src="https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/"></script>
 ++++
-
-== Sigma + Neo4j
-
-TODO
