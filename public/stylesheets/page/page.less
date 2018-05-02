@@ -168,28 +168,36 @@ body.page {
     }
 
   }
-  
+
   table {
     .table
   }
   table {
-    .table-striped 
+    .table-striped
   }
-  
+
+  table {
+    caption {
+      text-align: left;
+      font-style: italic;
+      color: @quaternary;
+    }
+  }
+
   .admonitionblock {
     table{
       width:auto;
-      
+
       tr {
 
-        
+
         td {
           border-top:none;
         }
-        
+
         td.icon {
-          border: 1px solid #008CC2;
-          color:#008CC2;
+          border: 1px solid @primary;
+          color:@primary;
           font-weight:bold;
         }
         td.content{
