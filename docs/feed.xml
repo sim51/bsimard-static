@@ -5,12 +5,10 @@
     <description>Site de Benoit Simard</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 02 May 2018 17:25:35 +0200</pubDate>
-    <lastBuildDate>Wed, 02 May 2018 17:25:35 +0200</lastBuildDate>
+    <pubDate>Fri, 04 May 2018 16:23:00 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 16:23:00 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
-    
-     
     
      
     
@@ -1164,6 +1162,299 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
         <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
+        
+        
+      </item>
+      
+    
+     
+      <item>
+        <title>Stresser facilement votre base Neo4j avec gatling</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#la-création-des-scenarii&quot;&gt;La création des scenarii&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#configuration-de-neo4j-pour-le-query-log&quot;&gt;Configuration de Neo4j pour le query-log&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#gatling&quot;&gt;Gatling&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#création-du-scenario&quot;&gt;Création du scenario&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#lancement-des-tests&quot;&gt;Lancement des tests&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;la-création-des-scenarii&quot;&gt;La création des scenarii&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;introduction&quot;&gt;Introduction&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;La chose la plus fastidieuse sur les tests de monté en charge, c’est la création des scenarii qui seront utilisés lors des tests.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lorsqu’on veut tester une application web, c’est assez simple puisque tous les outils possèdent un recorder permettant d’enregistrer vos actions de votre navigateur par l’intermédiaire d’un proxy. Et gatling ne déroge pas à la règle !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Mais comment faire pour une base de données ? Et bien avec le journal des requêtes pardi !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Attention&lt;/strong&gt;, même si cette méthode est efficace et très simple à mettre en place, généralement on préfère écrire nos scenarii de manière à ce qu’ils soient reproductibles (ie. idempotent).
+Or les query-log ne le sont pas !
+Et oui on ne peut faire deux fois la même requête d’insertion si celle-ci tombe sous le joug d’une contrainte d’unicité.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Bref, cette méthode est simple &amp;amp; rapide, mais &lt;strong&gt;criticable&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;configuration-de-neo4j-pour-le-query-log&quot;&gt;Configuration de Neo4j pour le query-log&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Neo4j vous permet de logger toutes les requêtes HTTP qui lui sont envoyées.
+Vous pouvez retrouver la documentation ici : &lt;a href=&quot;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&quot; class=&quot;bare&quot;&gt;http://neo4j.com/docs/stable/server-configuration.html#_http_logging_configuration&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici la liste des actions à réaliser :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Editer le fichier &lt;code&gt;neo4j-server.properties&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Activer ou ajouter les lignes suivantes :&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;org.neo4j.server.http.log.enabled=true
+org.neo4j.server.http.log.config=conf/neo4j-http-logging.xml
+Editer le fichier neo4j-http-logging.xml&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Remplacer la ligne pattern par celle-ci : &lt;code&gt;&amp;lt;pattern&amp;gt;%t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'&quot;', '\\&quot;'};%s&amp;lt;/pattern&amp;gt;`&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%t{dd/MMM/yyyy:HH:mm:ss Z} :&lt;/strong&gt; la date de la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%h :&lt;/strong&gt; l’hote d’où provient la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%m :&lt;/strong&gt; le verbe HTTP utilisé&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%r :&lt;/strong&gt; l’url de la requête&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%replace(%replace(%requestContent){'\', '\\'}){';', '\;'} :&lt;/strong&gt; le contenu de la requête où on echappe les caractères '\', ';' &amp;amp; '&quot;'&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;%s :&lt;/strong&gt; le code HTTP de réponse&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Si vous voulez avoir plus de détail sur ces varaibles, c’est par ici : &lt;a href=&quot;http://logback.qos.ch/manual/layouts.html#AccessPatternLayout&quot; class=&quot;bare&quot;&gt;http://logback.qos.ch/manual/layouts.html#AccessPatternLayout&lt;/a&gt; &amp;amp; &lt;a href=&quot;http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html&quot; class=&quot;bare&quot;&gt;http://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A présent, toutes les requêtes HTTP envoyés à Neo4j seront tracées dans un fichier selon le shema suivant : &lt;code&gt;date;hote;method;url;content;code&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;gatling&quot;&gt;Gatling&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;installation&quot;&gt;Installation&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Vous pouvez télécharger le bundle Gatling ici : &lt;a href=&quot;http://gatling.io/#/download&quot; class=&quot;bare&quot;&gt;http://gatling.io/#/download&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Pour son installation, il suffit de le dézipper dans le répertoire de votre choix et d’avoir un JDK7 sur votre ordinateur.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et c’est tout, on ne peut pas faire plus simple non ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;création-du-scenario&quot;&gt;Création du scenario&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Les scenarii dans Gatling sont du code écrit en Scala avec un DSL simple à prendre en main.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Voici celui-ci que je vous propose :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-scala&quot; data-lang=&quot;scala&quot;&gt;package neo4j
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+/**
+ * Simple simulation that take the neo4j query file with this :
+ * * Pattern : %t{dd/MMM/yyyy:HH:mm:ss Z};%h;%m;%r;%replace(%replace(%replace(%requestContent){'\\', '\\\\'}){';', '\\;'}){'&quot;', '\\&quot;'};%s
+ * * Header : date;hote;method;url;content;code
+ */
+class HttpLogReplaySimulation extends Simulation {
+
+  val httpConf = http
+    .baseURL(&quot;http://localhost:7474&quot;)
+    .acceptHeader(&quot;application/json, text/plain, */*&quot;)
+    .basicAuth(&quot;neo4j&quot;, &quot;admin&quot;)
+
+  val queryFeeder = ssv(&quot;http.log&quot;).convert {
+    case (&quot;code&quot;, string) =&amp;gt; string.toInt // transform response code to an int
+    case (&quot;url&quot;, string) =&amp;gt; {
+      // we only take the uri
+      val uri :String = string.replaceFirst(&quot;(GET|POST|PUT|DELETE|OPTIONS) (.*) HTTP(.*)&quot;, &quot;$2&quot;)
+
+      // we make serial transaction query as unique transaction query
+      uri.matches(&quot;/db/data/transaction.*&quot;) match {
+        case true =&amp;gt;  &quot;/db/data/transaction/commit&quot;
+        case false =&amp;gt; uri
+      }
+    }
+  }.circular
+
+  val scn = scenario(&quot;query-log&quot;)
+    .feed(queryFeeder)
+    .doSwitch(&quot;${method}&quot;) (
+      &quot;GET&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+                .get(&quot;${url}&quot;)
+                .body(StringBody(&quot;${content}&quot;))
+                .asJSON
+                .check(status.is(&quot;${code}&quot;))),
+      &quot;POST&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .post(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;PUT&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .put(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;DELETE&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .delete(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;))),
+      &quot;OPTIONS&quot; -&amp;gt; exec(http(&quot;Query-log&quot;)
+        .options(&quot;${url}&quot;)
+        .body(StringBody(&quot;${content}&quot;))
+        .asJSON
+        .check(status.is(&quot;${code}&quot;)))
+    )
+
+  setUp(
+    scn
+      .inject(
+        rampUsers(100) over (10) // making 100 queries on 10 sec
+      )
+      .protocols(httpConf)
+  )
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Pour installer ce scenario, il vous suffit d’enregistrer le code dans le fichier &lt;code&gt;HttpLogReplaySimulation.scala&lt;/code&gt; dans le répertoire &lt;code&gt;$GATLING_HOME/user_files/simulations/neo4j&lt;/code&gt; (créer le fichier et les répertoires).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Son comportement est simple, il vient lire un fichier de log http, et exécute les requêtes une à une. Par contre il faut que le fichier de log :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;soit dans le répertoire &lt;code&gt;$GATLING_HOME/user_files/data&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;possède en-tête le header suivant : &lt;code&gt;date;hote;method;url;content;code&lt;/code&gt;. Ceci peut être fait simplement avec la commande unix sed : &lt;code&gt;sed -i -e &quot;1i\date;hote;method;url;content;code&quot; http.log&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ne comporte pas de ligne vide à la fin du fichier&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Il est à noter que ce scenario &lt;strong&gt;transforme toutes les transactions multi-requêtes en multiple transactions&lt;/strong&gt;, et donc &lt;strong&gt;les rollbacks ne sont pas pris en compte&lt;/strong&gt;. Bref il n’est pas parfait, mais comme évoqué précécemment il est préférable de faire ses propres scenarii si vous voulez quelques de choses aux petits oignons.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;lancement-des-tests&quot;&gt;Lancement des tests&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A présent, dans le répertoire &lt;code&gt;$GATLING_HOME/user_files&lt;/code&gt; vous devez avoir la structure suivante :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;├── data
+│   └── http.log
+└── simulations
+    └── neo4j
+        └── HttpLogReplaySimulation.scala&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Maintenant il ne vous reste plus qu’à lancer Gatling vi la commande suivante : &lt;code&gt;bin/gatling.sh&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;L’outil va vous poser trois questions :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;le numéro du scenario a exécuter. Choississez celui avec le nom &lt;code&gt;neo4j.HttpLogReplaySimulation&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;le nom de la simulation, celui-ci servira pour la génération du rapport. Laissez le par défaut.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;la description du tir au besoin. Laissez la vide.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Une fois ce questionnaire remplie, Gatling va exécuter son tir.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A la fin, vous obtenez un rapport en html dans le répertoire &lt;code&gt;$GATLING_HOME/results/httplogreplaysimulation-*&lt;/code&gt;, contenant toutes les résultats du tests :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;le nombre de requête simultanée&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;les différents percentiles, avec la moyenne, le min le max et l’écart-type&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;la distribution des temps de réponse&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-gatling/gatling-report.png&quot; alt=&quot;gatling report&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        
+        <category>neo4j, gatling, stress-tool</category>
         
         
       </item>

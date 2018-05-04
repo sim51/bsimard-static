@@ -5,14 +5,786 @@
     <description>Benoit 's Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 02 May 2018 17:25:35 +0200</pubDate>
-    <lastBuildDate>Wed, 02 May 2018 17:25:35 +0200</lastBuildDate>
+    <pubDate>Fri, 04 May 2018 16:23:00 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 16:23:00 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
      
-    
-     
+      <item>
+        <title>How to use Sigmajs to display your graph ?</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to&quot;&gt;How-to&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-choose-between-svg-canvas-and-webgl&quot;&gt;How to choose between SVG, Canvas and Webgl ?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-sigmajs-graph-structure&quot;&gt;The SigmaJS graph structure&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#definition&quot;&gt;Definition&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#example&quot;&gt;Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#loading-graph-in-sigma&quot;&gt;Loading graph in sigma&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#live-example&quot;&gt;Live example&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#graph-layout-algorithm&quot;&gt;Graph layout algorithm&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#definition-2&quot;&gt;Definition&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#force-atlas2&quot;&gt;Force-Atlas2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#live-example-2&quot;&gt;Live example&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#plugins&quot;&gt;Plugins&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#edge-labels&quot;&gt;Edge labels&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#edge-paralleledges&quot;&gt;Edge parallelEdges&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#relative-size&quot;&gt;Relative size&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#sigma-and-neo4j&quot;&gt;Sigma and Neo4j&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#create-a-graph-structure-from-a-neo4j-query&quot;&gt;Create a graph structure from a Neo4j query&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-sigma-neosig&quot;&gt;Neo4j + Sigma = NeoSig&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this article, I will show how to display and customize a graph in a browser with the help of &lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt;,
+a JS library dedicated to graph drawing delivered under the &lt;a href=&quot;https://opensource.org/licenses/MIT&quot;&gt;MIT licence&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Initially, SigmaJS has been developed for &lt;a href=&quot;https://gephi.org/&quot;&gt;Gephi&lt;/a&gt; to export a graph on the web.
+Today, &lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; is a stable, full features and highly configurable graph library.
+Moreover, the small &quot;plus&quot; that makes the difference is its compatibility with touch screens.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to&quot;&gt;How-to&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are four steps to follow :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Step 1 : Install SigmaJS binaries&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; can be found on :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.npmjs.com/package/sigma&quot;&gt;NPM&lt;/a&gt; : you just have to type : &lt;code&gt;npm sigma --save-dev&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/jacomyal/sigma.js/releases&quot;&gt;Github&lt;/a&gt; : download the &lt;code&gt;build.zip&lt;/code&gt; from a release like &lt;a href=&quot;https://github.com/jacomyal/sigma.js/releases/download/v1.2.0/build.zip&quot;&gt;this&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Step 2 : Import the JavaScript library in your web page&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The minimal script you have to load is : &lt;code&gt;&amp;lt;script src=&quot;./build/sigma.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Personally, I prefer to import all the source files, it permits to lighten the library by removing the unused source files (ex: I don&amp;#8217;t need SVG &amp;amp; Webgl renderers if I use canvas).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Step 3 :  Create an HTML container&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You have to create an HTML element, for example a &lt;code&gt;div&lt;/code&gt; with an &lt;code&gt;id&lt;/code&gt; like this : &lt;code&gt;&amp;lt;div id='sigma-container'&amp;gt;&amp;lt;/div&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Moreover, you also need to give an &lt;code&gt;height&lt;/code&gt; and &lt;code&gt;width&lt;/code&gt; to it, otherwise it will has a size of 0 pixel.
+This easily done with some CSS : &lt;code&gt;#sigma-container { width:100%, height:100%}&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Step 4: Initialise SigmaJS&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To initialise SigmaJS, you need to call the function &lt;code&gt;sigma&lt;/code&gt; with those arguments :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A &lt;strong&gt;render&lt;/strong&gt; : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;sigma&amp;#8217;s &lt;strong&gt;settings&lt;/strong&gt; : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available &lt;a href=&quot;https://github.com/jacomyal/sigma.js/wiki/Settings&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At the end, you should have something like that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    &amp;lt;title&amp;gt;SigmaJS example&amp;lt;/title&amp;gt;
+    &amp;lt;script src=&quot;./build/sigma.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+    &amp;lt;style&amp;gt;
+      html { height:100%;}
+      body {height: 100%;}
+      #sigma-container { width:100%; height:100%; background-color:#E1E1E1}
+    &amp;lt;/style&amp;gt;
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;div id='sigma-container'&amp;gt;&amp;lt;/div&amp;gt;
+    &amp;lt;script&amp;gt;
+      // Initialise sigma:
+      var s = new sigma(
+        {
+           renderer: {
+             container: document.getElementById('sigma-container'),
+             type: 'canvas'
+           },
+           settings: {}
+         }
+       );
+    &amp;lt;/script&amp;gt;
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to-choose-between-svg-canvas-and-webgl&quot;&gt;How to choose between SVG, Canvas and Webgl ?&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; can used one this technology to display your graph : &lt;strong&gt;svg&lt;/strong&gt;, &lt;strong&gt;canvas&lt;/strong&gt; &amp;amp; &lt;strong&gt;webgl&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;SVG&lt;/strong&gt; is a markup language, directly interpreted by your browser,
+so it&amp;#8217;s easy to customize the style of nodes &amp;amp; edges, you just have to add some CSS rules.
+But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
+and if this DOM is heavy, the result is slow and can freeze your browser.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Canvas&lt;/strong&gt; is an HTML5 element compatible with all the modern browsers.
+It defines a space on your web page where you can draw some pixels by using a JavaScript PI.
+The JavaScript code is directly interpreted by your browser and it decide to what render and when.
+Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On the other hand, there is &lt;strong&gt;WebGL&lt;/strong&gt;, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
+As in Canvas, you need to write some JavaScript code to render your visualisation (it&amp;#8217;s not the same JavaScript API),
+but this time, its computation is delegated to &lt;strong&gt;OpenGL&lt;/strong&gt; so to your &lt;strong&gt;GPU&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To resume :&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 25%;&quot;&gt;
+&lt;col style=&quot;width: 25%;&quot;&gt;
+&lt;col style=&quot;width: 25%;&quot;&gt;
+&lt;col style=&quot;width: 25%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;strong&gt;SVG&lt;/strong&gt;&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;strong&gt;Canvas&lt;/strong&gt;&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;strong&gt;WebGL&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;strong&gt;Browser compatibility&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;ALL (even old one)&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;ALL&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Modern browsers&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;strong&gt;Render phases&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;SVG creation &amp;gt; Browser parsing &amp;gt; Browser rendering&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JS code &amp;gt; Browser rendering&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JS Code &amp;gt; OpenGL rendering&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;strong&gt;Performance&lt;/strong&gt;&lt;br&gt;
+to display a large graph (more than 1000 elements)&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Slow&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Normal&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Performant&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So the choice will depend of your needs, and also of the &lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; plugins you want to use (plugins are not compatible with every formats).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I suggest you to choose &lt;strong&gt;Canvas&lt;/strong&gt; or &lt;strong&gt;Webgl&lt;/strong&gt; if you want to really display a big graph.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-sigmajs-graph-structure&quot;&gt;The SigmaJS graph structure&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;definition&quot;&gt;Definition&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that sigma is initialised, we need to give it a graph.
+It structure is simple : an object with an array of nodes and an array of edges.&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;caption class=&quot;title&quot;&gt;Table 1. Node definition&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 14.2857%;&quot;&gt;
+&lt;col style=&quot;width: 14.2857%;&quot;&gt;
+&lt;col style=&quot;width: 28.5714%;&quot;&gt;
+&lt;col style=&quot;width: 42.8572%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Field&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Type&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Required&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;id&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Any&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Yes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Node identifier, must be unique across all the node&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;label&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;String&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;x&lt;/code&gt; &amp;amp; &lt;code&gt;y&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Float&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Yes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Position of the node in 2D. Can be initialize with &lt;code&gt;Math.random()&lt;/code&gt;.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;size&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Float&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No  &lt;em&gt;(0)&lt;/em&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Size of the node that is use to render it.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;color&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Color RGB&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No &lt;em&gt;(&lt;code&gt;defaultNodeColor&lt;/code&gt;)&lt;/em&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Color used to display the node.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;caption class=&quot;title&quot;&gt;Table 2. Edge definition&lt;/caption&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 14.2857%;&quot;&gt;
+&lt;col style=&quot;width: 14.2857%;&quot;&gt;
+&lt;col style=&quot;width: 28.5714%;&quot;&gt;
+&lt;col style=&quot;width: 42.8572%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Field&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Type&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Required&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;id&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Any&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Yes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Edge identifier, must be unique across all the edge.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;source&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Any&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Yes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Starting node&amp;#8217;s identifier of the edge.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;target&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Any&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Yes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Ending node&amp;#8217;s identifier of the edge.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;type&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;line&lt;/code&gt;,&lt;br&gt;
+&lt;code&gt;curve&lt;/code&gt;,&lt;br&gt;
+&lt;code&gt;arrow&lt;/code&gt; or&lt;br&gt;
+&lt;code&gt;curvedArrow&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No &lt;em&gt;(line)&lt;/em&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Edge type for its render.&lt;br&gt;
+The choice will depend on if you want to display an oriented graph. If so, you need an arrow type.
+And if you want to display a high number of edges, it&amp;#8217;s faster to use a line type (ie. line or arrow).&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;size&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Float&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No &lt;em&gt;(&lt;code&gt;minEdgeSize&lt;/code&gt;)&lt;/em&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Size of the edge that is use to render it.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;code&gt;color&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Color RGB&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;No &lt;em&gt;(&lt;code&gt;defaultEdgeColor&lt;/code&gt;)&lt;/em&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Color used to display the edge.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;example&quot;&gt;Example&lt;/h3&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;var graph = {
+  nodes: [
+    { id: &quot;n0&quot;, label: &quot;A node&quot;, x: 0, y: 0, size: 3, color: '#008cc2' },
+    { id: &quot;n1&quot;, label: &quot;Another node&quot;, x: 3, y: 1, size: 2, color: '#008cc2' },
+    { id: &quot;n2&quot;, label: &quot;And a last one&quot;, x: 1, y: 3, size: 1, color: '#E57821' }
+  ],
+  edges: [
+    { id: &quot;e0&quot;, source: &quot;n0&quot;, target: &quot;n1&quot;, color: '#282c34', type:'line', size:0.5 },
+    { id: &quot;e1&quot;, source: &quot;n1&quot;, target: &quot;n2&quot;, color: '#282c34', type:'curve', size:1},
+    { id: &quot;e2&quot;, source: &quot;n2&quot;, target: &quot;n0&quot;, color: '#FF0000', type:'line', size:2}
+  ]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;loading-graph-in-sigma&quot;&gt;Loading graph in sigma&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Sigma has a complete API to manage its graph data. I let you see the &lt;a href=&quot;https://github.com/jacomyal/sigma.js/wiki/Graph-API&quot;&gt;API documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To load a graph in sigma, you just have to call the method &lt;code&gt;read&lt;/code&gt; on the sigma graph instance : &lt;code&gt;s.graph.read(graph)&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Once it&amp;#8217;s done, we need to tell sigma to draw the graph by calling its &lt;code&gt;refresh&lt;/code&gt; function : &lt;code&gt;s.refresh()&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;live-example&quot;&gt;Live example&lt;/h3&gt;
+&lt;script async src=&quot;http://jsfiddle.net/sim51/gxum1dq1/embed/result,js/&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;graph-layout-algorithm&quot;&gt;Graph layout algorithm&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;definition-2&quot;&gt;Definition&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;What is hard in displaying a graph is to rapidly display it in such a way
+that we can see all nodes and their edges without overlaps (in fact the less as possible).
+To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the &lt;strong&gt;force-directed&lt;/strong&gt; algorithms.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The principle is simple, you need to consider two forces :&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;col style=&quot;width: 50%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Repulsive&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Attractive&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Each node repulse the others. You can consider nodes like particle with the same electric charge.&lt;/p&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Two nodes with an edge, attract themselves. You can consider an edge as a spring&lt;/p&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/sigmajs/repulsion.png&quot; alt=&quot;repulsion&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/sigmajs/attraction.png&quot; alt=&quot;attraction&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Then you run an algorithm that compute on each iteration, the sum of the applied forces on each node, and move them in consequence.
+After a number of iteration, you will see that graph is in a stable state.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;force-atlas2&quot;&gt;Force-Atlas2&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; include (as a plugin) a forced-directed algorithm called &lt;strong&gt;Force-Atlas2&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use it, you need to :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 1 : import the plugin files&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;./build/plugins/sigma.layout.forceAtlas2/supervisor.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&quot;./build/plugins/sigma.layout.forceAtlas2/worker.js&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 2 : Run it&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that the plugin is loaded, we can directly call it on the sigma instance : &lt;code&gt;s.startForceAtlas2()&lt;/code&gt;;
+This creates a &lt;a href=&quot;https://developer.mozilla.org/fr/docs/Utilisation_des_web_workers&quot;&gt;web worker&lt;/a&gt; where all the algorithm iterations will be calculated.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 3 (al) : Stop it&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The algorithm won&amp;#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : &lt;code&gt;window.setTimeout(function() {s.killForceAtlas2()}, 10000);&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;live-example-2&quot;&gt;Live example&lt;/h3&gt;
+&lt;script async src=&quot;https://jsfiddle.net/sim51/xck9a7yf/embed/result,js/&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;plugins&quot;&gt;Plugins&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; has a lot of plugins, you can see the list &lt;a href=&quot;https://github.com/jacomyal/sigma.js/tree/master/plugins&quot;&gt;here&lt;/a&gt;.
+I will not show you all of them, so I have done a list of my most used plugins.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;edge-labels&quot;&gt;Edge labels&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This plugin allows you to add a label on each edge. I mainly use it to display the Neo4j&amp;#8217;s relationship type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Import the needed script (in my case &lt;code&gt;settings.js&lt;/code&gt;, &lt;code&gt;sigma.canvas.edges.labels.def.js&lt;/code&gt; &amp;amp; &lt;code&gt;sigma.canvas.edges.labels.curvedArrow.js&lt;/code&gt;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add a &lt;code&gt;label&lt;/code&gt; property on yours edges&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;script async src=&quot;http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;edge-paralleledges&quot;&gt;Edge parallelEdges&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you want parallel edges (ie. to have multiple relationship between two nodes), it&amp;#8217;s the plugin you must have.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Import the needed script :&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;utils.js&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;sigma.canvas.edges.curvedArrow.js&lt;/code&gt;  &amp;amp; &lt;code&gt;sigma.canvas.edgehovers.curvedArrow.js&lt;/code&gt; if you have a directed graph.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;sigma.canvas.edgehovers.curve.js&lt;/code&gt; &amp;amp; &lt;code&gt;sigma.canvas.edges.curve.js&lt;/code&gt;  if you want the an undirected graph.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;sigma.canvas.edges.labels.curve.js&lt;/code&gt;  if you have enabled label on edges&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add a property &lt;code&gt;count&lt;/code&gt; that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;script async src=&quot;//jsfiddle.net/sim51/5vL3e72e/embed/result,js/&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;relative-size&quot;&gt;Relative size&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This plugin is really useful when you want to see which node is most connected.
+The size of the node depends of its degree, ie. its number of in-going &amp;amp; outgoing edges.&lt;/p&gt;
+&lt;/div&gt;
+&lt;script async src=&quot;https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/&quot;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;sigma-and-neo4j&quot;&gt;Sigma and Neo4j&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now that you know how to use Sigma, the next step is to build a graph visualisation from Neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To do this there is two points :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;How to query Neo4j in your browser ?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;From a query result, how to build a sigma graph structure&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I will not explain the first point, Michael has already done this part in this &lt;a href=&quot;https://medium.com/neo4j/hands-on-graph-data-visualization-bd1f055a492d&quot;&gt;excellent post&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So let see the second one !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;create-a-graph-structure-from-a-neo4j-query&quot;&gt;Create a graph structure from a Neo4j query&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Result of a query is a collection of tuple, ie. composed of &lt;strong&gt;rows&lt;/strong&gt; where each row has some &lt;strong&gt;columns&lt;/strong&gt;.
+Moreover, each &lt;em&gt;cell&lt;/em&gt; is typed, and to display a graph we only want &lt;code&gt;node&lt;/code&gt;, &lt;code&gt;relationship&lt;/code&gt; and &lt;code&gt;path&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To create our data structure, we need to iterate over rows, then over columns and finnaly check the type.
+If it&amp;#8217;s a node or relationship, we can add it to our sigma graph structure (if it&amp;#8217;s not already present).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And what about &lt;code&gt;path&lt;/code&gt;  ? A &lt;code&gt;path&lt;/code&gt; in Neo4j driver types, is an array of &lt;code&gt;segment&lt;/code&gt; where each segmet is composed of :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a starting node&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a relationship&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;an edning node&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So if we have a path, we need also to iterate over it to add starting &amp;amp; ending node, plus the relationship.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But wait, a Neo4j node (resp. relationship) is not a Sigma node (resp. relationship), so we also need to convert them.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you code it, finally you should have something like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;let graph = { nodes:[], edges:[]} ;
+this.driver.session().run(&quot;MATCH (n)-[r]-&amp;gt;(m) RETURN n,r,m LIMIT $limit&quot;, {limit:50}).then(
+  (result) =&amp;gt; {
+    // for each rows
+    result.records.forEach( record =&amp;gt; {
+      // for each column
+      record.forEach( ( value, key ) =&amp;gt; {
+        // if it's a node
+        if ( value &amp;amp;&amp;amp; value.hasOwnProperty( 'labels' ) ) {
+          graph.nodes.push(convertionToSigmaNode(value));
+        }
+        // if it's an edge
+        if ( value &amp;amp;&amp;amp; value.hasOwnProperty( 'type' ) ) {
+          graph.edges.push(convertionToSigmaEdge(value));
+        }
+        // if it's a path
+        if ( value &amp;amp;&amp;amp; value.hasOwnProperty( 'segments' ) ) {
+          value.segments.forEach( ( seg ) =&amp;gt; {
+            // add starting &amp;amp; ending nodes + relationship
+            graph.nodes.push(convertionToSigmaNode(seg.start));
+            graph.nodes.push(convertionToSigmaNode(seg.end));
+            graph.edges.push(convertionToSigmaEdge(seg.rel));
+          });
+        }
+      });
+    })
+  })&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And here we go, you have everything to display your graph from a Cypher query with SigmaJS !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s a little borring, no ? All this code just to display a graph&amp;#8230;&amp;#8203;
+And what if I tell you that I have already made the work for you  ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-sigma-neosig&quot;&gt;Neo4j + Sigma = NeoSig&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To avoid you the complexity of doing all the above work, I have created a library for that : &lt;strong&gt;NeoSig&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) &amp;amp; relationships (by type).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To use it, you need :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 1 : Import the NeoSig script and the Neo4j driver&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 2 (optional) : Import font-awesome if you want to display an icon in nodes&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;https://use.fontawesome.com/bd149a0111.js&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 3 : Create a Neo4j configuration object&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;const neoConfig = {
+  url:'bolt://localhost:7867',
+  user: 'neo4j',
+  password: 'letmein',
+  driver : {
+    // all the driver configuration (not needed)
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 4: Create a style object&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;const neoStyle = {
+  labels: { // Map of label
+    Person : {
+      label: 'name', // The node's property to display as label
+      color: '#654321', // Color of the node
+      size: 10, // Size of the node
+      icon: { // icon object
+        name: 'f007', // Fontawesome unicode
+        color: '#FFF', // Color of the font
+        scale: 1.0 // Scale ratio
+      }
+    },
+    Movie : {
+      label: 'title',
+      color: '#123456',
+      size: 10,
+      icon: {
+        name: 'f008',
+        color: '#FFF',
+        scale: 1.0
+      }
+    }
+  },
+  edges: { // Map of edges
+    ACTED_IN: { // Name of the relationship type
+      label: 'roles',
+      //color: '#202020',
+      // size: 2
+    }
+  }
+};&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Step 5: Calling NeojSig to make the glue&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;script async src=&quot;https://jsfiddle.net/sim51/ep6g95st/embed/js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/sigmajs/neosig.png&quot; alt=&quot;neosig&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Wed, 25 Apr 2018 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</guid>
+        
+        <category>sigma, graph, visualisation, dataviz</category>
+        
+        
+      </item>
+      
     
      
     
@@ -1584,6 +2356,8 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
         
       </item>
       
+    
+     
     
      
     

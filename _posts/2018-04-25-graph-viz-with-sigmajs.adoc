@@ -1,7 +1,7 @@
 = How to use Sigmajs to display your graph ?
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
-//:page-locale: en
+:page-locale: en
 :page-description:
 :page-image: /public/images/sigmajs/banner.png
 :page-tags: sigma, graph, visualisation, dataviz
@@ -297,9 +297,9 @@ To use it, you need to :
 Now that the plugin is loaded, we can directly call it on the sigma instance : `s.startForceAtlas2()`;
 This creates a https://developer.mozilla.org/fr/docs/Utilisation_des_web_workers[web worker] where all the algorithm iterations will be calculated.
 
-* *Step 3 (optional) : Stop it*
+* *Step 3 (al) : Stop it*
 
-The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : `window.setTimeout(function() {s.killForceAtlas2()}, 10000)`;
+The algorithm won't stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : `window.setTimeout(function() {s.killForceAtlas2()}, 10000);`
 
 === Live example
 
@@ -339,7 +339,7 @@ To use it :
 * Add a property `count` that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.
 
 ++++
-<script async src="//jsfiddle.net/sim51/ep6g95st/embed/result,js/"></script>
+<script async src="//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
 ++++
 
 === Relative size
@@ -350,3 +350,156 @@ The size of the node depends of its degree, ie. its number of in-going & outgoin
 ++++
 <script async src="https://jsfiddle.net/sim51/y7kwmc3g/embed/result,js/"></script>
 ++++
+
+== Sigma and Neo4j
+
+Now that you know how to use Sigma, the next step is to build a graph visualisation from Neo4j.
+
+To do this there is two points :
+
+* How to query Neo4j in your browser ?
+* From a query result, how to build a sigma graph structure
+
+I will not explain the first point, Michael has already done this part in this https://medium.com/neo4j/hands-on-graph-data-visualization-bd1f055a492d[excellent post].
+
+So let see the second one !
+
+=== Create a graph structure from a Neo4j query
+
+Result of a query is a collection of tuple, ie. composed of *rows* where each row has some *columns*.
+Moreover, each _cell_ is typed, and to display a graph we only want `node`, `relationship` and `path`.
+
+To create our data structure, we need to iterate over rows, then over columns and finnaly check the type.
+If it's a node or relationship, we can add it to our sigma graph structure (if it's not already present).
+
+And what about `path`  ? A `path` in Neo4j driver types, is an array of `segment` where each segmet is composed of :
+
+* a starting node
+* a relationship
+* an edning node
+
+So if we have a path, we need also to iterate over it to add starting & ending node, plus the relationship.
+
+But wait, a Neo4j node (resp. relationship) is not a Sigma node (resp. relationship), so we also need to convert them.
+
+If you code it, finally you should have something like this :
+
+[source, javascript]
+----
+let graph = { nodes:[], edges:[]} ;
+this.driver.session().run("MATCH (n)-[r]->(m) RETURN n,r,m LIMIT $limit", {limit:50}).then(
+  (result) => {
+    // for each rows
+    result.records.forEach( record => {
+      // for each column
+      record.forEach( ( value, key ) => {
+        // if it's a node
+        if ( value && value.hasOwnProperty( 'labels' ) ) {
+          graph.nodes.push(convertionToSigmaNode(value));
+        }
+        // if it's an edge
+        if ( value && value.hasOwnProperty( 'type' ) ) {
+          graph.edges.push(convertionToSigmaEdge(value));
+        }
+        // if it's a path
+        if ( value && value.hasOwnProperty( 'segments' ) ) {
+          value.segments.forEach( ( seg ) => {
+            // add starting & ending nodes + relationship
+            graph.nodes.push(convertionToSigmaNode(seg.start));
+            graph.nodes.push(convertionToSigmaNode(seg.end));
+            graph.edges.push(convertionToSigmaEdge(seg.rel));
+          });
+        }
+      });
+    })
+  })
+----
+
+And here we go, you have everything to display your graph from a Cypher query with SigmaJS !
+
+It's a little borring, no ? All this code just to display a graph...
+And what if I tell you that I have already made the work for you  ?
+
+=== Neo4j + Sigma = NeoSig
+
+To avoid you the complexity of doing all the above work, I have created a library for that : *NeoSig*.
+
+It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) & relationships (by type).
+
+To use it, you need :
+
+* *Step 1 : Import the NeoSig script and the Neo4j driver*
+
+[source,xml]
+----
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0"></script>
+----
+
+* *Step 2 (optional) : Import font-awesome if you want to display an icon in nodes*
+
+[source,xml]
+----
+<script src="https://use.fontawesome.com/bd149a0111.js"></script>
+----
+
+* *Step 3 : Create a Neo4j configuration object*
+
+[source,javascript]
+----
+const neoConfig = {
+  url:'bolt://localhost:7867',
+  user: 'neo4j',
+  password: 'letmein',
+  driver : {
+    // all the driver configuration (not needed)
+  }
+}
+----
+
+* *Step 4: Create a style object*
+
+[source,javascript]
+----
+const neoStyle = {
+  labels: { // Map of label
+    Person : {
+      label: 'name', // The node's property to display as label
+      color: '#654321', // Color of the node
+      size: 10, // Size of the node
+      icon: { // icon object
+        name: 'f007', // Fontawesome unicode
+        color: '#FFF', // Color of the font
+        scale: 1.0 // Scale ratio
+      }
+    },
+    Movie : {
+      label: 'title',
+      color: '#123456',
+      size: 10,
+      icon: {
+        name: 'f008',
+        color: '#FFF',
+        scale: 1.0
+      }
+    }
+  },
+  edges: { // Map of edges
+    ACTED_IN: { // Name of the relationship type
+      label: 'roles',
+      //color: '#202020',
+      // size: 2
+    }
+  }
+};
+----
+
+By default, a node is black, with a size of 5, and the label is its Neo4j'ID ; a relationship is black with a size of 1, and the label is its Neo4j type.
+
+* *Step 5: Calling NeojSig to make the glue*
+
+++++
+<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js"></script>
+++++
+
+image::/public/images/sigmajs/neosig.png[]

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
   <title>How to use Sigmajs to display your graph ?</title>
 <meta charset="UTF-8">
@@ -16,7 +16,7 @@
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
 <!-- RSS feed -->
-<link rel="alternate" type="application/rss+xml" title="RSS" href="//feed.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/en/feed.xml" />
 
 </head>
 <body class="page">
@@ -30,12 +30,28 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/" title="Benoît Simard">
+            <a class="brand" href="/en" title="Benoît Simard">
                 <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
             </a>
             <nav class="nav-collapse collapse">
                 <ul class="nav navbar-nav">
                   
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
                   
                 </ul>
 
@@ -44,7 +60,7 @@
                   
                     
                         <li>
-                        <a href="/2018/04/25/graph-viz-with-sigmajs.html" class=""></a>
+                        <a href="/2018/04/25/graph-viz-with-sigmajs.html" class="en">en</a>
                         </li>
                     
                   
@@ -97,6 +113,12 @@
 <li><a href="#edge-labels">Edge labels</a></li>
 <li><a href="#edge-paralleledges">Edge parallelEdges</a></li>
 <li><a href="#relative-size">Relative size</a></li>
+</ul>
+</li>
+<li><a href="#sigma-and-neo4j">Sigma and Neo4j</a>
+<ul class="sectlevel2">
+<li><a href="#create-a-graph-structure-from-a-neo4j-query">Create a graph structure from a Neo4j query</a></li>
+<li><a href="#neo4j-sigma-neosig">Neo4j + Sigma = NeoSig</a></li>
 </ul>
 </li>
 </ul>
@@ -522,12 +544,12 @@ This creates a <a href="https://developer.mozilla.org/fr/docs/Utilisation_des_we
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Step 3 (optional) : Stop it</strong></p>
+<p><strong>Step 3 (al) : Stop it</strong></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The algorithm won&#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : <code>window.setTimeout(function() {s.killForceAtlas2()}, 10000)</code>;</p>
+<p>The algorithm won&#8217;t stop by itself, so I recommend you to stop it after a predefined duration (10 seconds in my example) : <code>window.setTimeout(function() {s.killForceAtlas2()}, 10000);</code></p>
 </div>
 </div>
 <div class="sect2">
@@ -597,7 +619,7 @@ I will not show you all of them, so I have done a list of my most used plugins.<
 </li>
 </ul>
 </div>
-<script async src="//jsfiddle.net/sim51/ep6g95st/embed/result,js/"></script>
+<script async src="//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
 </div>
 <div class="sect2">
 <h3 id="relative-size">Relative size</h3>
@@ -609,26 +631,241 @@ The size of the node depends of its degree, ie. its number of in-going &amp; out
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="sigma-and-neo4j">Sigma and Neo4j</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that you know how to use Sigma, the next step is to build a graph visualisation from Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>To do this there is two points :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>How to query Neo4j in your browser ?</p>
+</li>
+<li>
+<p>From a query result, how to build a sigma graph structure</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I will not explain the first point, Michael has already done this part in this <a href="https://medium.com/neo4j/hands-on-graph-data-visualization-bd1f055a492d">excellent post</a>.</p>
+</div>
+<div class="paragraph">
+<p>So let see the second one !</p>
+</div>
+<div class="sect2">
+<h3 id="create-a-graph-structure-from-a-neo4j-query">Create a graph structure from a Neo4j query</h3>
+<div class="paragraph">
+<p>Result of a query is a collection of tuple, ie. composed of <strong>rows</strong> where each row has some <strong>columns</strong>.
+Moreover, each <em>cell</em> is typed, and to display a graph we only want <code>node</code>, <code>relationship</code> and <code>path</code>.</p>
+</div>
+<div class="paragraph">
+<p>To create our data structure, we need to iterate over rows, then over columns and finnaly check the type.
+If it&#8217;s a node or relationship, we can add it to our sigma graph structure (if it&#8217;s not already present).</p>
+</div>
+<div class="paragraph">
+<p>And what about <code>path</code>  ? A <code>path</code> in Neo4j driver types, is an array of <code>segment</code> where each segmet is composed of :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a starting node</p>
+</li>
+<li>
+<p>a relationship</p>
+</li>
+<li>
+<p>an edning node</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So if we have a path, we need also to iterate over it to add starting &amp; ending node, plus the relationship.</p>
+</div>
+<div class="paragraph">
+<p>But wait, a Neo4j node (resp. relationship) is not a Sigma node (resp. relationship), so we also need to convert them.</p>
+</div>
+<div class="paragraph">
+<p>If you code it, finally you should have something like this :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">let graph = { nodes:[], edges:[]} ;
+this.driver.session().run("MATCH (n)-[r]-&gt;(m) RETURN n,r,m LIMIT $limit", {limit:50}).then(
+  (result) =&gt; {
+    // for each rows
+    result.records.forEach( record =&gt; {
+      // for each column
+      record.forEach( ( value, key ) =&gt; {
+        // if it's a node
+        if ( value &amp;&amp; value.hasOwnProperty( 'labels' ) ) {
+          graph.nodes.push(convertionToSigmaNode(value));
+        }
+        // if it's an edge
+        if ( value &amp;&amp; value.hasOwnProperty( 'type' ) ) {
+          graph.edges.push(convertionToSigmaEdge(value));
+        }
+        // if it's a path
+        if ( value &amp;&amp; value.hasOwnProperty( 'segments' ) ) {
+          value.segments.forEach( ( seg ) =&gt; {
+            // add starting &amp; ending nodes + relationship
+            graph.nodes.push(convertionToSigmaNode(seg.start));
+            graph.nodes.push(convertionToSigmaNode(seg.end));
+            graph.edges.push(convertionToSigmaEdge(seg.rel));
+          });
+        }
+      });
+    })
+  })</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And here we go, you have everything to display your graph from a Cypher query with SigmaJS !</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s a little borring, no ? All this code just to display a graph&#8230;&#8203;
+And what if I tell you that I have already made the work for you  ?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="neo4j-sigma-neosig">Neo4j + Sigma = NeoSig</h3>
+<div class="paragraph">
+<p>To avoid you the complexity of doing all the above work, I have created a library for that : <strong>NeoSig</strong>.</p>
+</div>
+<div class="paragraph">
+<p>It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) &amp; relationships (by type).</p>
+</div>
+<div class="paragraph">
+<p>To use it, you need :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 1 : Import the NeoSig script and the Neo4j driver</strong></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0"&gt;&lt;/script&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 2 (optional) : Import font-awesome if you want to display an icon in nodes</strong></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="https://use.fontawesome.com/bd149a0111.js"&gt;&lt;/script&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 3 : Create a Neo4j configuration object</strong></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">const neoConfig = {
+  url:'bolt://localhost:7867',
+  user: 'neo4j',
+  password: 'letmein',
+  driver : {
+    // all the driver configuration (not needed)
+  }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 4: Create a style object</strong></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">const neoStyle = {
+  labels: { // Map of label
+    Person : {
+      label: 'name', // The node's property to display as label
+      color: '#654321', // Color of the node
+      size: 10, // Size of the node
+      icon: { // icon object
+        name: 'f007', // Fontawesome unicode
+        color: '#FFF', // Color of the font
+        scale: 1.0 // Scale ratio
+      }
+    },
+    Movie : {
+      label: 'title',
+      color: '#123456',
+      size: 10,
+      icon: {
+        name: 'f008',
+        color: '#FFF',
+        scale: 1.0
+      }
+    }
+  },
+  edges: { // Map of edges
+    ACTED_IN: { // Name of the relationship type
+      label: 'roles',
+      //color: '#202020',
+      // size: 2
+    }
+  }
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By default, a node is black, with a size of 5, and the label is its Neo4j&#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Step 5: Calling NeojSig to make the glue</strong></p>
+</li>
+</ul>
+</div>
+<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js"></script>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/sigmajs/neosig.png" alt="neosig">
+</div>
+</div>
+</div>
+</div>
+</div>
           </section>
           <footer>
             <ul class="inline pull-right metadata">
               <li >
-                <span class="metadata"> :</span>
+                <span class="metadata">Tags :</span>
                 <span>
                   sigma, graph, visualisation, dataviz
                 </span>,
               </li>
               <li >
-                <span class="metadata"> :</span>
+                <span class="metadata">Auteur :</span>
                 <span>
                   <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
                 </span>,
               </li>
               <li>
-                <span class="metadata"> :</span>
+                <span class="metadata">Created at :</span>
                 <time itemprop="dateCreated" datetime="2018-04-25">Apr 25, 2018</time>
               </li>
-              <li><a href="" title="Permalien : How to use Sigmajs to display your graph ?" itemprop="url"></a></li>
+              <li><a href="" title="Permalien : How to use Sigmajs to display your graph ?" itemprop="url">Permalink</a></li>
             </ul>
           </footer>
         </div>
@@ -645,10 +882,6 @@ The size of the node depends of its degree, ie. its number of in-going &amp; out
               <a class="btn btn-primary" href="/2017/11/23/fr-import-matrice-adjacence.html" title="Importer une matrice d&#8217;adjacence">&lt; Importer une matrice d&#8217;adjacence</a>
             </li>
             
-            
-            <li class="pull-right">
-              <a class="btn btn-primary" href="/2018/05/02/neo4j-viz-with-sigmajs.html" title="How to display a Neo4j graph with SigmaJS ?">How to display a Neo4j graph with SigmaJS ? &gt;</a>
-            </li>
             
           </ul>
         </div>
@@ -678,22 +911,22 @@ The size of the node depends of its degree, ie. its number of in-going &amp; out
         <div class="span8">
           <ul class="pull-right inline">
             <li>
-              <a href="mailto:contact@bsimard.com" title="">
+              <a href="mailto:contact@bsimard.com" title="Contact me">
                 <i class="icon-envelope"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.twitter.com/logisima" title="">
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
                 <i class="icon-twitter"></i>
               </a>
             </li>
             <li>
-              <a href="https://www.github.com/sim51" title="">
+              <a href="https://www.github.com/sim51" title="My github account">
                 <i class="icon-github-alt"></i>
               </a>
             </li>
             <li>
-              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="">
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
                 <i class="icon-linkedin"></i>
               </a>
             </li>
