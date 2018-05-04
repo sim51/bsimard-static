@@ -5,8 +5,8 @@
     <description>Benoit 's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 04 May 2018 18:07:17 +0200</pubDate>
-    <lastBuildDate>Fri, 04 May 2018 18:07:17 +0200</lastBuildDate>
+    <pubDate>Fri, 04 May 2018 18:19:19 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 18:19:19 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -223,7 +223,7 @@ to display a large graph (more than 1000 elements)&lt;/p&gt;&lt;/td&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;So the choice will depend of your needs, and also of the &lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; plugins you want to use (plugins are not compatible with every formats).&lt;/p&gt;
+&lt;p&gt;The choice will depend on your needs, and also of the &lt;a href=&quot;http://sigmajs.org&quot;&gt;SigmaJS&lt;/a&gt; plugins you want to use (plugins are not compatible with every format).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;I suggest you to choose &lt;strong&gt;Canvas&lt;/strong&gt; or &lt;strong&gt;Webgl&lt;/strong&gt; if you want to really display a big graph.&lt;/p&gt;
@@ -394,8 +394,8 @@ And if you want to display a high number of edges, it&amp;#8217;s faster to use 
 &lt;h3 id=&quot;definition-2&quot;&gt;Definition&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;What is hard in displaying a graph is to rapidly display it in such a way
-that we can see all nodes and their edges without overlaps (in fact the less as possible).
-To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the &lt;strong&gt;force-directed&lt;/strong&gt; algorithms.&lt;/p&gt;
+that we can see all nodes and their edges without overlaps (in fact less as possible).
+To do it, we need an algorithm that computes the position of each nodes, and the most known for that are the &lt;strong&gt;force-directed&lt;/strong&gt; algorithms.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;The principle is simple, you need to consider two forces :&lt;/p&gt;
@@ -414,7 +414,7 @@ To do it, we need an algorithm that will compute the position of each nodes, and
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Each node repulse the others. You can consider nodes like particle with the same electric charge.&lt;/p&gt;
+&lt;p&gt;Nodes repulse each others. You can consider nodes like particle with the same electric charge.&lt;/p&gt;
 &lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Two nodes with an edge, attract themselves. You can consider an edge as a spring&lt;/p&gt;
@@ -608,7 +608,7 @@ If it&amp;#8217;s a node or relationship, we can add it to our sigma graph struc
 &lt;p&gt;a relationship&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;an edning node&lt;/p&gt;
+&lt;p&gt;an ending node&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -782,7 +782,7 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
 &lt;p&gt;Now have fun !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;A big thanks to Jacomyal,&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;A big thanks to &lt;a href=&quot;https://github.com/jacomyal&quot;&gt;Jacomyal&lt;/a&gt;, &lt;a href=&quot;https://github.com/yomguithereal&quot;&gt;Yomguithereal&lt;/a&gt; and  &lt;a href=&quot;https://github.com/astik&quot;&gt;Astik&lt;/a&gt; for the help !&lt;/em&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
