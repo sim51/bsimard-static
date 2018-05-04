@@ -507,7 +507,7 @@ And the final result is :
 image::/public/images/sigmajs/neosig.png[]
 
 
-You see the code here :
+You can see the code here :
 
 ++++
 <script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
