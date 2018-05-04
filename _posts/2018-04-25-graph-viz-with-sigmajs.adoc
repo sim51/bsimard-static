@@ -2,7 +2,7 @@
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-locale: en
-:page-description:
+:page-description: In this article, I will show how to display and customize a graph in a browser with the help of SigmaJS
 :page-image: /public/images/sigmajs/banner.png
 :page-tags: sigma, graph, visualisation, dataviz
 :page-ref: how-to-use-sigmajs
