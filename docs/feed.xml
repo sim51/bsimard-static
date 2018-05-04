@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 04 May 2018 16:24:55 +0200</pubDate>
-    <lastBuildDate>Fri, 04 May 2018 16:24:55 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 04 May 2018 16:25:44 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 16:25:44 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -176,8 +176,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         <category>neo4j, import, apoc, matrice</category>
         
@@ -626,8 +626,8 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
         
         <category>neo4j, ldap, authenfication, authorisation</category>
         
@@ -1021,8 +1021,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -1158,8 +1158,8 @@ Toutefois, je pense qu&amp;#8217;il est nécessaire de les faire évoluer pour q
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/Les-icones-du-passe</link>
-        <guid isPermaLink="true">http://www.bsimard.com/Les-icones-du-passe</guid>
+        <link>http://localhost:4000/Les-icones-du-passe</link>
+        <guid isPermaLink="true">http://localhost:4000/Les-icones-du-passe</guid>
         
         <category>ergonomie</category>
         
@@ -1451,8 +1451,8 @@ class HttpLogReplaySimulation extends Simulation {
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 05 Oct 2015 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
-        <guid isPermaLink="true">http://www.bsimard.com/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
+        <link>http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</link>
+        <guid isPermaLink="true">http://localhost:4000/Stresser-facilement-votre-base-Neo4j-avec-gatling</guid>
         
         <category>neo4j, gatling, stress-tool</category>
         
