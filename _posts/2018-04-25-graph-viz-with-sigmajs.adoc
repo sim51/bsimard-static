@@ -91,13 +91,13 @@ so it's easy to customize nodes & edges style, you just have to add some CSS rul
 But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
 and if this DOM is heavy, the result is slow and can freeze your browser.
 
-*Canvas* is an HTML5 element compatible with all the modern browsers.
-It defines a space on your web page where you can draw some pixels by using a JavaScript PI.
-The JavaScript code is directly interpreted by your browser and it decide to what render and when.
-Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.
+*Canvas* is an HTML5 element compatible with all modern browsers.
+It defines an area on your web page where you can draw some pixels by using a JavaScript API.
+The JavaScript code is directly interpreted by your browser and it decides what and when to render.
+Due to this, Canvas scales more than the SVG, but if you want to change the color of a shape, you need a way to specify it in the code.
 
-On the other hand, there is *WebGL*, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
-As in Canvas, you need to write some JavaScript code to render your visualisation (it's not the same JavaScript API),
+On the other hand, there is *WebGL*, compatible with almost all newest browsers (even if the API is not stable).
+As in Canvas, you need to write some JavaScript code for rendering your visualisation,
 but this time, its computation is delegated to *OpenGL* so to your *GPU*.
 
 To resume :
@@ -111,7 +111,7 @@ To resume :
 | *WebGL*
 
 | *Browser compatibility*
-| ALL (even old one)
+| ALL (even old ones)
 | ALL
 | Modern browsers
 
@@ -136,7 +136,7 @@ I suggest you to choose *Canvas* or *Webgl* if you want to really display a big 
 
 === Definition
 
-Now that sigma is Initialized, we need to give it a graph.
+Now that sigma is initialized, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.
 
 [%header,cols='1,1,2,3',title='Node definition']
@@ -514,3 +514,6 @@ You can see the code here :
 ++++
 
 Now have fun !
+
+
+A big thanks to Jacomyal,

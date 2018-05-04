@@ -5,8 +5,8 @@
     <description>Benoit 's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 04 May 2018 18:00:34 +0200</pubDate>
-    <lastBuildDate>Fri, 04 May 2018 18:00:34 +0200</lastBuildDate>
+    <pubDate>Fri, 04 May 2018 18:07:17 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 18:07:17 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -172,14 +172,14 @@ But when you apply a layout algorithm on the graph, you continuously change the 
 and if this DOM is heavy, the result is slow and can freeze your browser.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;strong&gt;Canvas&lt;/strong&gt; is an HTML5 element compatible with all the modern browsers.
-It defines a space on your web page where you can draw some pixels by using a JavaScript PI.
-The JavaScript code is directly interpreted by your browser and it decide to what render and when.
-Due to this, Canvas scales more than the SVG, but if you want to change the color of a form, you need a mechanism to specify it in the code.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Canvas&lt;/strong&gt; is an HTML5 element compatible with all modern browsers.
+It defines an area on your web page where you can draw some pixels by using a JavaScript API.
+The JavaScript code is directly interpreted by your browser and it decides what and when to render.
+Due to this, Canvas scales more than the SVG, but if you want to change the color of a shape, you need a way to specify it in the code.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;On the other hand, there is &lt;strong&gt;WebGL&lt;/strong&gt;, that is compatible with almost newest modern browsers (even if the API is not stable everywhere).
-As in Canvas, you need to write some JavaScript code to render your visualisation (it&amp;#8217;s not the same JavaScript API),
+&lt;p&gt;On the other hand, there is &lt;strong&gt;WebGL&lt;/strong&gt;, compatible with almost all newest browsers (even if the API is not stable).
+As in Canvas, you need to write some JavaScript code for rendering your visualisation,
 but this time, its computation is delegated to &lt;strong&gt;OpenGL&lt;/strong&gt; so to your &lt;strong&gt;GPU&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -203,7 +203,7 @@ but this time, its computation is delegated to &lt;strong&gt;OpenGL&lt;/strong&g
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;strong&gt;Browser compatibility&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;ALL (even old one)&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;ALL (even old ones)&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;ALL&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Modern browsers&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
@@ -237,7 +237,7 @@ to display a large graph (more than 1000 elements)&lt;/p&gt;&lt;/td&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;definition&quot;&gt;Definition&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now that sigma is Initialized, we need to give it a graph.
+&lt;p&gt;Now that sigma is initialized, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.&lt;/p&gt;
 &lt;/div&gt;
 &lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
@@ -780,6 +780,9 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
 &lt;script src=&quot;https://jsfiddle.net/sim51/ep6g95st/embed/js/&quot;&gt;&lt;/script&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Now have fun !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;A big thanks to Jacomyal,&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
