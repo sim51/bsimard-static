@@ -424,26 +424,32 @@ And what if I tell you that I have already made the work for you  ?
 
 To avoid you the complexity of doing all the above work, I have created a library for that : *NeoSig*.
 
-It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) & relationships (by type).
-
-To use it, you need :
-
-* *Step 1 : Import the NeoSig script and the Neo4j driver*
+To use it, you need to import the library + the Neo4j driver :
 
 [source,xml]
 ----
-<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/neosig@1.2.2/docs/neosig-1.2.2.js"></script>
 ----
 
-* *Step 2 (optional) : Import font-awesome if you want to display an icon in nodes*
+NOTE: The library embed SigmaJS (with some customs code) but not the Neo4j driver.
 
-[source,xml]
+
+Then you can call the function `Neo4jGraph(neo4jConfig, neo4jStyle, query, queryParams)`, it returns a _promise_ with the sigma graph object.
+
+[source,javascript]
 ----
-<script src="https://use.fontawesome.com/bd149a0111.js"></script>
+Neo4jGraph(neo4jConfig, neo4jStyle, 'MATCH (n)-[r]->(m) RETURN n,r,m LIMIT $limit', {limit:20}).then( function(graph) {
+  s.graph.read(graph);
+  // enable drag'n'drop
+  sigma.plugins.dragNodes(s, s.renderers[0]);
+  // start layout
+  s.startForceAtlas2();
+  setTimeout(() => { s.stopForceAtlas2() }, Math.log(graph.nodes.length*graph.edges.length)*1000);
+});
 ----
 
-* *Step 3 : Create a Neo4j configuration object*
+Where `neo4jConfig` is an object with :
 
 [source,javascript]
 ----
@@ -452,12 +458,12 @@ const neoConfig = {
   user: 'neo4j',
   password: 'letmein',
   driver : {
-    // all the driver configuration (not needed)
+    // all the driver configuration (optional)
   }
 }
 ----
 
-* *Step 4: Create a style object*
+And `neo4jStyle` is :
 
 [source,javascript]
 ----
@@ -494,12 +500,17 @@ const neoStyle = {
 };
 ----
 
-By default, a node is black, with a size of 5, and the label is its Neo4j'ID ; a relationship is black with a size of 1, and the label is its Neo4j type.
+NOTE: By default, a node is black, with a size of 5, and the label is its Neo4j'ID ; a relationship is black with a size of 1, and the label is its Neo4j type.
 
-* *Step 5: Calling NeojSig to make the glue*
-
-++++
-<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js"></script>
-++++
+And the final result is :
 
 image::/public/images/sigmajs/neosig.png[]
+
+
+You see the code here :
+
+++++
+<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
+++++
+
+Now have fun !

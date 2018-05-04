@@ -736,42 +736,43 @@ And what if I tell you that I have already made the work for you  ?</p>
 <p>To avoid you the complexity of doing all the above work, I have created a library for that : <strong>NeoSig</strong>.</p>
 </div>
 <div class="paragraph">
-<p>It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) &amp; relationships (by type).</p>
+<p>To use it, you need to import the library + the Neo4j driver :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/neosig@1.2.2/docs/neosig-1.2.2.js"&gt;&lt;/script&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The library embed SigmaJS (with some customs code) but not the Neo4j driver.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>To use it, you need :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Step 1 : Import the NeoSig script and the Neo4j driver</strong></p>
-</li>
-</ul>
+<p>Then you can call the function <code>Neo4jGraph(neo4jConfig, neo4jStyle, query, queryParams)</code>, it returns a <em>promise</em> with the sigma graph object.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js"&gt;&lt;/script&gt;
-&lt;script src="https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0"&gt;&lt;/script&gt;</code></pre>
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">Neo4jGraph(neo4jConfig, neo4jStyle, 'MATCH (n)-[r]-&gt;(m) RETURN n,r,m LIMIT $limit', {limit:20}).then( function(graph) {
+  s.graph.read(graph);
+  // enable drag'n'drop
+  sigma.plugins.dragNodes(s, s.renderers[0]);
+  // start layout
+  s.startForceAtlas2();
+  setTimeout(() =&gt; { s.stopForceAtlas2() }, Math.log(graph.nodes.length*graph.edges.length)*1000);
+});</code></pre>
 </div>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Step 2 (optional) : Import font-awesome if you want to display an icon in nodes</strong></p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;script src="https://use.fontawesome.com/bd149a0111.js"&gt;&lt;/script&gt;</code></pre>
-</div>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Step 3 : Create a Neo4j configuration object</strong></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Where <code>neo4jConfig</code> is an object with :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -780,17 +781,13 @@ And what if I tell you that I have already made the work for you  ?</p>
   user: 'neo4j',
   password: 'letmein',
   driver : {
-    // all the driver configuration (not needed)
+    // all the driver configuration (optional)
   }
 }</code></pre>
 </div>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Step 4: Create a style object</strong></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>And <code>neo4jStyle</code> is :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -827,21 +824,32 @@ And what if I tell you that I have already made the work for you  ?</p>
 };</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+By default, a node is black, with a size of 5, and the label is its Neo4j&#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>By default, a node is black, with a size of 5, and the label is its Neo4j&#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.</p>
+<p>And the final result is :</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Step 5: Calling NeojSig to make the glue</strong></p>
-</li>
-</ul>
-</div>
-<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js"></script>
 <div class="imageblock">
 <div class="content">
 <img src="/public/images/sigmajs/neosig.png" alt="neosig">
 </div>
+</div>
+<div class="paragraph">
+<p>You see the code here :</p>
+</div>
+<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
+<div class="paragraph">
+<p>Now have fun !</p>
 </div>
 </div>
 </div>

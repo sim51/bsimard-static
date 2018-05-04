@@ -5,8 +5,8 @@
     <description>Benoit 's Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 04 May 2018 16:25:44 +0200</pubDate>
-    <lastBuildDate>Fri, 04 May 2018 16:25:44 +0200</lastBuildDate>
+    <pubDate>Fri, 04 May 2018 17:42:44 +0200</pubDate>
+    <lastBuildDate>Fri, 04 May 2018 17:42:44 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -666,42 +666,43 @@ And what if I tell you that I have already made the work for you  ?&lt;/p&gt;
 &lt;p&gt;To avoid you the complexity of doing all the above work, I have created a library for that : &lt;strong&gt;NeoSig&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;It generates for you the Sigma graph structure from a cypher query and a style object to configure the render of nodes (by label) &amp;amp; relationships (by type).&lt;/p&gt;
+&lt;p&gt;To use it, you need to import the library + the Neo4j driver :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neosig@1.2.2/docs/neosig-1.2.2.js&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The library embed SigmaJS (with some customs code) but not the Neo4j driver.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To use it, you need :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Step 1 : Import the NeoSig script and the Neo4j driver&lt;/strong&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Then you can call the function &lt;code&gt;Neo4jGraph(neo4jConfig, neo4jStyle, query, queryParams)&lt;/code&gt;, it returns a &lt;em&gt;promise&lt;/em&gt; with the sigma graph object.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0/lib/browser/neo4j-web.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;script src=&quot;https://cdn.jsdelivr.net/npm/neo4j-driver@1.6.0&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;Neo4jGraph(neo4jConfig, neo4jStyle, 'MATCH (n)-[r]-&amp;gt;(m) RETURN n,r,m LIMIT $limit', {limit:20}).then( function(graph) {
+  s.graph.read(graph);
+  // enable drag'n'drop
+  sigma.plugins.dragNodes(s, s.renderers[0]);
+  // start layout
+  s.startForceAtlas2();
+  setTimeout(() =&amp;gt; { s.stopForceAtlas2() }, Math.log(graph.nodes.length*graph.edges.length)*1000);
+});&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Step 2 (optional) : Import font-awesome if you want to display an icon in nodes&lt;/strong&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;script src=&quot;https://use.fontawesome.com/bd149a0111.js&quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Step 3 : Create a Neo4j configuration object&lt;/strong&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Where &lt;code&gt;neo4jConfig&lt;/code&gt; is an object with :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -710,17 +711,13 @@ And what if I tell you that I have already made the work for you  ?&lt;/p&gt;
   user: 'neo4j',
   password: 'letmein',
   driver : {
-    // all the driver configuration (not needed)
+    // all the driver configuration (optional)
   }
 }&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Step 4: Create a style object&lt;/strong&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And &lt;code&gt;neo4jStyle&lt;/code&gt; is :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -757,21 +754,32 @@ And what if I tell you that I have already made the work for you  ?&lt;/p&gt;
 };&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8217;ID ; a relationship is black with a size of 1, and the label is its Neo4j type.&lt;/p&gt;
+&lt;p&gt;And the final result is :&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;Step 5: Calling NeojSig to make the glue&lt;/strong&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;script async src=&quot;https://jsfiddle.net/sim51/ep6g95st/embed/js&quot;&gt;&lt;/script&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;img src=&quot;/public/images/sigmajs/neosig.png&quot; alt=&quot;neosig&quot;&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You see the code here :&lt;/p&gt;
+&lt;/div&gt;
+&lt;script async src=&quot;https://jsfiddle.net/sim51/ep6g95st/embed/js/&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now have fun !&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
