@@ -132,8 +132,8 @@ a JS library dedicated to graph drawing delivered under the <a href="https://ope
 </div>
 <div class="paragraph">
 <p>Initially, SigmaJS has been developed for <a href="https://gephi.org/">Gephi</a> to export a graph on the web.
-Today, <a href="http://sigmajs.org">SigmaJS</a> is a stable, full features and highly configurable graph library.
-Moreover, the small "plus" that makes the difference is its compatibility with touch screens.</p>
+Today, <a href="http://sigmajs.org">sigmajs</a> is a stable, full features and highly configurable graph library.
+Moreover, the small cherry on the cake is its compatibility with touch screens.</p>
 </div>
 </div>
 </div>
@@ -146,10 +146,10 @@ Moreover, the small "plus" that makes the difference is its compatibility with t
 <p>There are four steps to follow :</p>
 </div>
 <div class="paragraph">
-<p><strong>Step 1 : Install SigmaJS binaries</strong></p>
+<p><strong>Step 1 : Install sigmajs binaries</strong></p>
 </div>
 <div class="paragraph">
-<p><a href="http://sigmajs.org">SigmaJS</a> can be found on :</p>
+<p><a href="http://sigmajs.org">sigmajs</a> can be found on :</p>
 </div>
 <div class="ulist">
 <ul>
@@ -168,7 +168,7 @@ Moreover, the small "plus" that makes the difference is its compatibility with t
 <p>The minimal script you have to load is : <code>&lt;script src="./build/sigma.min.js"&gt;&lt;/script&gt;</code>.</p>
 </div>
 <div class="paragraph">
-<p>Personally, I prefer to import all the source files, it permits to lighten the library by removing the unused source files (ex: I don&#8217;t need SVG &amp; Webgl renderers if I use canvas).</p>
+<p>Personally, I prefer to import all the source files, it helps to lighten the library by removing the unused source files (ex: I don&#8217;t need SVG &amp; Webgl renderers if I use canvas).</p>
 </div>
 <div class="paragraph">
 <p><strong>Step 3 :  Create an HTML container</strong></p>
@@ -177,22 +177,22 @@ Moreover, the small "plus" that makes the difference is its compatibility with t
 <p>You have to create an HTML element, for example a <code>div</code> with an <code>id</code> like this : <code>&lt;div id='sigma-container'&gt;&lt;/div&gt;</code>.</p>
 </div>
 <div class="paragraph">
-<p>Moreover, you also need to give an <code>height</code> and <code>width</code> to it, otherwise it will has a size of 0 pixel.
-This easily done with some CSS : <code>#sigma-container { width:100%, height:100%}</code></p>
+<p>Moreover, you also need to give it an  <code>height</code> and <code>width</code>, otherwise it will have a size of 0 pixel.
+This is easily done with some CSS : <code>#sigma-container { width:100%, height:100%}</code></p>
 </div>
 <div class="paragraph">
-<p><strong>Step 4: Initialise SigmaJS</strong></p>
+<p><strong>Step 4: Initialize sigmajs</strong></p>
 </div>
 <div class="paragraph">
-<p>To initialise SigmaJS, you need to call the function <code>sigma</code> with those arguments :</p>
+<p>To initialize Sigmajs, you need to call the function <code>sigma</code> with those arguments :</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>A <strong>render</strong> : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)</p>
+<p>A <strong>render</strong> : it contains the HTML element  that sigmajs will use to display the graph, plus the type of renderer (SVG, canvas or WebGL)</p>
 </li>
 <li>
-<p>sigma&#8217;s <strong>settings</strong> : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available <a href="https://github.com/jacomyal/sigma.js/wiki/Settings">here</a></p>
+<p>sigmajs&#8217;s <strong>settings</strong> : this object will override the default settings, so you can pass an empty object for now. The complete settings list is available <a href="https://github.com/jacomyal/sigma.js/wiki/Settings">here</a></p>
 </li>
 </ul>
 </div>
@@ -214,7 +214,7 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
   &lt;body&gt;
     &lt;div id='sigma-container'&gt;&lt;/div&gt;
     &lt;script&gt;
-      // Initialise sigma:
+      // Initialize sigma:
       var s = new sigma(
         {
            renderer: {
@@ -237,7 +237,7 @@ This easily done with some CSS : <code>#sigma-container { width:100%, height:100
 </div>
 <div class="paragraph">
 <p><strong>SVG</strong> is a markup language, directly interpreted by your browser,
-so it&#8217;s easy to customize the style of nodes &amp; edges, you just have to add some CSS rules.
+so it&#8217;s easy to customize nodes &amp; edges style, you just have to add some CSS rules.
 But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
 and if this DOM is heavy, the result is slow and can freeze your browser.</p>
 </div>
@@ -307,7 +307,7 @@ to display a large graph (more than 1000 elements)</p></td>
 <div class="sect2">
 <h3 id="definition">Definition</h3>
 <div class="paragraph">
-<p>Now that sigma is initialised, we need to give it a graph.
+<p>Now that sigma is Initialized, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
@@ -453,7 +453,7 @@ And if you want to display a high number of edges, it&#8217;s faster to use a li
 </div>
 <div class="sect2">
 <h3 id="live-example">Live example</h3>
-<script async src="http://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
+<script async src="https://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
 </div>
 </div>
 </div>
@@ -583,7 +583,7 @@ I will not show you all of them, so I have done a list of my most used plugins.<
 </li>
 </ul>
 </div>
-<script async src="http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
+<script async src="https://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
 </div>
 <div class="sect2">
 <h3 id="edge-paralleledges">Edge parallelEdges</h3>
@@ -619,7 +619,7 @@ I will not show you all of them, so I have done a list of my most used plugins.<
 </li>
 </ul>
 </div>
-<script async src="//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
+<script async src="https//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
 </div>
 <div class="sect2">
 <h3 id="relative-size">Relative size</h3>
@@ -847,7 +847,7 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&#8217;
 <div class="paragraph">
 <p>You can see the code here :</p>
 </div>
-<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
+<script src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
 <div class="paragraph">
 <p>Now have fun !</p>
 </div>

@@ -14,8 +14,8 @@ In this article, I will show how to display and customize a graph in a browser w
 a JS library dedicated to graph drawing delivered under the https://opensource.org/licenses/MIT[MIT licence].
 
 Initially, SigmaJS has been developed for https://gephi.org/[Gephi] to export a graph on the web.
-Today, http://sigmajs.org[SigmaJS] is a stable, full features and highly configurable graph library.
-Moreover, the small "plus" that makes the difference is its compatibility with touch screens.
+Today, http://sigmajs.org[sigmajs] is a stable, full features and highly configurable graph library.
+Moreover, the small cherry on the cake is its compatibility with touch screens.
 
 == Installation
 
@@ -23,9 +23,9 @@ Moreover, the small "plus" that makes the difference is its compatibility with t
 
 There are four steps to follow :
 
-*Step 1 : Install SigmaJS binaries*
+*Step 1 : Install sigmajs binaries*
 
-http://sigmajs.org[SigmaJS] can be found on :
+http://sigmajs.org[sigmajs] can be found on :
 
 * https://www.npmjs.com/package/sigma[NPM] : you just have to type : `npm sigma --save-dev`
 * https://github.com/jacomyal/sigma.js/releases[Github] : download the `build.zip` from a release like https://github.com/jacomyal/sigma.js/releases/download/v1.2.0/build.zip[this]
@@ -34,21 +34,21 @@ http://sigmajs.org[SigmaJS] can be found on :
 
 The minimal script you have to load is : `<script src="./build/sigma.min.js"></script>`.
 
-Personally, I prefer to import all the source files, it permits to lighten the library by removing the unused source files (ex: I don't need SVG & Webgl renderers if I use canvas).
+Personally, I prefer to import all the source files, it helps to lighten the library by removing the unused source files (ex: I don't need SVG & Webgl renderers if I use canvas).
 
 *Step 3 :  Create an HTML container*
 
 You have to create an HTML element, for example a `div` with an `id` like this : `<div id='sigma-container'></div>`.
 
-Moreover, you also need to give an `height` and `width` to it, otherwise it will has a size of 0 pixel.
-This easily done with some CSS : `#sigma-container { width:100%, height:100%}`
+Moreover, you also need to give it an  `height` and `width`, otherwise it will have a size of 0 pixel.
+This is easily done with some CSS : `#sigma-container { width:100%, height:100%}`
 
-*Step 4: Initialise SigmaJS*
+*Step 4: Initialize sigmajs*
 
-To initialise SigmaJS, you need to call the function `sigma` with those arguments :
+To initialize Sigmajs, you need to call the function `sigma` with those arguments :
 
-* A *render* : it contains the HTML element where sigma will display the graph, plus the type of renderer (SVG, canvas or WebGL)
-* sigma's *settings* : this object will override the default settings, so you can pass an empty object for now. The complete list settings is available https://github.com/jacomyal/sigma.js/wiki/Settings[here]
+* A *render* : it contains the HTML element  that sigmajs will use to display the graph, plus the type of renderer (SVG, canvas or WebGL)
+* sigmajs's *settings* : this object will override the default settings, so you can pass an empty object for now. The complete settings list is available https://github.com/jacomyal/sigma.js/wiki/Settings[here]
 
 At the end, you should have something like that :
 
@@ -67,7 +67,7 @@ At the end, you should have something like that :
   <body>
     <div id='sigma-container'></div>
     <script>
-      // Initialise sigma:
+      // Initialize sigma:
       var s = new sigma(
         {
            renderer: {
@@ -87,7 +87,7 @@ At the end, you should have something like that :
 http://sigmajs.org[SigmaJS] can used one this technology to display your graph : *svg*, *canvas* & *webgl*.
 
 *SVG* is a markup language, directly interpreted by your browser,
-so it's easy to customize the style of nodes & edges, you just have to add some CSS rules.
+so it's easy to customize nodes & edges style, you just have to add some CSS rules.
 But when you apply a layout algorithm on the graph, you continuously change the DOM of the SVG,
 and if this DOM is heavy, the result is slow and can freeze your browser.
 
@@ -136,7 +136,7 @@ I suggest you to choose *Canvas* or *Webgl* if you want to really display a big 
 
 === Definition
 
-Now that sigma is initialised, we need to give it a graph.
+Now that sigma is Initialized, we need to give it a graph.
 It structure is simple : an object with an array of nodes and an array of edges.
 
 [%header,cols='1,1,2,3',title='Node definition']
@@ -248,7 +248,7 @@ Once it's done, we need to tell sigma to draw the graph by calling its `refresh`
 === Live example
 
 ++++
-<script async src="http://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
+<script async src="https://jsfiddle.net/sim51/gxum1dq1/embed/result,js/"></script>
 ++++
 
 == Graph layout algorithm
@@ -322,7 +322,7 @@ To use it :
 * Add a `label` property on yours edges
 
 ++++
-<script async src="http://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
+<script async src="https://jsfiddle.net/sim51/uzmxvg3u/embed/result,js/"></script>
 ++++
 
 === Edge parallelEdges
@@ -339,7 +339,7 @@ To use it :
 * Add a property `count` that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.
 
 ++++
-<script async src="//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
+<script async src="https//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
 ++++
 
 === Relative size
@@ -510,7 +510,7 @@ image::/public/images/sigmajs/neosig.png[]
 You can see the code here :
 
 ++++
-<script async src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
+<script src="https://jsfiddle.net/sim51/ep6g95st/embed/js/"></script>
 ++++
 
 Now have fun !
