@@ -128,7 +128,7 @@ to display a large graph (more than 1000 elements)
 
 |===
 
-So the choice will depend of your needs, and also of the http://sigmajs.org[SigmaJS] plugins you want to use (plugins are not compatible with every formats).
+The choice will depend on your needs, and also of the http://sigmajs.org[SigmaJS] plugins you want to use (plugins are not compatible with every format).
 
 I suggest you to choose *Canvas* or *Webgl* if you want to really display a big graph.
 
@@ -256,8 +256,8 @@ Once it's done, we need to tell sigma to draw the graph by calling its `refresh`
 === Definition
 
 What is hard in displaying a graph is to rapidly display it in such a way
-that we can see all nodes and their edges without overlaps (in fact the less as possible).
-To do it, we need an algorithm that will compute the position of each nodes, and the most known for that are the **force-directed** algorithms.
+that we can see all nodes and their edges without overlaps (in fact less as possible).
+To do it, we need an algorithm that computes the position of each nodes, and the most known for that are the **force-directed** algorithms.
 
 The principle is simple, you need to consider two forces :
 
@@ -267,7 +267,7 @@ The principle is simple, you need to consider two forces :
 | Repulsive
 | Attractive
 
-| Each node repulse the others. You can consider nodes like particle with the same electric charge.
+| Nodes repulse each others. You can consider nodes like particle with the same electric charge.
 | Two nodes with an edge, attract themselves. You can consider an edge as a spring
 
 | image::/public/images/sigmajs/repulsion.png[]
@@ -376,7 +376,7 @@ And what about `path`  ? A `path` in Neo4j driver types, is an array of `segment
 
 * a starting node
 * a relationship
-* an edning node
+* an ending node
 
 So if we have a path, we need also to iterate over it to add starting & ending node, plus the relationship.
 
@@ -515,5 +515,4 @@ You can see the code here :
 
 Now have fun !
 
-
-A big thanks to Jacomyal,
+_A big thanks to https://github.com/jacomyal[Jacomyal], https://github.com/yomguithereal[Yomguithereal] and  https://github.com/astik[Astik] for the help !_
