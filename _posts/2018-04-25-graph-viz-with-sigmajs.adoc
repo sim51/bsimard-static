@@ -339,7 +339,7 @@ To use it :
 * Add a property `count` that represent the index of the edge in the set of parallel edges. Inversely proportional to the amplitude of the vertex of the edge curve.
 
 ++++
-<script async src="https//jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
+<script async src="https://jsfiddle.net/sim51/5vL3e72e/embed/result,js/"></script>
 ++++
 
 === Relative size
