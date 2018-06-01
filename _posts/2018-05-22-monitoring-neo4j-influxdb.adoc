@@ -43,9 +43,9 @@ name: captor_temperature_humidity
 ----------------------------------
 time                    temperature   humidity   room
 2015-08-18T00:00:00Z    18.3          51.2       Living Room
-2015-08-18T00:00:00Z    16.7          48.9       Bed Room
+2015-08-18T00:00:00Z    16.7          48.9       Bedroom
 2015-08-18T00:01:00Z    18.5          51.1       Living Room
-2015-08-18T00:01:02Z    16.9          49.0       Bed Room
+2015-08-18T00:01:02Z    16.9          49.0       Bedroom
 ...
 ----
 
@@ -257,7 +257,7 @@ I think it's easy to understand, except for the `templates` part.
 In fact, in graphite all metrics follow a schema like this one `MyHost.neo4j.bolt.messages_done 10`.
 So we need to tell *Telegraf* how to parse it to find the field measurement, the value,  and tags.
 
-The part `*.neo4j.*.*` is a filter. If a line match this pattern, then it will parsed with `host.measurement.measurement.field*`.
+The part `\*.neo4j.*.\*` is a filter. If a line match this pattern, then it will parsed with `host.measurement.measurement.field*`.
 With the example `MyHost.neo4j.bolt.messages_done 10`, we will have :
 
 * Tags: `MyHost`

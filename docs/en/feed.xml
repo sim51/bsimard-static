@@ -5,8 +5,8 @@
     <description>Benoit 's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 16:16:04 +0200</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 16:16:04 +0200</lastBuildDate>
+    <pubDate>Fri, 01 Jun 2018 16:54:42 +0200</pubDate>
+    <lastBuildDate>Fri, 01 Jun 2018 16:54:42 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -90,9 +90,9 @@ But you also want to be able to distinguish the data from the living room and th
 ----------------------------------
 time                    temperature   humidity   room
 2015-08-18T00:00:00Z    18.3          51.2       Living Room
-2015-08-18T00:00:00Z    16.7          48.9       Bed Room
+2015-08-18T00:00:00Z    16.7          48.9       Bedroom
 2015-08-18T00:01:00Z    18.5          51.1       Living Room
-2015-08-18T00:01:02Z    16.9          49.0       Bed Room
+2015-08-18T00:01:02Z    16.9          49.0       Bedroom
 ...&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -394,7 +394,7 @@ sudo apt-get install telegraf&lt;/code&gt;&lt;/pre&gt;
 So we need to tell &lt;strong&gt;Telegraf&lt;/strong&gt; how to parse it to find the field measurement, the value,  and tags.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The part &lt;code&gt;&lt;strong&gt;.neo4j.&lt;/strong&gt;.&lt;strong&gt;&lt;/code&gt; is a filter. If a line match this pattern, then it will parsed with &lt;code&gt;host.measurement.measurement.field&lt;/strong&gt;&lt;/code&gt;.
+&lt;p&gt;The part &lt;code&gt;*.neo4j.*.*&lt;/code&gt; is a filter. If a line match this pattern, then it will parsed with &lt;code&gt;host.measurement.measurement.field*&lt;/code&gt;.
 With the example &lt;code&gt;MyHost.neo4j.bolt.messages_done 10&lt;/code&gt;, we will have :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;

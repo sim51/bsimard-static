@@ -184,9 +184,9 @@ But you also want to be able to distinguish the data from the living room and th
 ----------------------------------
 time                    temperature   humidity   room
 2015-08-18T00:00:00Z    18.3          51.2       Living Room
-2015-08-18T00:00:00Z    16.7          48.9       Bed Room
+2015-08-18T00:00:00Z    16.7          48.9       Bedroom
 2015-08-18T00:01:00Z    18.5          51.1       Living Room
-2015-08-18T00:01:02Z    16.9          49.0       Bed Room
+2015-08-18T00:01:02Z    16.9          49.0       Bedroom
 ...</code></pre>
 </div>
 </div>
@@ -488,7 +488,7 @@ sudo apt-get install telegraf</code></pre>
 So we need to tell <strong>Telegraf</strong> how to parse it to find the field measurement, the value,  and tags.</p>
 </div>
 <div class="paragraph">
-<p>The part <code><strong>.neo4j.</strong>.<strong></code> is a filter. If a line match this pattern, then it will parsed with <code>host.measurement.measurement.field</strong></code>.
+<p>The part <code>*.neo4j.*.*</code> is a filter. If a line match this pattern, then it will parsed with <code>host.measurement.measurement.field*</code>.
 With the example <code>MyHost.neo4j.bolt.messages_done 10</code>, we will have :</p>
 </div>
 <div class="ulist">
