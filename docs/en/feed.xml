@@ -5,10 +5,758 @@
     <description>Benoit 's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 23 May 2018 01:07:41 +0200</pubDate>
-    <lastBuildDate>Wed, 23 May 2018 01:07:41 +0200</lastBuildDate>
+    <pubDate>Fri, 01 Jun 2018 16:09:34 +0200</pubDate>
+    <lastBuildDate>Fri, 01 Jun 2018 16:09:34 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
+      <item>
+        <title>Monitoring Neo4j with influxdb TICK stack</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#influxdb&quot;&gt;Influxdb&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#concept&quot;&gt;Concept&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-tick-stack&quot;&gt;The TICK stack&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-architecture&quot;&gt;The architecture&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-monitored-server&quot;&gt;The monitored server&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j&quot;&gt;Neo4j&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#telegraf&quot;&gt;Telegraf&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#the-monitoring-server&quot;&gt;The monitoring server&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#installation-2&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#influxdb-2&quot;&gt;InfluxDb&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#telegraf-2&quot;&gt;Telegraf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#chronograf&quot;&gt;Chronograf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#kapacitor&quot;&gt;Kapacitor&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When you push a service in production, it&amp;#8217;s really important to monitor its health status.
+This will allow you to see if everything is OK,
+to be alerted if something is going wrong but also in a case of a problem, to investigate.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This rule should be applied for &lt;a href=&quot;http://neo4j.com/&quot;&gt;Neo4j&lt;/a&gt;, and you will see how to do it with the &lt;strong&gt;TICK&lt;/strong&gt; stack (from &lt;a href=&quot;http://influxdata.com/&quot;&gt;influxDB&lt;/a&gt;).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;But before to explain how to do it for &lt;a href=&quot;http://neo4j.com/&quot;&gt;Neo4j&lt;/a&gt;, lets talk a little about Influxdb.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;influxdb&quot;&gt;Influxdb&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;concept&quot;&gt;Concept&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.influxdata.com&quot;&gt;Influx DB&lt;/a&gt; is a &lt;a href=&quot;https://en.wikipedia.org/wiki/Time_series_database&quot;&gt;time series database&lt;/a&gt;.
+It&amp;#8217;s made to store and query data in times, so it&amp;#8217;s the perfect tool to store metrics of a system.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Influx has &lt;strong&gt;7 key concepts&lt;/strong&gt; : &lt;code&gt;time&lt;/code&gt;, &lt;code&gt;field&lt;/code&gt;, &lt;code&gt;tag&lt;/code&gt;, &lt;code&gt;measurement&lt;/code&gt;, &lt;code&gt;series&lt;/code&gt;, &lt;code&gt;retention policy&lt;/code&gt; and &lt;code&gt;continous queries&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s better to take an example to understand those concepts.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Imagine that you have a captor of temperature and humidity in your living room and an other one in your bedroom.
+Each time you will read one, you will receive the data at a point of time.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Because it&amp;#8217;s the same kind of data, you will store them at the same location.
+But you also want to be able to distinguish the data from the living room and the bedroom.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At the end, you will have something like that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;name: captor_temperature_humidity
+----------------------------------
+time                    temperature   humidity   room
+2015-08-18T00:00:00Z    18.3          51.2       Living Room
+2015-08-18T00:00:00Z    16.7          48.9       Bed Room
+2015-08-18T00:01:00Z    18.5          51.1       Living Room
+2015-08-18T00:01:02Z    16.9          49.0       Bed Room
+...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Here we have a &lt;strong&gt;measurement name&lt;/strong&gt; called &lt;code&gt;captor_temperature_humidity&lt;/code&gt; (you can think about it like a table in SQL) and each line is &lt;strong&gt;measurement&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Measurement&lt;/strong&gt; is composed of : &lt;code&gt;time&lt;/code&gt; , &lt;code&gt;temperature&lt;/code&gt;, &lt;code&gt;humidity&lt;/code&gt; and &lt;code&gt;room&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Temperature&lt;/strong&gt; and &lt;strong&gt;humidity&lt;/strong&gt; are measurement&amp;#8217;s &lt;strong&gt;fields&lt;/strong&gt;, and their values are the data you want to follow in time.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On each measurement, I have added the &lt;strong&gt;room&lt;/strong&gt; to know where comes the measurement. It&amp;#8217;s a measurement&amp;#8217;s &lt;strong&gt;tag&lt;/strong&gt; (a metadata), and you can have multiple tags for a measurement.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By the time, you will have a very huge number of measurement, and usually you don&amp;#8217;t want to save them forover.
+It&amp;#8217;s where the concept of &lt;strong&gt;retention policy&lt;/strong&gt; takes place,
+you can configure the database  to delete measurements older than X (X is hours, days, weeks, &amp;#8230;&amp;#8203;, years).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;CREATE RETENTION POLICY one_week ON my_database DURATION 1w;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The default &lt;strong&gt;retention policy&lt;/strong&gt; is to keep the data forever.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Moreover, you can define some &lt;strong&gt;continious queries&lt;/strong&gt; to aggregate measurements over time. it will create a new (aggregated) measurement on the same database but with a new retention policy :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;CREATE CONTINUOUS QUERY &quot;my_continious_query&quot; ON &quot;my_database&quot;
+BEGIN
+  SELECT mean(&quot;temperature&quot;) INTO &quot;my_database&quot;.&quot;one_week&quot;.&quot;average_temperature&quot; FROM &quot;captor_temperature_humidity&quot; GROUP BY time(1h)
+END&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;So with the help of &lt;strong&gt;retention policies&lt;/strong&gt; and &lt;strong&gt;continious queries&lt;/strong&gt;, you can downsampling the data with somehting similar as that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;keep the fine data for 1 week&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;aggregate per minute for data between one week and one month&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;aggregate per 10 minutes for data older than a month&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This give those retention policies :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;CREATE RETENTION POLICY &quot;1_week&quot; ON &quot;my_database&quot; DURATION 7d REPLICATION 1 DEFAULT
+CREATE RETENTION POLICY &quot;1_month&quot; ON &quot;my_database&quot; DURATION 30d REPLICATION 1
+CREATE RETENTION POLICY &quot;forever&quot; ON &quot;my_database&quot; DURATION INF REPLICATION 1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And those continuous query :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;CREATE CONTINUOUS QUERY &quot;cq_1min_1month&quot; ON &quot;my_database&quot;
+BEGIN
+  SELECT mean(*) INTO &quot;my_database&quot;.&quot;1_month&quot;.:MEASUREMENT FROM /.*/ GROUP BY time(60s),*
+END;
+CREATE CONTINUOUS QUERY &quot;cq_1min_1month&quot; ON &quot;my_database&quot;
+BEGIN
+  SELECT mean(*) INTO &quot;my_database&quot;.&quot;forever&quot;.:MEASUREMENT FROM /.*/ GROUP BY time(600s),*
+END;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;the-tick-stack&quot;&gt;The TICK stack&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;TICK stack&lt;/strong&gt; is composed of :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Telegraf :&lt;/strong&gt; an agent that collects metrics, and write them in an influx database.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Influx :&lt;/strong&gt; the time series database&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Chronograf :&lt;/strong&gt; a front-end applicatino that allow you to explore your data and to create dashboards.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Kapacitor :&lt;/strong&gt; an alerting system&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s a complete stack to collect, manage and exploit your time series data, so it&amp;#8217;s perfect for my goal.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-architecture&quot;&gt;The architecture&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Generally there is a server where all the metrics are a centralized, and where all the monitoring application are installed.
+I will call it the &lt;strong&gt;Monitoring server&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This server will save all the metrics fron your system, and to do it there is two methods :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;push&lt;/strong&gt; : metrics are directly pushed to the monitoring server by using an agent on each server that you want to monitor.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;pull&lt;/strong&gt; : the monitoring system will query all your servers to collect the metrics.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Generally, the first solution is prefered, and it&amp;#8217;s the one that I will put in place.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the architecture schema :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-f2e5f75f5280dc00917b791b23c08a79.png&quot; alt=&quot;diag f2e5f75f5280dc00917b791b23c08a79&quot; width=&quot;440&quot; height=&quot;216&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In red you have the monitoring server, and in grey the monitored server.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+With this kind of architecture, Neo4j send metrics locally, so it&amp;#8217;s very fast.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-monitored-server&quot;&gt;The monitored server&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j&quot;&gt;Neo4j&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In its &lt;strong&gt;Enterprise Edition&lt;/strong&gt;, Neo4j has a &lt;a href=&quot;https://neo4j.com/docs/operations-manual/current/monitoring/metrics/&quot;&gt;monitoring system&lt;/a&gt;.
+In fact there is four ways to monitor it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;JMX :&lt;/strong&gt; it&amp;#8217;s a standard java functionnality that allow you to retrive some metrics values.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Graphite connector :&lt;/strong&gt; you just have to configure your Graphana server, and Neo4j will send its metrics regulary.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Prometheus connector :&lt;/strong&gt; same as for Graphite but for Prometheus time series database.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;CSV file :&lt;/strong&gt;  Neo4j dumps all its metrics at a regular time interval&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;strong&gt;Telegraf&lt;/strong&gt; is compatible with the Graphite protocol, so I will use it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The configuration is really simple, just edit your &lt;code&gt;neo4j.conf&lt;/code&gt; file and put at the end those lines :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;# Setting for enabling all supported metrics.
+metrics.enabled=true
+# Setting for enabling all Neo4j specific metrics.
+metrics.neo4j.enabled=true
+# Setting for exposing metrics about transactions; number of transactions started, committed, etc.
+metrics.neo4j.tx.enabled=true
+# Setting for exposing metrics about the Neo4j page cache; page faults, evictions, flushes and exceptions, etc.
+metrics.neo4j.pagecache.enabled=true
+# Setting for exposing metrics about approximately entities are in the database; nodes, relationships, properties, etc.
+metrics.neo4j.counts.enabled=true
+# Setting for exposing metrics about the network usage of the HA cluster component.
+metrics.neo4j.network.enabled=true
+# Enable the Graphite integration. Default is 'false'.
+metrics.graphite.enabled=true
+# The IP and port of the Graphite server on the format &amp;lt;hostname or IP address&amp;gt;:&amp;lt;port number&amp;gt;.
+# The default port number for Graphite is 2003.
+metrics.graphite.server=localhost:2003
+# How often to send data. Default is 3 seconds.
+metrics.graphite.interval=3s
+# Prefix for Neo4j metrics on Graphite server.
+metrics.prefix=MyHost&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Like you see, I just :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;enable the metrics feature and also each familly metric.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;enable the graphite integration, and configure its location, time interval and the prefix.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You don&amp;#8217;t have to change anything, except the &lt;code&gt;metrics.prefix&lt;/code&gt;. This value will be used as the host identifier in metrics.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;telegraf&quot;&gt;Telegraf&lt;/h3&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;installation&quot;&gt;Installation&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are many ways to install Telegraf on your system, and you can check directly on &lt;a href=&quot;https://docs.influxdata.com/telegraf/v1.6/introduction/installation/#installation&quot;&gt;the documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;My prefer OS is &lt;strong&gt;debian&lt;/strong&gt;, so I will show you how to do on it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;add the influxdb repository key&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;add the repository&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;perfom an update&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;install the package &lt;code&gt;telegraf&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+echo &quot;deb https://repos.influxdata.com/debian jessie stable&quot; | tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install telegraf&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;configuration&quot;&gt;Configuration&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;All &lt;strong&gt;Telegraf&lt;/strong&gt;'s configuration is located in the file &lt;code&gt;/etc/telegraf/telegraf.conf&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Firstly we need tell Telegraf to be able to act as a graphite server :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-property&quot; data-lang=&quot;property&quot;&gt;[[inputs.socket_listener]]
+  service_address = &quot;tcp://:2003&quot;
+  separator = &quot;.&quot;
+  data_format = &quot;graphite&quot;
+  templates = [
+    &quot;*.neo4j.*.* host.measurement.measurement.field* name=neo4j,vlan=testing&quot;,
+    &quot;*.vm.*.* host.measurement.measurement.field* name=neo4j,vlan=testing&quot;
+  ]&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I think it&amp;#8217;s easy to understand, except for the &lt;code&gt;templates&lt;/code&gt; part.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In fact, in graphite all metrics follow a schema like this one &lt;code&gt;MyHost.neo4j.bolt.messages_done 10&lt;/code&gt;.
+So we need to tell &lt;strong&gt;Telegraf&lt;/strong&gt; how to parse it to find the field measurement, the value,  and tags.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The part &lt;code&gt;&lt;strong&gt;.neo4j.&lt;/strong&gt;.&lt;strong&gt;&lt;/code&gt; is a filter. If a line match this pattern, then it will parsed with &lt;code&gt;host.measurement.measurement.field&lt;/strong&gt;&lt;/code&gt;.
+With the example &lt;code&gt;MyHost.neo4j.bolt.messages_done 10&lt;/code&gt;, we will have :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Tags: &lt;code&gt;MyHost&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Measurement: &lt;code&gt;neo4j.bolt&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Field: &lt;code&gt;messages_done&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;value: &lt;code&gt;10&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Moreover, at the end of each template you can see this &lt;code&gt;name=neo4j,vlan=testing&lt;/code&gt;.
+It&amp;#8217;s a list of static tags that will be added to each metric.
+This can be really useful if you want to monitor multiple Neo4j server (like a cluster).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Ok, now we have the metrics, but we need to push them to our centralized &lt;strong&gt;influx&lt;/strong&gt; database.
+For this, you need to configure &lt;strong&gt;Telegraf&lt;/strong&gt; like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-property&quot; data-lang=&quot;property&quot;&gt;[[outputs.influxdb]]
+  ## The full HTTP or UDP URL for your InfluxDB instance.
+  urls = [&quot;http://10.0.0.12:8086&quot;]
+
+  ## The target database for metrics; will be created as needed.
+  database = &quot;telegraf&quot;
+
+  ## Name of existing retention policy to write to.  Empty string writes to
+  ## the default retention policy.
+  retention_policy = &quot;&quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You just have to change the &lt;code&gt;urls&lt;/code&gt; property with yours (in my case &lt;code&gt;&lt;a href=&quot;http://10.0.0.12:8086&quot; class=&quot;bare&quot;&gt;http://10.0.0.12:8086&lt;/a&gt;&lt;/code&gt;), and optionnally the database name (by default it&amp;#8217;s &lt;code&gt;telegraf&lt;/code&gt;) and the rentention policy you want.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+In the general section of the configuration, you can configure the batch size if you want.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-monitoring-server&quot;&gt;The monitoring server&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;installation-2&quot;&gt;Installation&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;On this server we will install : InfluxDb, Chronograf, Kapacitor and Telegraf (to monitor the monitoring system ^^)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I will follow the same process as explained on the installation of &lt;strong&gt;Telegraf&lt;/strong&gt; : via &lt;strong&gt;apt&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+echo &quot;deb https://repos.influxdata.com/debian jessie stable&quot; | tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install telegraf influxdb chronograf kapacitor&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;influxdb-2&quot;&gt;InfluxDb&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I change nothing in the default configuration of &lt;strong&gt;Influxdb&lt;/strong&gt;,
+The only thing I will do it&amp;#8217;s to create a database &lt;code&gt;telegraf&lt;/code&gt; with a custom retention policy that keep the data for 3 months.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For this I will use the &lt;strong&gt;Influxdb&lt;/strong&gt; CLI,  &lt;code&gt;sudo influx&lt;/code&gt;, and typing those commands :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-SQL&quot; data-lang=&quot;SQL&quot;&gt;CREATE DATABASE telegraf
+USE telegraf
+CREATE RETENTION POLICY &quot;3_month&quot; ON &quot;monitoring&quot; DURATION 90d REPLICATION 1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+If you want to check, you can type &lt;code&gt;SHOW RETENTION POLICIES&lt;/code&gt; to display all RPs.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;telegraf-2&quot;&gt;Telegraf&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I have installed &lt;strong&gt;Telegraf&lt;/strong&gt; just to monitor the monitoring server (CPU, network, disk, &amp;#8230;&amp;#8203;).
+You just have to configure it to send all the data to the &lt;code&gt;telegraf&lt;/code&gt; (the default value).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-property&quot; data-lang=&quot;property&quot;&gt;[[outputs.influxdb]]
+  ## The full HTTP or UDP URL for your InfluxDB instance.
+  # default is localhost with the standard port of influx
+  # urls = [&quot;http://10.0.0.12:8086&quot;]
+
+  ## The target database for metrics; will be created as needed.
+  database = &quot;telegraf&quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;chronograf&quot;&gt;Chronograf&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;By default, Chronograf is listening on the port &lt;code&gt;8888&lt;/code&gt;.
+So open your browser at &lt;a href=&quot;http://MONITORING_SERVER_IP:8888/&quot; class=&quot;bare&quot;&gt;http://MONITORING_SERVER_IP:8888/&lt;/a&gt; (change &lt;code&gt;MONITORING_SERVER_IP&lt;/code&gt; with the corresponding IP).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can take a look at the &lt;strong&gt;Host List&lt;/strong&gt;, you should see a list with two items : names of the monitored and monitoring server.
+Click on one, and should see something like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/monitor-neo4j-influx/chronograf.png&quot; alt=&quot;chronograf&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now you can create a new dashboard for Neo4j with the following widgets :&lt;/p&gt;
+&lt;/div&gt;
+&lt;table class=&quot;tableblock frame-all grid-all spread&quot;&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 16.6666%;&quot;&gt;
+&lt;col style=&quot;width: 16.6666%;&quot;&gt;
+&lt;col style=&quot;width: 66.6668%;&quot;&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Name&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Type&lt;/th&gt;
+&lt;th class=&quot;tableblock halign-left valign-top&quot;&gt;Query&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Thread Jetty&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT mean(&quot;threads.jetty.all&quot;) AS &quot;mean_threads.jetty.all&quot;,
+       mean(&quot;threads.jetty.idle&quot;) AS &quot;mean_threads.jetty.idle&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.server&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JVM memory&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Stacked Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT pool.g1_survivor_space/1000000,
+       pool.metaspace/1000000,
+       pool.g1_eden_space/1000000,
+       pool.g1_old_gen/1000000
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;vm.memory&quot;
+WHERE time &amp;gt; :dashboardTime:&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JVM GC Time&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT DIFFERENCE(&quot;time.g1_young_generation&quot;) AS &quot;mean_time.g1_young_generation&quot;,
+       DIFFERENCE(&quot;time.g1_old_generation&quot;) AS &quot;mean_time.g1_old_generation&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;vm.gc&quot;
+WHERE time &amp;gt; :dashboardTime:&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Transactions&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT DIFFERENCE(last(&quot;started&quot;)) AS &quot;mean_started&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.transaction&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(linear)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Page cache&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT mean(&quot;hits&quot;) AS &quot;mean_hits&quot;,
+       mean(&quot;page_faults&quot;) AS &quot;mean_page_faults&quot;,
+       mean(&quot;flushes&quot;) AS &quot;mean_flushes&quot;,
+       mean(&quot;evictions&quot;) AS &quot;mean_evictions&quot;,
+       mean(&quot;eviction_exceptions&quot;) AS &quot;mean_eviction_exceptions&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.page_cache&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;JVM Threads&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT mean(&quot;total&quot;) AS &quot;mean_total&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;vm.thread&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Number of Nodes&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph + Single stat&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT max(&quot;node&quot;) AS &quot;max_node&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.ids_in_use&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Number of relationships&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph + Single stat&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT last(&quot;relationship&quot;) AS &quot;last_relationship&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.ids_in_use&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Number of Properties&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph + Single stat&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT last(&quot;property&quot;) AS &quot;last_property&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.ids_in_use&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Number of Relationship Types&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph + Single stat&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT last(&quot;relationship_type&quot;) AS &quot;last_relationship_type&quot;
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.ids_in_use&quot;
+WHERE time &amp;gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Opened Transactions&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Line Graph + Single stat&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;div&gt;&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-sql&quot; data-lang=&quot;sql&quot;&gt;SELECT started  - committed - rollbacks
+FROM &quot;telegraf&quot;.&quot;autogen&quot;.&quot;neo4j.transaction&quot;
+WHERE time &amp;gt; :dashboardTime:&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And the result :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/monitor-neo4j-influx/neo-dashboard.png&quot; alt=&quot;neo dashboard&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;kapacitor&quot;&gt;Kapacitor&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Kapacitor is the alerting systen of the stack.
+You can create some rules for Kapacitor directly in Chronograf :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/monitor-neo4j-influx/kapacitor.png&quot; alt=&quot;kapacitor&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This alert sends a message on slack as soon as there less than 20% of free space on my disk :)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You see it&amp;#8217;s really easy to monitor your infrastructure and Neo4j servers with the &lt;strong&gt;TICK&lt;/strong&gt; stack.
+But there are some lacks :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;There is no percentile function in the query language&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Telegraf doesn&amp;#8217;t have a JMX plugin&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;It&amp;#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I would like to make the same kind of article but this time with Promotheus and Graphite.
+So if you are interested, please leave a comment, it will motivate me to write it :)&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
+        <link>http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</guid>
+        
+        <category>monitoring, neo4j, influx, tick</category>
+        
+        
+      </item>
+      
+    
+     
     
      
       <item>
@@ -2367,10 +3115,6 @@ If you want to save more time, you can let your IDE to compile (incrementaly!) y
         
       </item>
       
-    
-     
-    
-     
     
   </channel>
 </rss>
