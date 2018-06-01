@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Monitoring Neo4j with influxdb TICK stack</title>
+<meta charset="UTF-8">
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="When you push a service in production, it's important to monitor its health status.This rule should be applied for Neo4j, and you will see how to do it with the TICK stack (from influxDB)." />
+<meta name="keywords" content="monitoring, neo4j, influx, tick" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/en/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/en" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2018/05/22/monitoring-neo4j-influxdb.html" class="en">en</a>
+                        </li>
+                    
+                  
+                    
+                        <li>
+                        <a href="/2018/05/22/fr-monitoring-neo4j-influxdb.html" class="fr">fr</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Monitoring Neo4j with influxdb TICK stack</h1>
+            <meta itemprop="description" content=" When you push a service in production, it's important to monitor its health status.This rule should be applied for Neo4j, and you will see how to do it with the TICK stack (from influxDB).">
+            <img itemprop="image" src="/public/images/monitor-neo4j-influx/banner.jpg"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#influxdb">Influxdb</a>
+<ul class="sectlevel2">
+<li><a href="#concept">Concept</a></li>
+<li><a href="#the-tick-stack">The TICK stack</a></li>
+</ul>
+</li>
+<li><a href="#the-architecture">The architecture</a></li>
+<li><a href="#the-monitored-server">The monitored server</a>
+<ul class="sectlevel2">
+<li><a href="#neo4j">Neo4j</a></li>
+<li><a href="#telegraf">Telegraf</a></li>
+</ul>
+</li>
+<li><a href="#the-monitoring-server">The monitoring server</a>
+<ul class="sectlevel2">
+<li><a href="#installation-2">Installation</a></li>
+<li><a href="#influxdb-2">InfluxDb</a></li>
+<li><a href="#telegraf-2">Telegraf</a></li>
+<li><a href="#chronograf">Chronograf</a></li>
+<li><a href="#kapacitor">Kapacitor</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you push a service in production, it&#8217;s really important to monitor its health status.
+This will allow you to see if everything is OK,
+to be alerted if something is going wrong but also in a case of a problem, to investigate.</p>
+</div>
+<div class="paragraph">
+<p>This rule should be applied for <a href="http://neo4j.com/">Neo4j</a>, and you will see how to do it with the <strong>TICK</strong> stack (from <a href="http://influxdata.com/">influxDB</a>).</p>
+</div>
+<div class="paragraph">
+<p>But before to explain how to do it for <a href="http://neo4j.com/">Neo4j</a>, lets talk a little about Influxdb.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="influxdb">Influxdb</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="concept">Concept</h3>
+<div class="paragraph">
+<p><a href="https://www.influxdata.com">Influx DB</a> is a <a href="https://en.wikipedia.org/wiki/Time_series_database">time series database</a>.
+It&#8217;s made to store and query data in times, so it&#8217;s the perfect tool to store metrics of a system.</p>
+</div>
+<div class="paragraph">
+<p>Influx has <strong>7 key concepts</strong> : <code>time</code>, <code>field</code>, <code>tag</code>, <code>measurement</code>, <code>series</code>, <code>retention policy</code> and <code>continous queries</code>.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s better to take an example to understand those concepts.</p>
+</div>
+<div class="paragraph">
+<p>Imagine that you have a captor of temperature and humidity in your living room and an other one in your bedroom.
+Each time you will read one, you will receive the data at a point of time.</p>
+</div>
+<div class="paragraph">
+<p>Because it&#8217;s the same kind of data, you will store them at the same location.
+But you also want to be able to distinguish the data from the living room and the bedroom.</p>
+</div>
+<div class="paragraph">
+<p>At the end, you will have something like that :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>name: captor_temperature_humidity
+----------------------------------
+time                    temperature   humidity   room
+2015-08-18T00:00:00Z    18.3          51.2       Living Room
+2015-08-18T00:00:00Z    16.7          48.9       Bed Room
+2015-08-18T00:01:00Z    18.5          51.1       Living Room
+2015-08-18T00:01:02Z    16.9          49.0       Bed Room
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here we have a <strong>measurement name</strong> called <code>captor_temperature_humidity</code> (you can think about it like a table in SQL) and each line is <strong>measurement</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Measurement</strong> is composed of : <code>time</code> , <code>temperature</code>, <code>humidity</code> and <code>room</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Temperature</strong> and <strong>humidity</strong> are measurement&#8217;s <strong>fields</strong>, and their values are the data you want to follow in time.</p>
+</div>
+<div class="paragraph">
+<p>On each measurement, I have added the <strong>room</strong> to know where comes the measurement. It&#8217;s a measurement&#8217;s <strong>tag</strong> (a metadata), and you can have multiple tags for a measurement.</p>
+</div>
+<div class="paragraph">
+<p>By the time, you will have a very huge number of measurement, and usually you don&#8217;t want to save them forover.
+It&#8217;s where the concept of <strong>retention policy</strong> takes place,
+you can configure the database  to delete measurements older than X (X is hours, days, weeks, &#8230;&#8203;, years).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE RETENTION POLICY one_week ON my_database DURATION 1w;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The default <strong>retention policy</strong> is to keep the data forever.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Moreover, you can define some <strong>continious queries</strong> to aggregate measurements over time. it will create a new (aggregated) measurement on the same database but with a new retention policy :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE CONTINUOUS QUERY "my_continious_query" ON "my_database"
+BEGIN
+  SELECT mean("temperature") INTO "my_database"."one_week"."average_temperature" FROM "captor_temperature_humidity" GROUP BY time(1h)
+END</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So with the help of <strong>retention policies</strong> and <strong>continious queries</strong>, you can downsampling the data with somehting similar as that :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>keep the fine data for 1 week</p>
+</li>
+<li>
+<p>aggregate per minute for data between one week and one month</p>
+</li>
+<li>
+<p>aggregate per 10 minutes for data older than a month</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This give those retention policies :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">CREATE RETENTION POLICY "1_week" ON "my_database" DURATION 7d REPLICATION 1 DEFAULT
+CREATE RETENTION POLICY "1_month" ON "my_database" DURATION 30d REPLICATION 1
+CREATE RETENTION POLICY "forever" ON "my_database" DURATION INF REPLICATION 1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And those continuous query :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">CREATE CONTINUOUS QUERY "cq_1min_1month" ON "my_database"
+BEGIN
+  SELECT mean(*) INTO "my_database"."1_month".:MEASUREMENT FROM /.*/ GROUP BY time(60s),*
+END;
+CREATE CONTINUOUS QUERY "cq_1min_1month" ON "my_database"
+BEGIN
+  SELECT mean(*) INTO "my_database"."forever".:MEASUREMENT FROM /.*/ GROUP BY time(600s),*
+END;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="the-tick-stack">The TICK stack</h3>
+<div class="paragraph">
+<p><strong>TICK stack</strong> is composed of :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Telegraf :</strong> an agent that collects metrics, and write them in an influx database.</p>
+</li>
+<li>
+<p><strong>Influx :</strong> the time series database</p>
+</li>
+<li>
+<p><strong>Chronograf :</strong> a front-end applicatino that allow you to explore your data and to create dashboards.</p>
+</li>
+<li>
+<p><strong>Kapacitor :</strong> an alerting system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It&#8217;s a complete stack to collect, manage and exploit your time series data, so it&#8217;s perfect for my goal.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-architecture">The architecture</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Generally there is a server where all the metrics are a centralized, and where all the monitoring application are installed.
+I will call it the <strong>Monitoring server</strong>.</p>
+</div>
+<div class="paragraph">
+<p>This server will save all the metrics fron your system, and to do it there is two methods :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>push</strong> : metrics are directly pushed to the monitoring server by using an agent on each server that you want to monitor.</p>
+</li>
+<li>
+<p><strong>pull</strong> : the monitoring system will query all your servers to collect the metrics.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Generally, the first solution is prefered, and it&#8217;s the one that I will put in place.</p>
+</div>
+<div class="paragraph">
+<p>This is the architecture schema :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-f2e5f75f5280dc00917b791b23c08a79.png" alt="diag f2e5f75f5280dc00917b791b23c08a79" width="440" height="216">
+</div>
+</div>
+<div class="paragraph">
+<p>In red you have the monitoring server, and in grey the monitored server.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+With this kind of architecture, Neo4j send metrics locally, so it&#8217;s very fast.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-monitored-server">The monitored server</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="neo4j">Neo4j</h3>
+<div class="paragraph">
+<p>In its <strong>Enterprise Edition</strong>, Neo4j has a <a href="https://neo4j.com/docs/operations-manual/current/monitoring/metrics/">monitoring system</a>.
+In fact there is four ways to monitor it :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>JMX :</strong> it&#8217;s a standard java functionnality that allow you to retrive some metrics values.</p>
+</li>
+<li>
+<p><strong>Graphite connector :</strong> you just have to configure your Graphana server, and Neo4j will send its metrics regulary.</p>
+</li>
+<li>
+<p><strong>Prometheus connector :</strong> same as for Graphite but for Prometheus time series database.</p>
+</li>
+<li>
+<p><strong>CSV file :</strong>  Neo4j dumps all its metrics at a regular time interval</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Telegraf</strong> is compatible with the Graphite protocol, so I will use it.</p>
+</div>
+<div class="paragraph">
+<p>The configuration is really simple, just edit your <code>neo4j.conf</code> file and put at the end those lines :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-properties" data-lang="properties"># Setting for enabling all supported metrics.
+metrics.enabled=true
+# Setting for enabling all Neo4j specific metrics.
+metrics.neo4j.enabled=true
+# Setting for exposing metrics about transactions; number of transactions started, committed, etc.
+metrics.neo4j.tx.enabled=true
+# Setting for exposing metrics about the Neo4j page cache; page faults, evictions, flushes and exceptions, etc.
+metrics.neo4j.pagecache.enabled=true
+# Setting for exposing metrics about approximately entities are in the database; nodes, relationships, properties, etc.
+metrics.neo4j.counts.enabled=true
+# Setting for exposing metrics about the network usage of the HA cluster component.
+metrics.neo4j.network.enabled=true
+# Enable the Graphite integration. Default is 'false'.
+metrics.graphite.enabled=true
+# The IP and port of the Graphite server on the format &lt;hostname or IP address&gt;:&lt;port number&gt;.
+# The default port number for Graphite is 2003.
+metrics.graphite.server=localhost:2003
+# How often to send data. Default is 3 seconds.
+metrics.graphite.interval=3s
+# Prefix for Neo4j metrics on Graphite server.
+metrics.prefix=MyHost</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Like you see, I just :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>enable the metrics feature and also each familly metric.</p>
+</li>
+<li>
+<p>enable the graphite integration, and configure its location, time interval and the prefix.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You don&#8217;t have to change anything, except the <code>metrics.prefix</code>. This value will be used as the host identifier in metrics.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="telegraf">Telegraf</h3>
+<div class="sect3">
+<h4 id="installation">Installation</h4>
+<div class="paragraph">
+<p>There are many ways to install Telegraf on your system, and you can check directly on <a href="https://docs.influxdata.com/telegraf/v1.6/introduction/installation/#installation">the documentation</a>.</p>
+</div>
+<div class="paragraph">
+<p>My prefer OS is <strong>debian</strong>, so I will show you how to do on it :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>add the influxdb repository key</p>
+</li>
+<li>
+<p>add the repository</p>
+</li>
+<li>
+<p>perfom an update</p>
+</li>
+<li>
+<p>install the package <code>telegraf</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+echo "deb https://repos.influxdata.com/debian jessie stable" | tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install telegraf</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="configuration">Configuration</h4>
+<div class="paragraph">
+<p>All <strong>Telegraf</strong>'s configuration is located in the file <code>/etc/telegraf/telegraf.conf</code>.</p>
+</div>
+<div class="paragraph">
+<p>Firstly we need tell Telegraf to be able to act as a graphite server :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-property" data-lang="property">[[inputs.socket_listener]]
+  service_address = "tcp://:2003"
+  separator = "."
+  data_format = "graphite"
+  templates = [
+    "*.neo4j.*.* host.measurement.measurement.field* name=neo4j,vlan=testing",
+    "*.vm.*.* host.measurement.measurement.field* name=neo4j,vlan=testing"
+  ]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I think it&#8217;s easy to understand, except for the <code>templates</code> part.</p>
+</div>
+<div class="paragraph">
+<p>In fact, in graphite all metrics follow a schema like this one <code>MyHost.neo4j.bolt.messages_done 10</code>.
+So we need to tell <strong>Telegraf</strong> how to parse it to find the field measurement, the value,  and tags.</p>
+</div>
+<div class="paragraph">
+<p>The part <code><strong>.neo4j.</strong>.<strong></code> is a filter. If a line match this pattern, then it will parsed with <code>host.measurement.measurement.field</strong></code>.
+With the example <code>MyHost.neo4j.bolt.messages_done 10</code>, we will have :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Tags: <code>MyHost</code></p>
+</li>
+<li>
+<p>Measurement: <code>neo4j.bolt</code></p>
+</li>
+<li>
+<p>Field: <code>messages_done</code></p>
+</li>
+<li>
+<p>value: <code>10</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Moreover, at the end of each template you can see this <code>name=neo4j,vlan=testing</code>.
+It&#8217;s a list of static tags that will be added to each metric.
+This can be really useful if you want to monitor multiple Neo4j server (like a cluster).</p>
+</div>
+<div class="paragraph">
+<p>Ok, now we have the metrics, but we need to push them to our centralized <strong>influx</strong> database.
+For this, you need to configure <strong>Telegraf</strong> like this :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-property" data-lang="property">[[outputs.influxdb]]
+  ## The full HTTP or UDP URL for your InfluxDB instance.
+  urls = ["http://10.0.0.12:8086"]
+
+  ## The target database for metrics; will be created as needed.
+  database = "telegraf"
+
+  ## Name of existing retention policy to write to.  Empty string writes to
+  ## the default retention policy.
+  retention_policy = ""</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You just have to change the <code>urls</code> property with yours (in my case <code><a href="http://10.0.0.12:8086" class="bare">http://10.0.0.12:8086</a></code>), and optionnally the database name (by default it&#8217;s <code>telegraf</code>) and the rentention policy you want.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+In the general section of the configuration, you can configure the batch size if you want.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-monitoring-server">The monitoring server</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="installation-2">Installation</h3>
+<div class="paragraph">
+<p>On this server we will install : InfluxDb, Chronograf, Kapacitor and Telegraf (to monitor the monitoring system ^^)</p>
+</div>
+<div class="paragraph">
+<p>I will follow the same process as explained on the installation of <strong>Telegraf</strong> : via <strong>apt</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+echo "deb https://repos.influxdata.com/debian jessie stable" | tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install telegraf influxdb chronograf kapacitor</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="influxdb-2">InfluxDb</h3>
+<div class="paragraph">
+<p>I change nothing in the default configuration of <strong>Influxdb</strong>,
+The only thing I will do it&#8217;s to create a database <code>telegraf</code> with a custom retention policy that keep the data for 3 months.</p>
+</div>
+<div class="paragraph">
+<p>For this I will use the <strong>Influxdb</strong> CLI,  <code>sudo influx</code>, and typing those commands :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-SQL" data-lang="SQL">CREATE DATABASE telegraf
+USE telegraf
+CREATE RETENTION POLICY "3_month" ON "monitoring" DURATION 90d REPLICATION 1</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If you want to check, you can type <code>SHOW RETENTION POLICIES</code> to display all RPs.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="telegraf-2">Telegraf</h3>
+<div class="paragraph">
+<p>I have installed <strong>Telegraf</strong> just to monitor the monitoring server (CPU, network, disk, &#8230;&#8203;).
+You just have to configure it to send all the data to the <code>telegraf</code> (the default value).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-property" data-lang="property">[[outputs.influxdb]]
+  ## The full HTTP or UDP URL for your InfluxDB instance.
+  # default is localhost with the standard port of influx
+  # urls = ["http://10.0.0.12:8086"]
+
+  ## The target database for metrics; will be created as needed.
+  database = "telegraf"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chronograf">Chronograf</h3>
+<div class="paragraph">
+<p>By default, Chronograf is listening on the port <code>8888</code>.
+So open your browser at <a href="http://MONITORING_SERVER_IP:8888/" class="bare">http://MONITORING_SERVER_IP:8888/</a> (change <code>MONITORING_SERVER_IP</code> with the corresponding IP).</p>
+</div>
+<div class="paragraph">
+<p>You can take a look at the <strong>Host List</strong>, you should see a list with two items : names of the monitored and monitoring server.
+Click on one, and should see something like this :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/monitor-neo4j-influx/chronograf.png" alt="chronograf">
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can create a new dashboard for Neo4j with the following widgets :</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 66.6668%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Query</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Thread Jetty</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT mean("threads.jetty.all") AS "mean_threads.jetty.all",
+       mean("threads.jetty.idle") AS "mean_threads.jetty.idle"
+FROM "telegraf"."autogen"."neo4j.server"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JVM memory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stacked Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT pool.g1_survivor_space/1000000,
+       pool.metaspace/1000000,
+       pool.g1_eden_space/1000000,
+       pool.g1_old_gen/1000000
+FROM "telegraf"."autogen"."vm.memory"
+WHERE time &gt; :dashboardTime:</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JVM GC Time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT DIFFERENCE("time.g1_young_generation") AS "mean_time.g1_young_generation",
+       DIFFERENCE("time.g1_old_generation") AS "mean_time.g1_old_generation"
+FROM "telegraf"."autogen"."vm.gc"
+WHERE time &gt; :dashboardTime:</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Transactions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT DIFFERENCE(last("started")) AS "mean_started"
+FROM "telegraf"."autogen"."neo4j.transaction"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(linear)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Page cache</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT mean("hits") AS "mean_hits",
+       mean("page_faults") AS "mean_page_faults",
+       mean("flushes") AS "mean_flushes",
+       mean("evictions") AS "mean_evictions",
+       mean("eviction_exceptions") AS "mean_eviction_exceptions"
+FROM "telegraf"."autogen"."neo4j.page_cache"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JVM Threads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT mean("total") AS "mean_total"
+FROM "telegraf"."autogen"."vm.thread"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(null)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Nodes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph + Single stat</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT max("node") AS "max_node"
+FROM "telegraf"."autogen"."neo4j.ids_in_use"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of relationships</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph + Single stat</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT last("relationship") AS "last_relationship"
+FROM "telegraf"."autogen"."neo4j.ids_in_use"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Properties</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph + Single stat</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT last("property") AS "last_property"
+FROM "telegraf"."autogen"."neo4j.ids_in_use"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of Relationship Types</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph + Single stat</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT last("relationship_type") AS "last_relationship_type"
+FROM "telegraf"."autogen"."neo4j.ids_in_use"
+WHERE time &gt; :dashboardTime:
+GROUP BY time(:interval:) FILL(none)</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Opened Transactions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Line Graph + Single stat</p></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-sql" data-lang="sql">SELECT started  - committed - rollbacks
+FROM "telegraf"."autogen"."neo4j.transaction"
+WHERE time &gt; :dashboardTime:</code></pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>And the result :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/monitor-neo4j-influx/neo-dashboard.png" alt="neo dashboard">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kapacitor">Kapacitor</h3>
+<div class="paragraph">
+<p>Kapacitor is the alerting systen of the stack.
+You can create some rules for Kapacitor directly in Chronograf :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/monitor-neo4j-influx/kapacitor.png" alt="kapacitor">
+</div>
+</div>
+<div class="paragraph">
+<p>This alert sends a message on slack as soon as there less than 20% of free space on my disk :)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion">Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You see it&#8217;s really easy to monitor your infrastructure and Neo4j servers with the <strong>TICK</strong> stack.
+But there are some lacks :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>There is no percentile function in the query language</p>
+</li>
+<li>
+<p>Telegraf doesn&#8217;t have a JMX plugin</p>
+</li>
+<li>
+<p>It&#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I would like to make the same kind of article but this time with Promotheus and Graphite.
+So if you are interested, please leave a comment, it will motivate me to write it :)</p>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  monitoring, neo4j, influx, tick
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Created at :</span>
+                <time itemprop="dateCreated" datetime="2018-05-22">May 22, 2018</time>
+              </li>
+              <li><a href="" title="Permalien : Monitoring Neo4j with influxdb TICK stack" itemprop="url">Permalink</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2018/05/22/fr-monitoring-neo4j-influxdb.html" title="[EN] Monitoring Neo4j with influxdb TICK stack">&lt; [EN] Monitoring Neo4j with influxdb TICK stack</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Contact me">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="My github account">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2018/05/22/monitoring-neo4j-influxdb';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>
