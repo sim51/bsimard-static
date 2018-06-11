@@ -499,15 +499,14 @@ image::/public/images/monitor-neo4j-influx/kapacitor.png[]
 
 This alert sends a message on slack as soon as there less than 20% of free space on my disk :)
 
-
 == Conclusion
 
 You see it's really easy to monitor your infrastructure and Neo4j servers with the *TICK* stack.
 But there are some lacks :
 
-* There is no percentile function in the query language
 * Telegraf doesn't have a JMX plugin
-* It's not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).
+* It's not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix). 
+This is really annoying when you want to have only one query to make your dashboard (and not one per retention). See this https://github.com/influxdata/influxdb/issues/7332[link for more details]
 
 I would like to make the same kind of article but this time with Promotheus and Graphite.
 So if you are interested, please leave a comment, it will motivate me to write it :)
