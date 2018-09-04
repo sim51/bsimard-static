@@ -1,0 +1,121 @@
+= How to use Kettle ot import data in Neo4j
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-locale: en
+:page-description: Kettle is an open-source ETL tool with a lot of plugins. In this post I show you how to use the ones for Neo4j.
+:page-image: /public/images/neo4j-kettle/banner.jpg
+:page-tags: Kettle, neo4j, ETL
+:page-ref: neo4j-kettle
+:toc:
+
+== Kettle
+
+Kettle (or Pentaho Data Integration) is a well known ETL tool.
+It is mature tool, simple to learn due to its GUI and open-source.
+
+Kettle has a lot of plugins for all various data editors, and in this blog, I will show you how to use the Neo4j one.
+
+To install kettle, it's pretty easy, you only need a JDK installed on your laptop, and then you have to follow those steps :
+
+* Download the last binaries at this location : https://sourceforge.net/projects/pentaho/files/Data%20Integration/7.1/
+* Extract it
+* Run `spoon.sh`
+
+== Neo4j connector
+
+There are some Neo4j connectors on the Kettle marketplace, but I strongly recommend you to use this one : https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output
+It is performant, updated and maintained.
+
+It is based on the official Neo4j Java Driver and have all the options you want to import your data, even on a cluster envrionment.
+
+=== How to install it
+
+* Go to this page https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/releases/, and get the latest release.
+* Unzip it into the `plugins` folder of your Kettle installation
+* Restart spoon
+
+=== Components
+
+This plugin comes with 2+1 components :
+
+* *Neo4j Cypher :* a very useful component where you can write a cypher query, and it  can be used as an input or output.
+* *Neo4j Output :* allow you to dynamically create (or update) nodes or relationships. It will generate the cypher query for you.
+* *Neo4j Graph Output:* By doing a graph mapping on the input fields, it will create/update the graph for you. But this component is in *WIP*.
+
+=== Neo4j Cypher
+
+This is (from my POV) the main component of this plugin.
+
+image::/public/images/neo4j-kettle/kettle-neo4j-cypher.png[]
+
+The first thing you need to do is to declare a *Neo4j connection*.
+If you have previously declare a Neo4j connection, you can use it, otherwise you need to create a new one by fulfill this form :
+
+image::/public/images/neo4j-kettle/kettle-neo4j-connection.png[]
+
+As you can see, the connection is using the *Bolt* protocol, and you can also configure a cluster connection with a routing policy.
+So it's really complete !
+
+The `batch size` parameter allow you define the size of your transaction.
+In my example, Every 500 rows, the component will commit the transaction.
+This is really important to control the transaction size during an import process, to have the best performances.
+
+Your Cypher query can be totally dynamic.
+Your query can come from an input field, you just have to enable the `Get Cypher from input field?` and then specify the `Cypher input field`.
+Otherwise, you have to define the `Cypher` field.
+
+Another good point is that the component allows you to use query parameters.
+In my example, `$name` and `$year` come from the input fields. As you can see, I have defined them into the `Parameters` section, just below.
+
+And last point, If you want to use this component as an *Input* one, you have to define the `Returns` section with the name and type.
+
+For me, you have the hand on everything to create a performant import process.
+The only lacks are in the UI (because I'm a _lazy person_ ^^), where I would like to have :
+
+* a *Get Fields* button on the `Parameters` section, to fulfill it with all the input fields
+* a *compute return values* button to automatically fulfill the `Return` section.
+
+=== Neo4j Output
+
+This component allow you to create nodes and relationships without writting a cypher query, it will do it for you.
+
+image::/public/images/neo4j-kettle/kettle-neo4j-output-from.png[]
+
+You can use it if you have Input fields define :
+
+* A node : you have to use only the `From Node` tab
+* Two nodes plus the relationship between them : you have to define the `From node`, `To node` and `Relationship` tabulation.
+
+Same as before, you can define the `Batch size`, and moreover you can also tell the component to create the Neo4j *UNIQUE CONSTRAINTS* for you if you enable the `Create indexes?` and specify the `Primary` fields.
+
+==== Example for nodes and relationship
+
+Imagine that you have the following input fields : `label, id, name, parent_id, type`
+What you want to do is to create :
+
+* a node with the label `label` and with the properties `id` and `name`.
+* a relationship between the current node and its `parent_id` with the type `type`
+
+Then you need to fulfill the component by following those screenshots
+
+image::/public/images/neo4j-kettle/kettle-neo4j-output-from.png[From node tabulation]
+
+image::/public/images/neo4j-kettle/kettle-neo4j-output-to.png[To node tabulation]
+
+image::/public/images/neo4j-kettle/kettle-neo4j-output-rel.png[relationship tabulation]
+
+NOTE: don't use the `CREATE` mode for such a process, otherwise the `To` node created each time.
+
+==== Tips
+
+This component needs to have an input field for the label of nodes and for the relationship type.
+If you don't have one because those value are static, you can use the `Add constants` component that allows you to a constant field to the fields :
+
+image::/public/images/neo4j-kettle/kettle-constant.png[]
+
+If you are using the `MERGE` mode, sometimes it is useful to define a default value for the _property_ on which do the merge.
+To do it, you can use the `Value Mapper` component like this :
+
+image::/public/images/neo4j-kettle/kettle-map.png[]
+
+in this example, if the `parent_id` is not set, I replace it with the value `0`.

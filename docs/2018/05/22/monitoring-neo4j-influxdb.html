@@ -64,12 +64,6 @@
                         </li>
                     
                   
-                    
-                        <li>
-                        <a href="/2018/05/22/fr-monitoring-neo4j-influxdb.html" class="fr">fr</a>
-                        </li>
-                    
-                  
 
                   
                   
@@ -806,18 +800,16 @@ But there are some lacks :</p>
 <div class="ulist">
 <ul>
 <li>
-<p>There is no percentile function in the query language</p>
-</li>
-<li>
 <p>Telegraf doesn&#8217;t have a JMX plugin</p>
 </li>
 <li>
-<p>It&#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).</p>
+<p>It&#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).
+This is really annoying when you want to have only one query to make your dashboard (and not one per retention). See this <a href="https://github.com/influxdata/influxdb/issues/7332">link for more details</a></p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>I would like to make the same kind of article but this time with Promotheus and Graphite.
+<p>I would like to make the same kind of article but this time with Prometheus and Grafana.
 So if you are interested, please leave a comment, it will motivate me to write it :)</p>
 </div>
 </div>
@@ -858,6 +850,10 @@ So if you are interested, please leave a comment, it will motivate me to write i
               <a class="btn btn-primary" href="/2018/05/22/fr-monitoring-neo4j-influxdb.html" title="[EN] Monitoring Neo4j with influxdb TICK stack">&lt; [EN] Monitoring Neo4j with influxdb TICK stack</a>
             </li>
             
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2018/09/03/fr-kettle-neo4j.html" title="[EN] How to use Kettle ot import data in Neo4j">[EN] How to use Kettle ot import data in Neo4j &gt;</a>
+            </li>
             
           </ul>
         </div>

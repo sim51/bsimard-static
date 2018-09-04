@@ -3,12 +3,269 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Benoit 's Blog</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 16:54:42 +0200</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 16:54:42 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 04 Sep 2018 13:24:21 +0200</pubDate>
+    <lastBuildDate>Tue, 04 Sep 2018 13:24:21 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
+      <item>
+        <title>How to use Kettle ot import data in Neo4j</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#kettle&quot;&gt;Kettle&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-connector&quot;&gt;Neo4j connector&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-install-it&quot;&gt;How to install it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#components&quot;&gt;Components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-cypher&quot;&gt;Neo4j Cypher&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-output&quot;&gt;Neo4j Output&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;kettle&quot;&gt;Kettle&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Kettle (or Pentaho Data Integration) is a well known ETL tool.
+It is mature tool, simple to learn due to its GUI and open-source.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Kettle has a lot of plugins for all various data editors, and in this blog, I will show you how to use the Neo4j one.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To install kettle, it&amp;#8217;s pretty easy, you only need a JDK installed on your laptop, and then you have to follow those steps :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the last binaries at this location : &lt;a href=&quot;https://sourceforge.net/projects/pentaho/files/Data%20Integration/7.1/&quot; class=&quot;bare&quot;&gt;https://sourceforge.net/projects/pentaho/files/Data%20Integration/7.1/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Extract it&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run &lt;code&gt;spoon.sh&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;neo4j-connector&quot;&gt;Neo4j connector&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are some Neo4j connectors on the Kettle marketplace, but I strongly recommend you to use this one : &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&quot; class=&quot;bare&quot;&gt;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&lt;/a&gt;
+It is performant, updated and maintained.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It is based on the official Neo4j Java Driver and have all the options you want to import your data, even on a cluster envrionment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to-install-it&quot;&gt;How to install it&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to this page &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/releases/&quot; class=&quot;bare&quot;&gt;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/releases/&lt;/a&gt;, and get the latest release.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Unzip it into the &lt;code&gt;plugins&lt;/code&gt; folder of your Kettle installation&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Restart spoon&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;components&quot;&gt;Components&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This plugin comes with 2+1 components :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Cypher :&lt;/strong&gt; a very useful component where you can write a cypher query, and it  can be used as an input or output.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Output :&lt;/strong&gt; allow you to dynamically create (or update) nodes or relationships. It will generate the cypher query for you.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Graph Output:&lt;/strong&gt; By doing a graph mapping on the input fields, it will create/update the graph for you. But this component is in &lt;strong&gt;WIP&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-cypher&quot;&gt;Neo4j Cypher&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is (from my POV) the main component of this plugin.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-cypher.png&quot; alt=&quot;kettle neo4j cypher&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first thing you need to do is to declare a &lt;strong&gt;Neo4j connection&lt;/strong&gt;.
+If you have previously declare a Neo4j connection, you can use it, otherwise you need to create a new one by fulfill this form :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-connection.png&quot; alt=&quot;kettle neo4j connection&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you can see, the connection is using the &lt;strong&gt;Bolt&lt;/strong&gt; protocol, and you can also configure a cluster connection with a routing policy.
+So it&amp;#8217;s really complete !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;code&gt;batch size&lt;/code&gt; parameter allow you define the size of your transaction.
+In my example, Every 500 rows, the component will commit the transaction.
+This is really important to control the transaction size during an import process, to have the best performances.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Your Cypher query can be totally dynamic.
+Your query can come from an input field, you just have to enable the &lt;code&gt;Get Cypher from input field?&lt;/code&gt; and then specify the &lt;code&gt;Cypher input field&lt;/code&gt;.
+Otherwise, you have to define the &lt;code&gt;Cypher&lt;/code&gt; field.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Another good point is that the component allows you to use query parameters.
+In my example, &lt;code&gt;$name&lt;/code&gt; and &lt;code&gt;$year&lt;/code&gt; come from the input fields. As you can see, I have defined them into the &lt;code&gt;Parameters&lt;/code&gt; section, just below.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And last point, If you want to use this component as an &lt;strong&gt;Input&lt;/strong&gt; one, you have to define the &lt;code&gt;Returns&lt;/code&gt; section with the name and type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For me, you have the hand on everything to create a performant import process.
+The only lacks are in the UI (because I&amp;#8217;m a &lt;em&gt;lazy person&lt;/em&gt; ^^), where I would like to have :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a &lt;strong&gt;Get Fields&lt;/strong&gt; button on the &lt;code&gt;Parameters&lt;/code&gt; section, to fulfill it with all the input fields&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a &lt;strong&gt;compute return values&lt;/strong&gt; button to automatically fulfill the &lt;code&gt;Return&lt;/code&gt; section.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-output&quot;&gt;Neo4j Output&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This component allow you to create nodes and relationships without writting a cypher query, it will do it for you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-from.png&quot; alt=&quot;kettle neo4j output from&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can use it if you have Input fields define :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A node : you have to use only the &lt;code&gt;From Node&lt;/code&gt; tab&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Two nodes plus the relationship between them : you have to define the &lt;code&gt;From node&lt;/code&gt;, &lt;code&gt;To node&lt;/code&gt; and &lt;code&gt;Relationship&lt;/code&gt; tabulation.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Same as before, you can define the &lt;code&gt;Batch size&lt;/code&gt;, and moreover you can also tell the component to create the Neo4j &lt;strong&gt;UNIQUE CONSTRAINTS&lt;/strong&gt; for you if you enable the &lt;code&gt;Create indexes?&lt;/code&gt; and specify the &lt;code&gt;Primary&lt;/code&gt; fields.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;example-for-nodes-and-relationship&quot;&gt;Example for nodes and relationship&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Imagine that you have the following input fields : &lt;code&gt;label, id, name, parent_id, type&lt;/code&gt;
+What you want to do is to create :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a node with the label &lt;code&gt;label&lt;/code&gt; and with the properties &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a relationship between the current node and its &lt;code&gt;parent_id&lt;/code&gt; with the type &lt;code&gt;type&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Then you need to fulfill the component by following those screenshots&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-from.png&quot; alt=&quot;From node tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-to.png&quot; alt=&quot;To node tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-rel.png&quot; alt=&quot;relationship tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+don&amp;#8217;t use the &lt;code&gt;CREATE&lt;/code&gt; mode for such a process, otherwise the &lt;code&gt;To&lt;/code&gt; node created each time.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;tips&quot;&gt;Tips&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This component needs to have an input field for the label of nodes and for the relationship type.
+If you don&amp;#8217;t have one because those value are static, you can use the &lt;code&gt;Add constants&lt;/code&gt; component that allows you to a constant field to the fields :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-constant.png&quot; alt=&quot;kettle constant&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you are using the &lt;code&gt;MERGE&lt;/code&gt; mode, sometimes it is useful to define a default value for the &lt;em&gt;property&lt;/em&gt; on which do the merge.
+To do it, you can use the &lt;code&gt;Value Mapper&lt;/code&gt; component like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-map.png&quot; alt=&quot;kettle map&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;in this example, if the &lt;code&gt;parent_id&lt;/code&gt; is not set, I replace it with the value &lt;code&gt;0&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2018/09/03/kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/kettle-neo4j.html</guid>
+        
+        <category>Kettle, neo4j, ETL</category>
+        
+        
+      </item>
+      
+    
+     
     
      
       <item>
@@ -730,25 +987,23 @@ But there are some lacks :&lt;/p&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;There is no percentile function in the query language&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
 &lt;p&gt;Telegraf doesn&amp;#8217;t have a JMX plugin&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;It&amp;#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).
+This is really annoying when you want to have only one query to make your dashboard (and not one per retention). See this &lt;a href=&quot;https://github.com/influxdata/influxdb/issues/7332&quot;&gt;link for more details&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I would like to make the same kind of article but this time with Promotheus and Graphite.
+&lt;p&gt;I would like to make the same kind of article but this time with Prometheus and Grafana.
 So if you are interested, please leave a comment, it will motivate me to write it :)&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</guid>
         
         <category>monitoring, neo4j, influx, tick</category>
         
@@ -1536,8 +1791,8 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Wed, 25 Apr 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</guid>
+        <link>http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</guid>
         
         <category>sigma, graph, visualisation, dataviz</category>
         
@@ -1974,8 +2229,8 @@ Finally, it can makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
         
         <category>neo4j, ldap connection, authentication, authorization</category>
         
@@ -2339,8 +2594,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
@@ -2349,772 +2604,6 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
       
     
      
-    
-     
-      <item>
-        <title>Lego Project</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#description&quot;&gt;Description&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#meta-graph&quot;&gt;Meta-graph&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#import-database&quot;&gt;Import database&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#schema-definition&quot;&gt;Schema definition&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#the-import-scripts&quot;&gt;The import scripts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#some-queries&quot;&gt;Some queries&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#piece-queries&quot;&gt;Piece queries&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#set-queries&quot;&gt;Set queries&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#give-me-some-pieces-and-i-will-construct-the-world&quot;&gt;Give me some pieces and I will construct the world&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;description&quot;&gt;Description&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This project aims to create a referencial of all the lego sets, with theirs pieces.
-So after, if you have a partial set, you will know wich piece to search to have a complete one.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;All the information comes from the website rebrickable.com, where you can download all the lego information under a CC-BY-SA : &lt;a href=&quot;http://rebrickable.com/downloads&quot; class=&quot;bare&quot;&gt;http://rebrickable.com/downloads&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;meta-graph&quot;&gt;Meta-graph&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;imageblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;/public/images/diag/diag-3d1914a5743da3d6d46673f3053ee94d.png&quot; alt=&quot;diag 3d1914a5743da3d6d46673f3053ee94d&quot; width=&quot;1217&quot; height=&quot;287&quot;&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;import-database&quot;&gt;Import database&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The dataset is composed of 4 files :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;colors.csv&lt;/strong&gt; : &lt;code&gt;id,descr&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;pieces.csv&lt;/strong&gt; : &lt;code&gt;piece_id,descr,category&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;sets.csv&lt;/strong&gt; : &lt;code&gt;set_id,year,pieces,t1,t2,t3,descr&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;set_pieces.csv&lt;/strong&gt; : &lt;code&gt;set_id,piece_id,num,color,type&lt;/code&gt; (type : 1=normal, 2=spare)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Just put those files into &lt;code&gt;NEO4J_HOME/import&lt;/code&gt; folder.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;schema-definition&quot;&gt;Schema definition&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;constraints&quot;&gt;Constraints&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Execute those commands with &lt;code&gt;NEO4J_HOME/bin/neo4j-shell&lt;/code&gt; tools :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE CONSTRAINT ON (n:PieceCategory) ASSERT n.name IS UNIQUE;
-CREATE CONSTRAINT ON (n:Color) ASSERT n.id IS UNIQUE;
-CREATE CONSTRAINT ON (n:Set) ASSERT n.id IS UNIQUE;
-CREATE CONSTRAINT ON (n:PieceType) ASSERT n.id IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;indexes&quot;&gt;Indexes&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Execute those command with &lt;code&gt;NEO4J_HOME/bin/neo4j-shell&lt;/code&gt; tools :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE INDEX ON :Set(name);
-CREATE INDEX ON :PieceType(name);
-CREATE INDEX ON :Color(name);
-CREATE INDEX ON :Theme(name);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;the-import-scripts&quot;&gt;The import scripts&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You can execute those scripts one at a time into the browser (&lt;code&gt;&lt;a href=&quot;http://localhost:7474/browser&quot; class=&quot;bare&quot;&gt;http://localhost:7474/browser&lt;/a&gt;&lt;/code&gt;) or via the &lt;code&gt;neo4j-shell&lt;/code&gt; tool.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;colors&quot;&gt;Colors&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM 'file:///colors.csv' AS row
-  CREATE (c:Color { id:row.id, name:row.descr });&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;pieces-type&quot;&gt;Pieces Type&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM 'file:///pieces.csv' AS row
-  CREATE (pt:PieceType { id:row.piece_id, name:row.descr })
-  MERGE (c:PieceCategory { name:row.category })
-  CREATE UNIQUE (pt)-[:HAS_CATEGORY]-&amp;gt;(c);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;sets&quot;&gt;Sets&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Firstly, we create the &lt;code&gt;RootTheme&lt;/code&gt; node :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE (:RootTheme);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Then we import the &lt;code&gt;sets.csv&lt;/code&gt; files :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM 'file:///sets.csv' AS row
-  MATCH (rt:RootTheme)
-
-  CREATE (s:Set { id:row.set_id, name:row.descr, year:toInt(row.year), nbPieces:0})
-
-  MERGE (rt)-[:HAS_CHILD]-&amp;gt;(t1:Theme { name: coalesce(row.t1, '@@')})
-  MERGE (t1)-[:HAS_CHILD]-&amp;gt;(t2:Theme { name: coalesce(row.t2, '@@')})
-  MERGE (t2)-[:HAS_CHILD]-&amp;gt;(t3:Theme { name: coalesce(row.t3, '@@')})
-
-  CREATE (s)-[:HAS_THEME]-&amp;gt;(t3);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Note that sometimes t1, t2 &amp;amp; t3 can be &lt;code&gt;null&lt;/code&gt;, so in the above script we make some trick to import them with some dummy value.
-But this mean that after the execution, we have some clean-up todo :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect4&quot;&gt;
-&lt;h5 id=&quot;clean-up-level-3&quot;&gt;Clean-up level 3&lt;/h5&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (rt:RootTheme)-[:HAS_CHILD]-&amp;gt;(t1:Theme)-[:HAS_CHILD]-&amp;gt;(t2:Theme)-[:HAS_CHILD]-&amp;gt;(t3:Theme)
-WHERE t3.name CONTAINS '@@'
-WITH t2, t3
-  MATCH (t3)&amp;lt;-[r:HAS_THEME]-(s:Set)
-  DELETE r
-  CREATE (t2)&amp;lt;-[:HAS_THEME]-(s);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect4&quot;&gt;
-&lt;h5 id=&quot;clean-up-level-2&quot;&gt;Clean-up level 2&lt;/h5&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (rt:RootTheme)-[:HAS_CHILD]-&amp;gt;(t1:Theme)-[:HAS_CHILD]-&amp;gt;(t2:Theme)
-WHERE t2.name CONTAINS '@@'
-WITH t1, t2
-  MATCH (t2)&amp;lt;-[r:HAS_THEME]-(s:Set)
-  DELETE r
-  CREATE (t1)&amp;lt;-[:HAS_THEME]-(s);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect4&quot;&gt;
-&lt;h5 id=&quot;delete-orphelan-theme-node&quot;&gt;Delete orphelan theme node&lt;/h5&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (t:Theme)
-WHERE
-  size((t)-[:HAS_CHILD]-&amp;gt;()) = 0 AND
-  size((t)&amp;lt;-[:HAS_THEME]-(:Set)) = 0
-WITH t
-  DETACH DELETE t;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;sets-pieces&quot;&gt;Sets pieces&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To have better performances, we split the script into three parts :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;The creation of the &lt;code&gt;Piece&lt;/code&gt; node (unique per type and color):&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
-  MATCH (pt:PieceType {id:row.piece_id})
-  MATCH (c:Color {id:row.color})
-  WITH pt, collect(DISTINCT c) AS colors
-    WITH pt, colors
-      UNWIND colors AS color
-        CREATE (p:Piece)
-        CREATE (p)-[:IS_TYPE_OF]-&amp;gt;(pt)
-        CREATE (p)-[:HAS_COLOR]-&amp;gt;(color);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;And the link between the &lt;code&gt;Set&lt;/code&gt; and its &lt;code&gt;Piece&lt;/code&gt; :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;USING PERIODIC COMMIT 10000
-LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
-WITH row WHERE row.type = '1'
-
-  MATCH (s:Set {id:row.set_id})
-  MATCH (:Color {id:row.color})&amp;lt;-[:HAS_COLOR]-(p:Piece)-[:IS_TYPE_OF]-&amp;gt;(:PieceType {id:row.piece_id})
-
-  CREATE (s)-[r:IS_COMPOSED_OF {occurrence:toInt(row.num)}]-&amp;gt;(p)
-
-  SET s.nbPieces = s.nbPieces + toInt(row.num);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Merge the link between the &lt;code&gt;Set&lt;/code&gt; and &lt;code&gt;Piece&lt;/code&gt; for spare pieces :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;USING PERIODIC COMMIT 10000
-LOAD CSV WITH HEADERS FROM 'file:///set_pieces.csv' AS row
-WITH row WHERE row.type = '2'
-
-  MATCH (:Set {id:row.set_id})-[r:IS_COMPOSED_OF]-&amp;gt;(p:Piece),
-        (:Color {id:row.color})&amp;lt;-[:HAS_COLOR]-(p)-[:IS_TYPE_OF]-&amp;gt;(:PieceType {id:row.piece_id})
-
-  SET r.spare = toInt(row.num);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;some-queries&quot;&gt;Some queries&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;piece-queries&quot;&gt;Piece queries&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-piece-type&quot;&gt;Number of piece type&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (pt:PieceType)
-RETURN count(pt) AS nbPieceType;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-piece&quot;&gt;Number of piece&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (p:Piece)
-RETURN count(p) AS nbPiece;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-pieces-type-per-category&quot;&gt;Number of pieces type per category&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (p:PieceType)-[:HAS_CATEGORY]-&amp;gt;(c:PieceCategory)
-RETURN c.name AS category, count(p) AS count
-ORDER BY category ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;get-piece-type-info&quot;&gt;Get piece type info&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (c:Color)&amp;lt;-[:HAS_COLOR]-(:Piece)-[:IS_TYPE_OF]-&amp;gt;(pt:PieceType {name:&quot;Technic Beam 1 x 11 Thick&quot; })-[:HAS_CATEGORY]-&amp;gt;(c:PieceCategory)
-RETURN pt.name AS name, c.name AS category, COLLECT(c.name) AS colors;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;fabrications-years-of-a-piece&quot;&gt;Fabrications years of a piece&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Set)-[:IS_COMPOSED_OF]-&amp;gt;(:Piece)-[:IS_TYPE_OF]-&amp;gt;(:PieceType {name:&quot;Technic Beam 1 x 11 Thick&quot; })
-RETURN DISTINCT s.year AS year  ORDER BY year ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;colors-available-for-a-piece-type&quot;&gt;Colors available for a piece type&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (p:Piece)-[:IS_TYPE_OF]-&amp;gt;(pt:PieceType {name:&quot;Technic Beam 1 x 11 Thick&quot; }),
-      (p)-[:HAS_COLOR]-&amp;gt;(c:Color)
-RETURN DISTINCT c.name AS color
-ORDER BY color ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;list-of-set-where-a-piece-type-appears-by-year&quot;&gt;List of set where a piece type appears by year&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Set)-[:IS_COMPOSED_OF]-&amp;gt;(:Piece)-[:IS_TYPE_OF]-&amp;gt;(:PieceType {name:&quot;Technic Beam 1 x 11 Thick&quot; })
-RETURN DISTINCT s.name AS set, s.year AS year
-ORDER BY year DESC, set ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;list-of-set-where-piece-appears-with-its-number-of-occurrence&quot;&gt;List of set where piece appears with its number of occurrence&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This query can be usefull if you have a missing piece and you want to search a partial set where it&amp;#8217;s frequent to find it.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Set)-[r:IS_COMPOSED_OF]-&amp;gt;(p:Piece),
-      (p)-[:IS_TYPE_OF]-&amp;gt;(:PieceType {name:&quot;Technic Beam 1 x 11 Thick&quot; }),
-      (p)-[:HAS_COLOR]-&amp;gt;(:Color { name:&quot;Black&quot;})
-RETURN s AS set, r.occurrence AS occurrence
-ORDER BY occurrence DESC, set.name ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;set-queries&quot;&gt;Set queries&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-sets&quot;&gt;Number of sets&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Set)
-RETURN count(*) AS nbSet;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-set-per-top-theme&quot;&gt;Number of set per top-theme&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (:RootTheme)-[:HAS_CHILD]-&amp;gt;(t),
-      (t)-[:HAS_CHILD*]-&amp;gt;(st)-[:HAS_THEME]-(s:Set)
-RETURN t.name AS name, count(s)+ size((t)&amp;lt;-[:HAS_THEME]-(:Set)) AS count
-ORDER BY name ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;number-of-set-per-year&quot;&gt;Number of set per year&lt;/h4&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Set)
-RETURN s.year AS year, count(s)
-ORDER BY year ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;is-there-some-sub-set-of-a-set&quot;&gt;Is there some sub-set of a set ?&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Can I do an other (sub)set with a set ?&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s1:Set)-[r1:IS_COMPOSED_OF]-&amp;gt;(p:Piece)&amp;lt;-[r2:IS_COMPOSED_OF]-(s2:Set)
-WHERE s1.name = &quot;The Kwik-E-Mart&quot; AND
-      r2.occurrence &amp;lt;= (r1.occurrence + coalesce(r1.spare, 0))
-WITH s1, s2, collect(id(p)) AS pieces
-  WHERE size(pieces) = size((s2)-[:IS_COMPOSED_OF]-&amp;gt;(:Piece))
-  RETURN s2.name;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;give-me-some-pieces-and-i-will-construct-the-world&quot;&gt;Give me some pieces and I will construct the world&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;initialize-piece-set-for-a-person&quot;&gt;Initialize piece set for a person&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Here we will create a user node, and attach to it the list of its pieces.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Firstly we will create a new constraint based on user email address :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE CONSTRAINT ON (n:Person) ASSERT n.email IS UNIQUE;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Then we create the user :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE (me:Person { name:'Simard', firstname:'Benoit', email:'benoit@lego.com'});&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For the example, let&amp;#8217;s consider that Benoit has all the piece to make the &lt;code&gt;Taj Mahal&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (me:Person {email:'benoit@lego.com'}),
-      (s:Set)-[r:IS_COMPOSED_OF]-&amp;gt;(p:Piece)
-WHERE s.name = 'Taj Mahal'
-WITH me, r.occurrence AS nb, p
-        CREATE (me)-[:HAS_PIECE {occurrence:nb}]-&amp;gt;(p);&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;give-me-all-sets-that-can-i-do&quot;&gt;Give me all sets that can I do&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;With a given number of piece (type and number), what set can I do ?&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;// look at piece in common where user have enought number of pieces
-MATCH (me:Person {email:'benoit@lego.com'})-[r:HAS_PIECE]-&amp;gt;(p:Piece)&amp;lt;-[r2:IS_COMPOSED_OF]-(s:Set)
-WHERE r2.occurrence &amp;lt;= r.occurrence
-WITH s, count(p) AS nbPiecesType
-  // we look if the set is complete
-  WHERE nbPiecesType = size((s)-[:IS_COMPOSED_OF]-&amp;gt;(:Piece))
-  RETURN s;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;give-me-all-sets-that-can-pretty-much-do&quot;&gt;Give me all sets that can pretty much do&lt;/h4&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;With a given number of piece (type and number), what set can I pretty much do (missing at max 10% of pieces type) ?&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (me:Person {email:'benoit@lego.com'}),
-      (s:Set)-[r:IS_COMPOSED_OF]-&amp;gt;(p:Piece)
-OPTIONAL MATCH (me)-[r2:HAS_PIECE]-&amp;gt;(p)
-WITH s,
-     p,
-     CASE
-       WHEN (r2.occurrence - r.occurrence) IS null THEN r.occurrence
-       WHEN (r2.occurrence - r.occurrence) &amp;lt; 0 THEN (r.occurrence - r2.occurrence)
-       ELSE 0
-     END AS missing
-     WITH s, sum(missing) AS nbMissingPieces
-       WHERE nbMissingPieces &amp;gt; 0 AND
-             (nbMissingPieces/toFloat(s.nbPieces) &amp;lt; 0.1
-       RETURN s, nbMissingPieces
-       ORDER BY nbMissingPieces ASC;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Sun, 04 Dec 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2016/12/04/lego-project.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2016/12/04/lego-project.html</guid>
-        
-        <category>neo4j, load csv, lego</category>
-        
-        
-      </item>
-      
-    
-     
-      <item>
-        <title>How to use JRebel with Neo4j</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#step-1-download-licence&quot;&gt;Step 1 : download &amp;amp; licence&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#step-2-installation&quot;&gt;Step 2 : Installation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#step-3-activation&quot;&gt;Step 3 : Activation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#configuration-for-neo4j&quot;&gt;Configuration for Neo4j&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#neo4j-plugin&quot;&gt;Neo4j plugin&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#installation-2&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#the-magic-part&quot;&gt;The magic part&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div id=&quot;preamble&quot;&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In this tutorial, I will show you how to install and to use Jrebel with Neo4j. This is usefull to be more productive in development mode, because it avoid the 'build/compile/deploy/restart/test' loop.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;step-1-download-licence&quot;&gt;Step 1 : download &amp;amp; licence&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;You have to download JRebel and to ask a trial code. For this, follow those instructions :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Got to the website and fullfill the form to get an activation code : &lt;a href=&quot;https://zeroturnaround.com/software/jrebel/download/&quot; class=&quot;bare&quot;&gt;https://zeroturnaround.com/software/jrebel/download/&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Then download a stand alone version here : &lt;a href=&quot;https://zeroturnaround.com/software/jrebel/download/#!/have-license&quot; class=&quot;bare&quot;&gt;https://zeroturnaround.com/software/jrebel/download/#!/have-license&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;step-2-installation&quot;&gt;Step 2 : Installation&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Unzip the downloaded file somwhere in your computer. In my case : &lt;code&gt;$&amp;gt; unzip jrebel-6.3.1-nosetup.zip -d ~/tmp/&lt;/code&gt;. Now you should have a &lt;strong&gt;jrebel&lt;/strong&gt; folder on your computer. In the rest of this tuto, I will use the var &lt;code&gt;JREBEL_HOME&lt;/code&gt; for the path of this folder.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;step-3-activation&quot;&gt;Step 3 : Activation&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;We have to activate JRebel with the trial code that we have asked. To do this, we only have to execute this commande : &lt;code&gt;$&amp;gt;JREBEL_HOME/bin/activate.sh &amp;lt;ACTIVATION_CODE&amp;gt;&lt;/code&gt; (replace &lt;code&gt;&amp;lt;ACTIVATION_CODE&amp;gt;&lt;/code&gt; with the one given at step 1)&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now you have a trial version of JRebel installed on your computer&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;configuration-for-neo4j&quot;&gt;Configuration for Neo4j&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Here, I’m assuming that you already have a neo4j instance installed on your computer in the folder &lt;code&gt;NEO4J_HOME&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;So now we have to configure JRebel for Neo4j. JRebel works with a java agent, so we have to add it in the JVM argument of Neo4j.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To do this, follow those instructions :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Edit the file &lt;code&gt;NEO4J_HOME/conf/neo4j-wrapper.conf&lt;/code&gt; : &lt;code&gt;$&amp;gt; vi NEO4J_HOME/conf/neo4j-wrapper.conf&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Add this line in the JVM Parameters section : &lt;code&gt;wrapper.java.additional=-javaagent: JREBEL_HOME/jrebel.jar&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now your configuration file should looks like this :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-property&quot; data-lang=&quot;property&quot;&gt;#********************************************************************
-# Property file references
-#********************************************************************
-
-wrapper.java.additional=-Dorg.neo4j.server.properties=conf/neo4j-server.properties
-wrapper.java.additional=-Dlog4j.configuration=file:conf/log4j.properties
-
-#********************************************************************
-# JVM Parameters
-#********************************************************************
-
-wrapper.java.additional=-XX:+UseG1GC
-wrapper.java.additional=-XX:-OmitStackTraceInFastThrow
-wrapper.java.additional=-XX:hashCode=5
-wrapper.java.additional=-javaagent:/home/bsimard/tmp/jrebel/jrebel.jar&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;neo4j-plugin&quot;&gt;Neo4j plugin&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I have created a simple Neo4j plugin at this url : &lt;a href=&quot;https://github.com/sim51/neo4j-plugin-xml&quot; class=&quot;bare&quot;&gt;https://github.com/sim51/neo4j-plugin-xml&lt;/a&gt; .
-It’s a simple plugin that translate a cypher query to an XML document. for our example it’s perfect.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;If you look at the &lt;code&gt;pom.xml&lt;/code&gt; file, you will notice this following plugin :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-xml&quot; data-lang=&quot;xml&quot;&gt;&amp;lt;plugin&amp;gt;
-    &amp;lt;groupId&amp;gt;org.zeroturnaround&amp;lt;/groupId&amp;gt;
-    &amp;lt;artifactId&amp;gt;jrebel-maven-plugin&amp;lt;/artifactId&amp;gt;
-    &amp;lt;version&amp;gt;${jrebel.version}&amp;lt;/version&amp;gt;
-    &amp;lt;executions&amp;gt;
-        &amp;lt;execution&amp;gt;
-            &amp;lt;id&amp;gt;generate-rebel-xml&amp;lt;/id&amp;gt;
-            &amp;lt;phase&amp;gt;process-resources&amp;lt;/phase&amp;gt;
-            &amp;lt;goals&amp;gt;
-                &amp;lt;goal&amp;gt;generate&amp;lt;/goal&amp;gt;
-            &amp;lt;/goals&amp;gt;
-        &amp;lt;/execution&amp;gt;
-    &amp;lt;/executions&amp;gt;
-&amp;lt;/plugin&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This is the only thing needed to a plugin to be compatible with JRebel. It will generate the JRebel configuration file for you during the maven process, and it’s working out-of-the-box with Neo4j.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;In fact JRebel needs a &lt;code&gt;rebel.xml&lt;/code&gt; file at the root of your jar, to know what to look (ie. your java classes).
-You will find all the information about how to configure JRebel at this url : &lt;a href=&quot;http://manuals.zeroturnaround.com/jrebel/standalone/config.html&quot; class=&quot;bare&quot;&gt;http://manuals.zeroturnaround.com/jrebel/standalone/config.html&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;installation-2&quot;&gt;Installation&lt;/h3&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;step-1-compiling-the-code&quot;&gt;Step 1 : Compiling the code&lt;/h4&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Go to the project folder&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Just run &lt;code&gt;mvn package&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;step-2-installation-into-neo4j&quot;&gt;Step 2 : installation into Neo4j&lt;/h4&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Copy &lt;code&gt;neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar&lt;/code&gt; from the target project folder to the plugins folder of Neo4j : &lt;code&gt;$&amp;gt;cp target/neo4j-xml-1.0-SNAPSHOT-jar-with-dependencies.jar NEO4J_HOME/plugins&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Edit the file &lt;code&gt;NEO4J_HOME/conf/neo4j-server.properties&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Add / modify the following line : &lt;code&gt;org.neo4j.server.thirdparty_jaxrs_classes=org.neo4j.plugin.xml=/xml&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Restart the server&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock important&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-you have a to deploy your plugin a first time before the magic appears !
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;the-magic-part&quot;&gt;The magic part&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;At this point of the tutorial, you have :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;JRebel installed on your computer&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;A working Neo4j server with the JRebel agent&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;A working Neo4j plugin deploy into your server that is compatible with Jrebel&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;So now, it’s time to see magic of JRebel !&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Firstly, we will see what the plugin endpoint ping respond to us :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; curl -u neo4j:admin http://localhost:7474/xml/ping
-Pong&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Now we are going to change the source code, by changing the response of this endpoint in the file &lt;code&gt;org.neo4j.plugin.xml.PluginExtension&lt;/code&gt; :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@GET
-@Path(&quot;/ping&quot;)
-public Response ping() throws IOException {
-    return Response.ok(&quot;I'm here master&quot;, MediaType.TEXT_PLAIN).build();
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;We have to compile the new code with maven &lt;code&gt;mvn compile&lt;/code&gt;, for the classes to be generated into the &lt;code&gt;target/classes&lt;/code&gt; folder. And now, let’s see the result :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; curl -u neo4j:admin  http://localhost:7474/xml/ping
-I'm here master&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Yeah it’s working, our change is here without any Neo4j restart. Now you can concentrate on your code, so happy coding !&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock note&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-If you use an IDE, JRebel has created various plugin and there is probably one for your favorite IDE. Those plugin permit to run/debug a class with JRebel.
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;div class=&quot;admonitionblock note&quot;&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;td class=&quot;icon&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
-&lt;/td&gt;
-&lt;td class=&quot;content&quot;&gt;
-If you want to save more time, you can let your IDE to compile (incrementaly!) your project automaticly. So each time you are saving a file, your IDE compile the java class into target/classes and JRebel reload it on the server.
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Mon, 04 Jan 2016 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/How-to-use-JRebel-with-Neo4j</link>
-        <guid isPermaLink="true">http://www.bsimard.com/How-to-use-JRebel-with-Neo4j</guid>
-        
-        <category>neo4j, jrebel</category>
-        
-        
-      </item>
-      
     
   </channel>
 </rss>

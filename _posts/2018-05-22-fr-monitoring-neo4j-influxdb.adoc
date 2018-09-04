@@ -5,7 +5,7 @@ Benoit Simard <contact@bsimard.com>
 :page-description: When you push a service in production, it's important to monitor its health status.This rule should be applied for Neo4j, and you will see how to do it with the TICK stack (from influxDB).
 :page-image: /public/images/monitor-neo4j-influx/banner.jpg
 :page-tags: monitoring, neo4j, influx, tick
-:page-ref: monitoring-ne04j-influx
+:page-ref: fr-monitoring-neo4j-influx
 :toc:
 
 IMPORTANT: Cet article est pour l'instant que en Anglais. Si vous le souhaitez je peux le traduire en français. Pour me motiver a le faire, pouvez-vous laisser commentaire ?

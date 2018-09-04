@@ -3,12 +3,285 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 01 Jun 2018 16:54:42 +0200</pubDate>
-    <lastBuildDate>Fri, 01 Jun 2018 16:54:42 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 04 Sep 2018 13:24:21 +0200</pubDate>
+    <lastBuildDate>Tue, 04 Sep 2018 13:24:21 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
+    
+     
+      <item>
+        <title>[EN] How to use Kettle ot import data in Neo4j</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#kettle&quot;&gt;Kettle&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-connector&quot;&gt;Neo4j connector&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#how-to-install-it&quot;&gt;How to install it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#components&quot;&gt;Components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-cypher&quot;&gt;Neo4j Cypher&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#neo4j-output&quot;&gt;Neo4j Output&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;admonitionblock important&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+Cet article est pour l&amp;#8217;instant que en Anglais. Si vous le souhaitez je peux le traduire en français. Pour me motiver a le faire, laissez un commentaire !
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;kettle&quot;&gt;Kettle&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Kettle (or Pentaho Data Integration) is a well known ETL tool.
+It is mature tool, simple to learn due to its GUI and open-source.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Kettle has a lot of plugins for all various data editors, and in this blog, I will show you how to use the Neo4j one.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To install kettle, it&amp;#8217;s pretty easy, you only need a JDK installed on your laptop, and then you have to follow those steps :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Download the last binaries at this location : &lt;a href=&quot;https://sourceforge.net/projects/pentaho/files/Data%20Integration/7.1/&quot; class=&quot;bare&quot;&gt;https://sourceforge.net/projects/pentaho/files/Data%20Integration/7.1/&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Extract it&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run &lt;code&gt;spoon.sh&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;neo4j-connector&quot;&gt;Neo4j connector&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;There are some Neo4j connectors on the Kettle marketplace, but I strongly recommend you to use this one : &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&quot; class=&quot;bare&quot;&gt;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&lt;/a&gt;
+It is performant, updated and maintained.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It is based on the official Neo4j Java Driver and have all the options you want to import your data, even on a cluster envrionment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;how-to-install-it&quot;&gt;How to install it&lt;/h3&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Go to this page &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/releases/&quot; class=&quot;bare&quot;&gt;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/releases/&lt;/a&gt;, and get the latest release.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Unzip it into the &lt;code&gt;plugins&lt;/code&gt; folder of your Kettle installation&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Restart spoon&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;components&quot;&gt;Components&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This plugin comes with 2+1 components :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Cypher :&lt;/strong&gt; a very useful component where you can write a cypher query, and it  can be used as an input or output.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Output :&lt;/strong&gt; allow you to dynamically create (or update) nodes or relationships. It will generate the cypher query for you.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Neo4j Graph Output:&lt;/strong&gt; By doing a graph mapping on the input fields, it will create/update the graph for you. But this component is in &lt;strong&gt;WIP&lt;/strong&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-cypher&quot;&gt;Neo4j Cypher&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is (from my POV) the main component of this plugin.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-cypher.png&quot; alt=&quot;kettle neo4j cypher&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first thing you need to do is to declare a &lt;strong&gt;Neo4j connection&lt;/strong&gt;.
+If you have previously declare a Neo4j connection, you can use it, otherwise you need to create a new one by fulfill this form :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-connection.png&quot; alt=&quot;kettle neo4j connection&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you can see, the connection is using the &lt;strong&gt;Bolt&lt;/strong&gt; protocol, and you can also configure a cluster connection with a routing policy.
+So it&amp;#8217;s really complete !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;code&gt;batch size&lt;/code&gt; parameter allow you define the size of your transaction.
+In my example, Every 500 rows, the component will commit the transaction.
+This is really important to control the transaction size during an import process, to have the best performances.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Your Cypher query can be totally dynamic.
+Your query can come from an input field, you just have to enable the &lt;code&gt;Get Cypher from input field?&lt;/code&gt; and then specify the &lt;code&gt;Cypher input field&lt;/code&gt;.
+Otherwise, you have to define the &lt;code&gt;Cypher&lt;/code&gt; field.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Another good point is that the component allows you to use query parameters.
+In my example, &lt;code&gt;$name&lt;/code&gt; and &lt;code&gt;$year&lt;/code&gt; come from the input fields. As you can see, I have defined them into the &lt;code&gt;Parameters&lt;/code&gt; section, just below.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And last point, If you want to use this component as an &lt;strong&gt;Input&lt;/strong&gt; one, you have to define the &lt;code&gt;Returns&lt;/code&gt; section with the name and type.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For me, you have the hand on everything to create a performant import process.
+The only lacks are in the UI (because I&amp;#8217;m a &lt;em&gt;lazy person&lt;/em&gt; ^^), where I would like to have :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a &lt;strong&gt;Get Fields&lt;/strong&gt; button on the &lt;code&gt;Parameters&lt;/code&gt; section, to fulfill it with all the input fields&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a &lt;strong&gt;compute return values&lt;/strong&gt; button to automatically fulfill the &lt;code&gt;Return&lt;/code&gt; section.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;neo4j-output&quot;&gt;Neo4j Output&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This component allow you to create nodes and relationships without writting a cypher query, it will do it for you.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-from.png&quot; alt=&quot;kettle neo4j output from&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;You can use it if you have Input fields define :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A node : you have to use only the &lt;code&gt;From Node&lt;/code&gt; tab&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Two nodes plus the relationship between them : you have to define the &lt;code&gt;From node&lt;/code&gt;, &lt;code&gt;To node&lt;/code&gt; and &lt;code&gt;Relationship&lt;/code&gt; tabulation.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Same as before, you can define the &lt;code&gt;Batch size&lt;/code&gt;, and moreover you can also tell the component to create the Neo4j &lt;strong&gt;UNIQUE CONSTRAINTS&lt;/strong&gt; for you if you enable the &lt;code&gt;Create indexes?&lt;/code&gt; and specify the &lt;code&gt;Primary&lt;/code&gt; fields.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;example-for-nodes-and-relationship&quot;&gt;Example for nodes and relationship&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Imagine that you have the following input fields : &lt;code&gt;label, id, name, parent_id, type&lt;/code&gt;
+What you want to do is to create :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a node with the label &lt;code&gt;label&lt;/code&gt; and with the properties &lt;code&gt;id&lt;/code&gt; and &lt;code&gt;name&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a relationship between the current node and its &lt;code&gt;parent_id&lt;/code&gt; with the type &lt;code&gt;type&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Then you need to fulfill the component by following those screenshots&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-from.png&quot; alt=&quot;From node tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-to.png&quot; alt=&quot;To node tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-neo4j-output-rel.png&quot; alt=&quot;relationship tabulation&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+don&amp;#8217;t use the &lt;code&gt;CREATE&lt;/code&gt; mode for such a process, otherwise the &lt;code&gt;To&lt;/code&gt; node created each time.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;tips&quot;&gt;Tips&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This component needs to have an input field for the label of nodes and for the relationship type.
+If you don&amp;#8217;t have one because those value are static, you can use the &lt;code&gt;Add constants&lt;/code&gt; component that allows you to a constant field to the fields :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-constant.png&quot; alt=&quot;kettle constant&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you are using the &lt;code&gt;MERGE&lt;/code&gt; mode, sometimes it is useful to define a default value for the &lt;em&gt;property&lt;/em&gt; on which do the merge.
+To do it, you can use the &lt;code&gt;Value Mapper&lt;/code&gt; component like this :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/neo4j-kettle/kettle-map.png&quot; alt=&quot;kettle map&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;in this example, if the &lt;code&gt;parent_id&lt;/code&gt; is not set, I replace it with the value &lt;code&gt;0&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
+        <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
+        
+        <category>Kettle, neo4j, ETL</category>
+        
+        
+      </item>
+      
     
      
     
@@ -765,8 +1038,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
         <category>monitoring, neo4j, influx, tick</category>
         
@@ -940,8 +1213,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         <category>neo4j, import, apoc, matrice</category>
         
@@ -1390,8 +1663,8 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
         
         <category>neo4j, ldap, authenfication, authorisation</category>
         
@@ -1785,18 +2058,14 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
         
       </item>
       
-    
-     
-    
-     
     
   </channel>
 </rss>
