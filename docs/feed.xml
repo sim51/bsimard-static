@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 04 Sep 2018 13:24:21 +0200</pubDate>
-    <lastBuildDate>Tue, 04 Sep 2018 13:24:21 +0200</lastBuildDate>
+    <link>http://www.bsimard.com/</link>
+    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 04 Sep 2018 18:47:29 +0200</pubDate>
+    <lastBuildDate>Tue, 04 Sep 2018 18:47:29 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -14,7 +14,7 @@
     
      
       <item>
-        <title>[EN] How to use Kettle ot import data in Neo4j</title>
+        <title>[EN] How to use Kettle to import data in Neo4j</title>
         <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
 &lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
 &lt;ul class=&quot;sectlevel1&quot;&gt;
@@ -274,8 +274,8 @@ To do it, you can use the &lt;code&gt;Value Mapper&lt;/code&gt; component like t
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
+        <link>http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</guid>
         
         <category>Kettle, neo4j, ETL</category>
         
@@ -1038,8 +1038,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
+        <link>http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
         <category>monitoring, neo4j, influx, tick</category>
         
@@ -1213,8 +1213,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         <category>neo4j, import, apoc, matrice</category>
         
@@ -1663,8 +1663,8 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
+        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
         
         <category>neo4j, ldap, authenfication, authorisation</category>
         
@@ -2058,8 +2058,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         

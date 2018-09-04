@@ -1,4 +1,4 @@
-= [EN] How to use Kettle ot import data in Neo4j
+= [EN] How to use Kettle to import data in Neo4j
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-locale: fr
