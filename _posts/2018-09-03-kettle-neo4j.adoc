@@ -105,7 +105,7 @@ UNWIND $data as $object
   CREATE ....
 ----
 
-SO you will not have many queries, but only one that match your batch size.
+So you will not have many queries, but only one that match your batch size.
 This is really cool for performances.
 
 ==== Example for nodes and relationship

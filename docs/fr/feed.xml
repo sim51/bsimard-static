@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Benoit 's Blog</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 06 Sep 2018 12:02:56 +0200</pubDate>
-    <lastBuildDate>Thu, 06 Sep 2018 12:02:56 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 06 Sep 2018 14:38:23 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Sep 2018 14:38:23 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -213,7 +213,7 @@ UNWIND $data as $object
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;SO you will not have many queries, but only one that match your batch size.
+&lt;p&gt;So you will not have many queries, but only one that match your batch size.
 This is really cool for performances.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
@@ -303,8 +303,8 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/03/kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/kettle-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/03/kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/kettle-neo4j.html</guid>
         
         <category>Kettle, neo4j, ETL</category>
         
@@ -1049,8 +1049,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</guid>
         
         <category>monitoring, neo4j, influx, tick</category>
         
@@ -1838,8 +1838,8 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Wed, 25 Apr 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</guid>
+        <link>http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</guid>
         
         <category>sigma, graph, visualisation, dataviz</category>
         
@@ -2276,8 +2276,8 @@ Finally, it can makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
         
         <category>neo4j, ldap connection, authentication, authorization</category>
         
@@ -2641,8 +2641,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         

@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 06 Sep 2018 12:02:56 +0200</pubDate>
-    <lastBuildDate>Thu, 06 Sep 2018 12:02:56 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 06 Sep 2018 14:38:23 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Sep 2018 14:38:23 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -14,7 +14,7 @@
     
      
       <item>
-        <title>[EN] How to use Kettle to import data in Neo4j</title>
+        <title>[EN] importez vos données dans Neo4j grâce a Kettle</title>
         <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
 &lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
 &lt;ul class=&quot;sectlevel1&quot;&gt;
@@ -231,7 +231,7 @@ UNWIND $data as $object
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;SO you will not have many queries, but only one that match your batch size.
+&lt;p&gt;So you will not have many queries, but only one that match your batch size.
 This is really cool for performances.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
@@ -321,8 +321,8 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
         
         <category>Kettle, neo4j, ETL</category>
         
@@ -373,7 +373,7 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;div class=&quot;title&quot;&gt;Important&lt;/div&gt;
 &lt;/td&gt;
 &lt;td class=&quot;content&quot;&gt;
-Cet article est pour l&amp;#8217;instant que en Anglais. Si vous le souhaitez je peux le traduire en français. Pour me motiver a le faire, pouvez-vous laisser commentaire ?
+Cet article est pour l&amp;#8217;instant que en Anglais. Si vous le souhaitez je peux le traduire en français. Pour me motiver a le faire, laissez un commentaire !
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;/table&gt;
@@ -1068,25 +1068,23 @@ But there are some lacks :&lt;/p&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;There is no percentile function in the query language&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
 &lt;p&gt;Telegraf doesn&amp;#8217;t have a JMX plugin&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;It&amp;#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s not possible to make a generic continious query that downsample the data with the same field name (you will have an aggregation prefix).
+This is really annoying when you want to have only one query to make your dashboard (and not one per retention). See this &lt;a href=&quot;https://github.com/influxdata/influxdb/issues/7332&quot;&gt;link for more details&lt;/a&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;I would like to make the same kind of article but this time with Promotheus and Graphite.
+&lt;p&gt;I would like to make the same kind of article but this time with Prometheus and Grafana.
 So if you are interested, please leave a comment, it will motivate me to write it :)&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
         <category>monitoring, neo4j, influx, tick</category>
         
@@ -1260,8 +1258,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         <category>neo4j, import, apoc, matrice</category>
         
@@ -1710,8 +1708,8 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
+        <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
         
         <category>neo4j, ldap, authenfication, authorisation</category>
         
@@ -2105,8 +2103,8 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 06 Feb 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
+        <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
         <category>opendata, jcdecaux, neo4j</category>
         
