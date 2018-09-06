@@ -5,8 +5,8 @@
     <description>Benoit 's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 04 Sep 2018 18:47:29 +0200</pubDate>
-    <lastBuildDate>Tue, 04 Sep 2018 18:47:29 +0200</lastBuildDate>
+    <pubDate>Thu, 06 Sep 2018 12:02:56 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Sep 2018 12:02:56 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -25,6 +25,7 @@
 &lt;li&gt;&lt;a href=&quot;#neo4j-output&quot;&gt;Neo4j Output&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
@@ -35,10 +36,11 @@
 It is mature tool, simple to learn due to its GUI and open-source.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Kettle has a lot of plugins for all various data editors, and in this blog, I will show you how to use the Neo4j one.&lt;/p&gt;
+&lt;p&gt;Moreover, Kettle has a lot of plugins for all various data editors, so can really do every thing you want with your data.
+In this post, I will show you how to use the Neo4j components, but firstly, you need to have ketlle on your computer.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;To install kettle, it&amp;#8217;s pretty easy, you only need a JDK installed on your laptop, and then you have to follow those steps :&lt;/p&gt;
+&lt;p&gt;To install kettle, it&amp;#8217;s pretty easy, you only need a JDK installed on your laptop (&amp;gt;= version 8), and then follow those steps :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
@@ -53,6 +55,18 @@ It is mature tool, simple to learn due to its GUI and open-source.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+Spoon is the application name of the graphic interface on which you will design your process
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
@@ -60,10 +74,13 @@ It is mature tool, simple to learn due to its GUI and open-source.&lt;/p&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;There are some Neo4j connectors on the Kettle marketplace, but I strongly recommend you to use this one : &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&quot; class=&quot;bare&quot;&gt;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output&lt;/a&gt;
-It is performant, updated and maintained.&lt;/p&gt;
+It is efficient, updated and maintained.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;It is based on the official Neo4j Java Driver and have all the options you want to import your data, even on a cluster envrionment.&lt;/p&gt;
+&lt;p&gt;It is based on the official Neo4j Java Driver and have all the options you want to import your data in Neo4j, even on a cluster environment.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For now, this plugin is not on the marketplace but it will be.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;how-to-install-it&quot;&gt;How to install it&lt;/h3&gt;
@@ -103,7 +120,7 @@ It is performant, updated and maintained.&lt;/p&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;neo4j-cypher&quot;&gt;Neo4j Cypher&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This is (from my POV) the main component of this plugin.&lt;/p&gt;
+&lt;p&gt;This is (from my POV) the main component of this plugin (I&amp;#8217;m a Cypher expert, so I like to write my own query ^^).&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -112,7 +129,7 @@ It is performant, updated and maintained.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;The first thing you need to do is to declare a &lt;strong&gt;Neo4j connection&lt;/strong&gt;.
-If you have previously declare a Neo4j connection, you can use it, otherwise you need to create a new one by fulfill this form :&lt;/p&gt;
+If you have previously declare a Neo4j connection you can reuse it, otherwise you need to create a new one by fulfill this form :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -121,28 +138,28 @@ If you have previously declare a Neo4j connection, you can use it, otherwise you
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;As you can see, the connection is using the &lt;strong&gt;Bolt&lt;/strong&gt; protocol, and you can also configure a cluster connection with a routing policy.
-So it&amp;#8217;s really complete !&lt;/p&gt;
+So it&amp;#8217;s really complete.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;The &lt;code&gt;batch size&lt;/code&gt; parameter allow you define the size of your transaction.
-In my example, Every 500 rows, the component will commit the transaction.
+In my example, Every 500 rows the component will do a commit.
 This is really important to control the transaction size during an import process, to have the best performances.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Your Cypher query can be totally dynamic.
-Your query can come from an input field, you just have to enable the &lt;code&gt;Get Cypher from input field?&lt;/code&gt; and then specify the &lt;code&gt;Cypher input field&lt;/code&gt;.
-Otherwise, you have to define the &lt;code&gt;Cypher&lt;/code&gt; field.&lt;/p&gt;
+&lt;p&gt;Your Cypher query can be totally dynamic, ie, can be defined from an input field. To do it,  you just have to enable the &lt;code&gt;Get Cypher from input field?&lt;/code&gt; and then specify the &lt;code&gt;Cypher input field&lt;/code&gt;.
+Otherwise, you have to write your query in the &lt;code&gt;Cypher&lt;/code&gt; field.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Another good point is that the component allows you to use query parameters.
-In my example, &lt;code&gt;$name&lt;/code&gt; and &lt;code&gt;$year&lt;/code&gt; come from the input fields. As you can see, I have defined them into the &lt;code&gt;Parameters&lt;/code&gt; section, just below.&lt;/p&gt;
+In my example, &lt;code&gt;$name&lt;/code&gt; and &lt;code&gt;$year&lt;/code&gt; come from the input fields.
+As you can see, I have defined them into the &lt;code&gt;Parameters&lt;/code&gt; section, just below.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;And last point, If you want to use this component as an &lt;strong&gt;Input&lt;/strong&gt; one, you have to define the &lt;code&gt;Returns&lt;/code&gt; section with the name and type.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;For me, you have the hand on everything to create a performant import process.
-The only lacks are in the UI (because I&amp;#8217;m a &lt;em&gt;lazy person&lt;/em&gt; ^^), where I would like to have :&lt;/p&gt;
+&lt;p&gt;For me, you have the hand on everything to create an efficient import process.
+The only lacks are in the UI (because I&amp;#8217;m a lazy person ^^), where I would like to have :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
@@ -154,11 +171,14 @@ The only lacks are in the UI (because I&amp;#8217;m a &lt;em&gt;lazy person&lt;/
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/issues/22&quot;&gt;github issue&lt;/a&gt;  is already created, and &lt;a href=&quot;https://github.com/mattcasters&quot;&gt;Matt Caster&lt;/a&gt; (the father of Kettle and one of the dev. of this plugin) is on it.&lt;/p&gt;
+&lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;neo4j-output&quot;&gt;Neo4j Output&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;This component allow you to create nodes and relationships without writting a cypher query, it will do it for you.&lt;/p&gt;
+&lt;p&gt;This component allow you to create nodes and relationships without writing a cypher query, it will do it for you.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -180,6 +200,21 @@ The only lacks are in the UI (because I&amp;#8217;m a &lt;em&gt;lazy person&lt;/
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Same as before, you can define the &lt;code&gt;Batch size&lt;/code&gt;, and moreover you can also tell the component to create the Neo4j &lt;strong&gt;UNIQUE CONSTRAINTS&lt;/strong&gt; for you if you enable the &lt;code&gt;Create indexes?&lt;/code&gt; and specify the &lt;code&gt;Primary&lt;/code&gt; fields.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This component has been designed to have the best performances for Neo4j.
+For example if you create nodes with a batch size, the component will collect your input fields in an array and generate a query like that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;WITH $data
+UNWIND $data as $object
+  CREATE ....&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;SO you will not have many queries, but only one that match your batch size.
+This is really cool for performances.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
 &lt;h4 id=&quot;example-for-nodes-and-relationship&quot;&gt;Example for nodes and relationship&lt;/h4&gt;
@@ -222,7 +257,7 @@ What you want to do is to create :&lt;/p&gt;
 &lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
 &lt;/td&gt;
 &lt;td class=&quot;content&quot;&gt;
-don&amp;#8217;t use the &lt;code&gt;CREATE&lt;/code&gt; mode for such a process, otherwise the &lt;code&gt;To&lt;/code&gt; node created each time.
+don&amp;#8217;t use the &lt;code&gt;CREATE&lt;/code&gt; mode for such a process, otherwise the &lt;code&gt;To&lt;/code&gt; node will be created each time.
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;/table&gt;
@@ -252,6 +287,18 @@ To do it, you can use the &lt;code&gt;Value Mapper&lt;/code&gt; component like t
 &lt;p&gt;in this example, if the &lt;code&gt;parent_id&lt;/code&gt; is not set, I replace it with the value &lt;code&gt;0&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This post is just an overview of Kettle, but as you can see its integration with Neo4j is really easy.
+I recommend you to test it, and if you have questions, requests or issues, don&amp;#8217;t hesitate to create an issue on the github repository.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Have fun, and boil your graph imports !&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
