@@ -1,5 +1,10 @@
 <title>{{ page.title }}</title>
 <meta charset="UTF-8">
+<meta name="og:title" content="{{ page.title }}"/>
+<meta name="og:type" content="article"/>
+<meta name="og:url" content="{{ page.url | prepend: site.baseurl }}"/>
+<meta name="og:description" content="{{ page.description}}"/>
+<meta name="og:image" content="{{ page.image | prepend: site.baseurl }}"/>
 <meta name="author" content="{{ include.author }}"/>
 <meta name="robots" content="index, follow" />
 <meta name="description" content="{{ include.description }}" />
