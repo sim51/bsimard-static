@@ -2,14 +2,16 @@ title: Benoit Simard
 email: contact@bsimard.com
 description:
   fr: Site de Benoit Simard
-  en: Benoit 's Blog
-keywords:
+  en: Benoit's Blog
+keyword:
   fr: blog, java, neo4j, graph, benoit, simard
   en: blog, java, neo4j, graph, benoit, simard
 url: http://www.bsimard.com
 twitter_username: logisima
 github_username:  sim51
 discuss_shortname: bsimard
+
+me: "Benoit Simard (@logisima)"
 
 contact-me:
   fr: Me contacter

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{page.locale}}">
   <head>
-    {% include head.html description='site.description[page.locale]' tags='site.keywords[page.locale]' author='site.author' %}
+    {% assign description=site.description[page.locale] %}
+    {% assign keywords=site.keyword[page.locale] %}
+    {% include head.html description=description author=site.me keywords=keywords %}
   </head>
   <body class="home" itemscope itemtype="http://schema.org/WebPage">
 

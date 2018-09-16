@@ -5,8 +5,8 @@
     <description>Site de Benoit Simard</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 12 Sep 2018 15:13:29 +0200</pubDate>
-    <lastBuildDate>Wed, 12 Sep 2018 15:13:29 +0200</lastBuildDate>
+    <pubDate>Sun, 16 Sep 2018 12:18:25 +0200</pubDate>
+    <lastBuildDate>Sun, 16 Sep 2018 12:18:25 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -324,7 +324,13 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
         <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
         
-        <category>Kettle, neo4j, ETL</category>
+        
+        <category>Kettle</category>
+        
+        <category> neo4j</category>
+        
+        <category> ETL</category>
+        
         
         
       </item>
@@ -1086,7 +1092,15 @@ So if you are interested, please leave a comment, it will motivate me to write i
         <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
-        <category>monitoring, neo4j, influx, tick</category>
+        
+        <category>monitoring</category>
+        
+        <category> neo4j</category>
+        
+        <category> influx</category>
+        
+        <category> tick</category>
+        
         
         
       </item>
@@ -1261,7 +1275,15 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
         <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
-        <category>neo4j, import, apoc, matrice</category>
+        
+        <category>neo4j</category>
+        
+        <category> import</category>
+        
+        <category> apoc</category>
+        
+        <category> matrice</category>
+        
         
         
       </item>
@@ -1711,7 +1733,15 @@ puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &
         <link>http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/11/13/fr-neo4j-ldap.html</guid>
         
-        <category>neo4j, ldap, authenfication, authorisation</category>
+        
+        <category>neo4j</category>
+        
+        <category> ldap</category>
+        
+        <category> authenfication</category>
+        
+        <category> authorisation</category>
+        
         
         
       </item>
@@ -2106,7 +2136,13 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
         <link>http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/02/06/fr-jcdecaux-cycle-neo4j.html</guid>
         
-        <category>opendata, jcdecaux, neo4j</category>
+        
+        <category>opendata</category>
+        
+        <category> jcdecaux</category>
+        
+        <category> neo4j</category>
+        
         
         
       </item>

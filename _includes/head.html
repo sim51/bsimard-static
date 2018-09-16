@@ -2,14 +2,13 @@
 <meta charset="UTF-8">
 <meta name="og:title" content="{{ page.title }}"/>
 <meta name="og:type" content="article"/>
-<meta name="og:url" content="{{ page.url | prepend: site.baseurl }}"/>
+<meta name="og:url" content="{{ page.url | prepend: site.url }}"/>
 <meta name="og:description" content="{{ page.description}}"/>
-<meta name="og:image" content="{{ page.image | prepend: site.baseurl }}"/>
+<meta name="og:image" content="{{ page.image | prepend: site.url }}"/>
 <meta name="author" content="{{ include.author }}"/>
 <meta name="robots" content="index, follow" />
 <meta name="description" content="{{ include.description }}" />
-<meta name="keywords" content="{{ include.tags }}" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="keywords" content="{{ include.keywords }}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
 
@@ -17,5 +16,6 @@
 <link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+
 <!-- RSS feed -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ '/' | append: page.locale | append: '/feed.xml'}}" />

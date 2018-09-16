@@ -2,11 +2,11 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Benoit Simard</title>
-    <description>Benoit 's Blog</description>
+    <description>Benoit's Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 12 Sep 2018 15:13:29 +0200</pubDate>
-    <lastBuildDate>Wed, 12 Sep 2018 15:13:29 +0200</lastBuildDate>
+    <pubDate>Sun, 16 Sep 2018 12:18:25 +0200</pubDate>
+    <lastBuildDate>Sun, 16 Sep 2018 12:18:25 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -306,7 +306,13 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
         <link>http://localhost:4000/2018/09/03/kettle-neo4j.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/09/03/kettle-neo4j.html</guid>
         
-        <category>Kettle, neo4j, ETL</category>
+        
+        <category>Kettle</category>
+        
+        <category> neo4j</category>
+        
+        <category> ETL</category>
+        
         
         
       </item>
@@ -1052,7 +1058,15 @@ So if you are interested, please leave a comment, it will motivate me to write i
         <link>http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</guid>
         
-        <category>monitoring, neo4j, influx, tick</category>
+        
+        <category>monitoring</category>
+        
+        <category> neo4j</category>
+        
+        <category> influx</category>
+        
+        <category> tick</category>
+        
         
         
       </item>
@@ -1841,7 +1855,15 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
         <link>http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</guid>
         
-        <category>sigma, graph, visualisation, dataviz</category>
+        
+        <category>sigma</category>
+        
+        <category> graph</category>
+        
+        <category> visualisation</category>
+        
+        <category> dataviz</category>
+        
         
         
       </item>
@@ -2279,7 +2301,15 @@ Finally, it can makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined i
         <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
         
-        <category>neo4j, ldap connection, authentication, authorization</category>
+        
+        <category>neo4j</category>
+        
+        <category> ldap connection</category>
+        
+        <category> authentication</category>
+        
+        <category> authorization</category>
+        
         
         
       </item>
@@ -2644,7 +2674,13 @@ RETURN  { type: 'FeatureCollection', features: features } AS geojson&lt;/code&gt
         <link>http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</link>
         <guid isPermaLink="true">http://localhost:4000/2017/02/06/jcdecaux-cycle-neo4j.html</guid>
         
-        <category>opendata, jcdecaux, neo4j</category>
+        
+        <category>opendata</category>
+        
+        <category> jcdecaux</category>
+        
+        <category> neo4j</category>
+        
         
         
       </item>
