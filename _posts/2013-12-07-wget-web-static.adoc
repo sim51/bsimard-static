@@ -1,0 +1,96 @@
+= World Wide Wget : comment créer un cache statique
+:page-layout: post
+:page-locale: fr
+:page-description: Créer un site stastique grace a WGET
+:page-image: /public/images/world-wide-wget/banner.png
+:page-tags: wget, site statique
+:page-ref: world-wide-get
+:toc:
+
+== La problématique
+
+Dans mon métier de développeur web, mes clients me demandent toujours d'atteindre les objectifs suivants :
+
+* avoir un site dynamique permettant de saisir de nouveaux contenus simplement et sans connaissance technique
+* que le site soit performant (affichage des pages en moins de 2 secondes)
+* qu'il puisse absorber des pics de charge important (exemple : > 20 000 utilisateurs uniques par jour)
+
+Ce cas de figure est un grand classique, mais comment y répondre  et surtout simplement ?
+
+Pour le premier point c'est simple, et c'est toujours la même réponse : on va mettre en place un CMS.
+
+== La solution classique
+
+Pour les deux autres points, j'entends souvent les mots suivants durant les réunions : cache, cluster, scalabilité, cloud, elasticité ... (tiens des buzz word).
+
+En effet pour répondre aux besoins de performance et charge sur des sites dynamiques, on a besoin d'une politique de cache (comme la mise en place d'un varnish) et de répartition de charge sur plusieurs machines (cluster ou cloud).
+
+Toutefois ces solutions peuvent être des usines à gaz et surtout coûter cher en développement, maintenance, machine, ...
+
+Mais existe-t-il une autre solution ?
+
+== Un cache statique : Wget est mon ami
+
+Voilà la solution, mettre en place un site statique !
+
+On peut directement développer en statique, il existe même des framework pour ça.
+Je ne parle pas ici de dreamwaver ou autre, mais plutôt des solutions comme Jekyll.
+Par contre il faut s'y connaitre techniquement pour pouvoir publier un article.
+Donc on garde notre CMS pour notre webmaster (ou le service marketing) qui n'a pas envie d'apprendre le HTML.
+
+Donc l'objectif est d'aspirer le site dynamique créé par le CMS et d'en faire une copie statique
+qu'on vient régulièrement mettre à jour et ce dernier sera servi par un simple apache (ou un nginx si vous préféré).
+
+=== Wget
+
+Wget est un utilitaire GNU que l'on retrouve sur les machines UNIX, et en ligne de commande il permet d'aspirer n'importe quel site web :
+
+[source,shell]
+----
+$>wget --recursive \
+       --no-clobber \
+       --page-requisites \
+       --html-extension \
+       --convert-links \
+       --restrict-file-names=unix \
+       --domains bsimard.com \
+       --no-parent \
+       www.bsimard.com
+----
+
+La liste des options :
+
+* *recursive :* permet de faire un wget recursif, et donc d'aspirer votre site internet.
+* *no-clobber :* permet de ne pas avoir de doublon de fichier en demandant à wget de ne pas télécharger deux fois le même fichier en le renommant file.1, file.2 ... Ici on aura un unique fichier.
+* *page-requisites :* télécharge tous les éléments nécesaires à la restitution web de la page comme le JS, le CSS, les images ...
+* *html-extension :* les pages téléchargées par wget seront enregistrées au format .html.
+* *convert-links :* modifie les liens trouvés dans les pages pour qu'ils fonctionnent localement (changement de absolu en relatif).
+* *restrict-file-names :* échappe certain caractère spéciaux des urls pour l'enregistrement sur le file system.
+* *domains :* restreint l'aspiration  au nom de domaine indiqué.
+* *no-parent :* dans notre cas cela n'est pas utile, mais c'est indispensable si vous souhaitez aspirer uniquement une sous-arborescence de votre site. Cette option permet de pas suivre les liens parents par rapport à l'url donné à wget.
+
+=== Finaliser la solution
+
+Maintenant qu'on a notre site en statique, il reste plus que deux choses à faire :
+
+* configurer apache pour qu'il distribue notre site statique
+* mettre en place un cron qui effectue notre wget régulièrement
+
+NOTE: Si votre site est volumineux, je vous conseil de faire votre wget dans un répertoire distinct de celui d'apache et d'effectuer un rsync.
+
+== Les inconvénients
+
+Attention, ce n'est pas une solution miracle, il y a quand même pas mal de limitation.
+
+=== Un site statique
+
+Le site généré est statique ! Celui-ci ne permet de faire des intéractions avec l'internaute, donc pas de commentaire, de rating, de formulaire de contact, ... bref aucune intéraction entre le client et le serveur.
+
+Toutefois ceci peut se corriger de deux manières :
+
+* le faire en JS coté navigateur. Par exemple pour les commentaires, utilisez disqus
+* faire de l'aggrégation coté serveur entre le CMS et un service avec un serveur ESI (comme ESIGate)
+
+=== La publication en temps réel
+
+Le site se mettra à jour au prochain passage du cron, donc les publications ne sont pas immédiates. Donc c'est un système à ne pas proposer à des services qui ont des contenus chauds (ou brulants) qui doivent être mis en ligne dans la minute.

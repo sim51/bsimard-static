@@ -1,0 +1,18 @@
+= Libérer la puissance des graphes avec GraphQL et Neo4j
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-locale: fr
+:page-description: Présentation au JUGSummerCamp 2018 : Libérer la puissance des graphes avec GraphQL et Neo4j
+:page-image: /public/images/graphql-neo4j/graphql-neo4j.jpeg
+:page-tags: JUGSummerCamp, Neo4j, graphe, graphql, apollo
+:page-ref: graphql-neo4j
+:toc:
+
+Voici la vidéo de ma présentation au JUG SUmmer Camp sur GraphQL :
+
+++++
+<iframe class="prez" src="http://www.youtube.com/embed/n7q8QzO3ncY" >
+</iframe>
+++++
+
+Et les slides sont ici : https://sim51.github.io/presentations/graphql-neo4j/

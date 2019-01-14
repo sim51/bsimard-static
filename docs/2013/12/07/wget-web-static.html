@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>World Wide Wget : comment créer un cache statique</title>
+<meta charset="UTF-8">
+<meta name="og:title" content="World Wide Wget : comment créer un cache statique"/>
+<meta name="og:type" content="article"/>
+<meta name="og:url" content="http://localhost:4000/2013/12/07/wget-web-static.html"/>
+<meta name="og:description" content="Créer un site stastique grace a WGET"/>
+<meta name="og:image" content="http://localhost:4000/public/images/world-wide-wget/banner.png"/>
+<meta name="author" content=""/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="Créer un site stastique grace a WGET" />
+<meta name="keywords" content="wget, site statique" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/fr/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2013/12/07/wget-web-static.html" class="fr">fr</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> World Wide Wget : comment créer un cache statique</h1>
+            <meta itemprop="description" content=" Créer un site stastique grace a WGET">
+            <img itemprop="image" src="/public/images/world-wide-wget/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#la-problématique">La problématique</a></li>
+<li><a href="#la-solution-classique">La solution classique</a></li>
+<li><a href="#un-cache-statique-wget-est-mon-ami">Un cache statique : Wget est mon ami</a>
+<ul class="sectlevel2">
+<li><a href="#wget">Wget</a></li>
+<li><a href="#finaliser-la-solution">Finaliser la solution</a></li>
+</ul>
+</li>
+<li><a href="#les-inconvénients">Les inconvénients</a>
+<ul class="sectlevel2">
+<li><a href="#un-site-statique">Un site statique</a></li>
+<li><a href="#la-publication-en-temps-réel">La publication en temps réel</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="la-problématique">La problématique</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Dans mon métier de développeur web, mes clients me demandent toujours d&#8217;atteindre les objectifs suivants :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>avoir un site dynamique permettant de saisir de nouveaux contenus simplement et sans connaissance technique</p>
+</li>
+<li>
+<p>que le site soit performant (affichage des pages en moins de 2 secondes)</p>
+</li>
+<li>
+<p>qu&#8217;il puisse absorber des pics de charge important (exemple : &gt; 20 000 utilisateurs uniques par jour)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ce cas de figure est un grand classique, mais comment y répondre  et surtout simplement ?</p>
+</div>
+<div class="paragraph">
+<p>Pour le premier point c&#8217;est simple, et c&#8217;est toujours la même réponse : on va mettre en place un CMS.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="la-solution-classique">La solution classique</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pour les deux autres points, j&#8217;entends souvent les mots suivants durant les réunions : cache, cluster, scalabilité, cloud, elasticité &#8230;&#8203; (tiens des buzz word).</p>
+</div>
+<div class="paragraph">
+<p>En effet pour répondre aux besoins de performance et charge sur des sites dynamiques, on a besoin d&#8217;une politique de cache (comme la mise en place d&#8217;un varnish) et de répartition de charge sur plusieurs machines (cluster ou cloud).</p>
+</div>
+<div class="paragraph">
+<p>Toutefois ces solutions peuvent être des usines à gaz et surtout coûter cher en développement, maintenance, machine, &#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Mais existe-t-il une autre solution ?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="un-cache-statique-wget-est-mon-ami">Un cache statique : Wget est mon ami</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Voilà la solution, mettre en place un site statique !</p>
+</div>
+<div class="paragraph">
+<p>On peut directement développer en statique, il existe même des framework pour ça.
+Je ne parle pas ici de dreamwaver ou autre, mais plutôt des solutions comme Jekyll.
+Par contre il faut s&#8217;y connaitre techniquement pour pouvoir publier un article.
+Donc on garde notre CMS pour notre webmaster (ou le service marketing) qui n&#8217;a pas envie d&#8217;apprendre le HTML.</p>
+</div>
+<div class="paragraph">
+<p>Donc l&#8217;objectif est d&#8217;aspirer le site dynamique créé par le CMS et d&#8217;en faire une copie statique
+qu&#8217;on vient régulièrement mettre à jour et ce dernier sera servi par un simple apache (ou un nginx si vous préféré).</p>
+</div>
+<div class="sect2">
+<h3 id="wget">Wget</h3>
+<div class="paragraph">
+<p>Wget est un utilitaire GNU que l&#8217;on retrouve sur les machines UNIX, et en ligne de commande il permet d&#8217;aspirer n&#8217;importe quel site web :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;wget --recursive \
+       --no-clobber \
+       --page-requisites \
+       --html-extension \
+       --convert-links \
+       --restrict-file-names=unix \
+       --domains bsimard.com \
+       --no-parent \
+       www.bsimard.com</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>La liste des options :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>recursive :</strong> permet de faire un wget recursif, et donc d&#8217;aspirer votre site internet.</p>
+</li>
+<li>
+<p><strong>no-clobber :</strong> permet de ne pas avoir de doublon de fichier en demandant à wget de ne pas télécharger deux fois le même fichier en le renommant file.1, file.2 &#8230;&#8203; Ici on aura un unique fichier.</p>
+</li>
+<li>
+<p><strong>page-requisites :</strong> télécharge tous les éléments nécesaires à la restitution web de la page comme le JS, le CSS, les images &#8230;&#8203;</p>
+</li>
+<li>
+<p><strong>html-extension :</strong> les pages téléchargées par wget seront enregistrées au format .html.</p>
+</li>
+<li>
+<p><strong>convert-links :</strong> modifie les liens trouvés dans les pages pour qu&#8217;ils fonctionnent localement (changement de absolu en relatif).</p>
+</li>
+<li>
+<p><strong>restrict-file-names :</strong> échappe certain caractère spéciaux des urls pour l&#8217;enregistrement sur le file system.</p>
+</li>
+<li>
+<p><strong>domains :</strong> restreint l&#8217;aspiration  au nom de domaine indiqué.</p>
+</li>
+<li>
+<p><strong>no-parent :</strong> dans notre cas cela n&#8217;est pas utile, mais c&#8217;est indispensable si vous souhaitez aspirer uniquement une sous-arborescence de votre site. Cette option permet de pas suivre les liens parents par rapport à l&#8217;url donné à wget.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="finaliser-la-solution">Finaliser la solution</h3>
+<div class="paragraph">
+<p>Maintenant qu&#8217;on a notre site en statique, il reste plus que deux choses à faire :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>configurer apache pour qu&#8217;il distribue notre site statique</p>
+</li>
+<li>
+<p>mettre en place un cron qui effectue notre wget régulièrement</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Si votre site est volumineux, je vous conseil de faire votre wget dans un répertoire distinct de celui d&#8217;apache et d&#8217;effectuer un rsync.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="les-inconvénients">Les inconvénients</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Attention, ce n&#8217;est pas une solution miracle, il y a quand même pas mal de limitation.</p>
+</div>
+<div class="sect2">
+<h3 id="un-site-statique">Un site statique</h3>
+<div class="paragraph">
+<p>Le site généré est statique ! Celui-ci ne permet de faire des intéractions avec l&#8217;internaute, donc pas de commentaire, de rating, de formulaire de contact, &#8230;&#8203; bref aucune intéraction entre le client et le serveur.</p>
+</div>
+<div class="paragraph">
+<p>Toutefois ceci peut se corriger de deux manières :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>le faire en JS coté navigateur. Par exemple pour les commentaires, utilisez disqus</p>
+</li>
+<li>
+<p>faire de l&#8217;aggrégation coté serveur entre le CMS et un service avec un serveur ESI (comme ESIGate)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="la-publication-en-temps-réel">La publication en temps réel</h3>
+<div class="paragraph">
+<p>Le site se mettra à jour au prochain passage du cron, donc les publications ne sont pas immédiates. Donc c&#8217;est un système à ne pas proposer à des services qui ont des contenus chauds (ou brulants) qui doivent être mis en ligne dans la minute.</p>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Mot-Clefs :</span>
+                <span>
+                  wget, site statique
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Author :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author"></a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2013-12-07">Dec 7, 2013</time>
+              </li>
+              <li><a href="" title="Permalien : World Wide Wget : comment créer un cache statique" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2013/12/01/nutch.html" title="Créer votre moteur de recherche avec Nutch">&lt; Créer votre moteur de recherche avec Nutch</a>
+            </li>
+            
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/A-la-recherche-des-points-de-collecte-pour-recycler" title="A la recherche des points de collecte pour recycler">A la recherche des points de collecte pour recycler &gt;</a>
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2013/12/07/wget-web-static';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

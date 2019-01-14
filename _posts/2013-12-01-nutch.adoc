@@ -1,0 +1,404 @@
+= Créer votre moteur de recherche avec Nutch
+:page-layout: post
+:page-locale: fr
+:page-description: Découvrez Nutch et créer votre propre moteur de recherche
+:page-image: /public/images/nutch/banner.png
+:page-tags: nutch, solr, recherche
+:page-ref: nutch
+:toc:
+
+== Nutch, Kesako ?
+
+Le but de cet article est de faire découvrir apache nutch, un utilitaire vous permettant d'indexer n'importe quel site internet (et plus encore) comme  un robot google : c'est ce qu'on appelle un crawler.
+
+Dans notre cas d'étude, nous allons voir comment l'utiliser pour effectuer un moteur de recherche pour un site internet, et ce sans toucher au code existant puisqu'on va venir indexer les contenus des pages web directement.
+
+=== Quand l'utiliser ?
+
+Nutch est très pratique lorsqu'on veut créer un moteur de recherche pour des sites internets:
+
+* statiques (développé avec  jekyll ou hakyll, ce qui est de plus en plus répandu)
+* qui sont constitués de multiple applications webs, comme des portails ou si vous utilisez ESIGate
+
+=== Quelques limitations
+
+Comme tout outil, il faut savoir quand ne pas l'utiliser. Voici une liste des limitations de nutch :
+
+* *Page vs objet de contenu :* Nutch indexe les pages web, il n'indexe pas des objets de contenu. Vous ne pourrez donc pas faire avec nutch un moteur de recherche spécialisé sur un type de contenu. (A moins de faire du web semantique).
+* *Contenu sécurisé :* Nutch est un robot, il parse votre site comme un internaute lambda, il n'est pas authentifié, et donc il ne peut pas avoir accès à du contenu sécurisé. Même s'il est possible d'authentifié nutch pour votre site, il ne va pas gérer(nativement) les droits d'accès lors de son indexation.
+* *Asycnhrone :* Comme tout crawler, l'indexation de votre site n'est pas immédiate. Pour voir un nouveau contenu (ou sa suppression) pris en compte, il faut attendre le prochain passage du robot
+* *Système d'hyperlien :* pour qu'une page soit indéxée, il faut qu'un lien pointe vers elle depuis une autre page. Si une page, ou une sous-arborescence, est indépendante du point d'indéxation de votre site, celle-ci ne sera jamais indéxée.
+
+== Comment cela fonctionne ?
+
+=== Avant tout, un peu de vocabulaire.
+
+Pour comprendre la documentation de nutch, il est nécessaire de connaitre les types de données qu'il manipule :
+
+* *CrawlDB :* ce sont les données des pages connues par nutch.
+* *LinkDB :* ce sont les informations de liaison entre les pages, cela permet de construire un graph
+* *Segment (deperecated > 2.0) :* un segment est une unité qui est un ensemble de page récupérées et indéxées. Un segment est divisé en trois parties
+** *fetchlist :* une liste de page à récupérer
+** *fetcher output :* la sortie des pages récupées (ie. la réponse de chaque page avec les headers et le body)
+** *index :* les indexes (au sens large non lucene) du fetcher output​
+
+=== Le cycle de vie de nutch
+
+Le travail de nutch est divisé en plusieurs tâches, dont voici le cycle de vie standard :
+
+* *Inject :* cette action permet d'injecter manuellement des urls dans la base crawldb de nutch. Lorsqu'on installe nutch, c'est la première étape a effectuer pour lui donner les urls des sites qu'on souhaite indexer.
+* *Generate :* à partir de la liste des pages qu'il connait, nutch va créer une liste de page à récupérer (la fetchlist)
+* *Fetch :* nutch  va interroger chaque page de la fetchlist  et enregistrer la réponse (avec le code http, les headers et le body).
+* *Parse :* c'est l'opération d'indexation des pages, mais pas au sens lucene. A partir des données récoltés, nutch va venir les parser pour créer un objet/document structuré. Il extratit le titre, le type, les metadatas, l'url, ... et les enregistre
+* *UpdateDB :* c'est l'opération qui consite a mettre à jour la base de données des pages (la crawlDB) à partir des données déjà présente. Nutch va regarder le code html et en extraire tous les liens pour les enregistrer
+* *InvertLinks :* permet à nutch de maintenir sa base de données de connaissances du web (la LinkDB), qui est un point essentiel de nutch.
+
+IMPORTANT:  vous pouvez consulter la liste des tâches de nucth à la page suivante : http://wiki.apache.org/nutch/CommandLineOptions
+
+En répétant de multiple fois, les actions 2 à 6, nutch parcourt la toile et se constitue sa base de données de manière itérative. A présent qu'on possède les données des pages et qu'on en a extrait un document (semi-)structuré, on peut facilement les envoyer à un moteur de recherche comme solR (ou elasticsearch).
+
+Pour se faire, nutch dispose de deux actions :
+
+* *solrindex :* permet d'envoyer à SolR les données des pages pour qu'ils puissent les indexers (on peut le faire par itération, ou en entier)
+* *solrdedup :* permet de supprimer les éventuels doublons de solR (ex: une page avec deux urls, font deux documents dans solR, donc un de trop).
+
+== Installons nos composants
+
+Maintenant que nous avons fait un petit tour d'horizon de nutch, mettons les mains dans le camboui et installons les différents composants dont nous avons besoin. Dans le cadre de cet article, je suis parti sur quelque chose d'assez simple puisque j'utilise Mysql pour sauvegarder les données de nutch.
+
+Ce n'est certainement pas le meilleur choix, surtout si vous voulez crawler le monde entier, puisque'il vous faudra une base de données perfomantes, scalable et simplifiant les traitement de map / reduce de nutch. Depuis la version 2, Nutch utilise Gora comme couche d'abstraction à sa base de données pour permettre la mise en place de solution NoSql et d'Hadoop (mais c'est un autre sujet).
+
+=== Mysql
+
+*Se connecter à mysql
+
+[source,shell]
+----
+$>mysql -uroot -p
+----
+
+* Créer une base donnée
+
+[source,shell]
+----
+mysql>CREATE DATABASE nutch DEFAULT CHARACTER SET 'UTF8';
+----
+
+* Créer la table webpage
+
+[source,shell]
+----
+mysql>use nutch;
+mysql>CREATE TABLE `webpage` (
+`id` varchar(767) NOT NULL,
+`headers` blob,
+`text` longtext DEFAULT NULL,
+`status` int(11) DEFAULT NULL,
+`markers` blob,
+`parseStatus` blob,
+`modifiedTime` bigint(20) DEFAULT NULL,
+`prevModifiedTime` bigint(20) DEFAULT NULL,
+`score` float DEFAULT NULL,
+`typ` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+`batchId` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+`baseUrl` varchar(767) DEFAULT NULL,
+`content` longblob,
+`title` varchar(2048) DEFAULT NULL,
+`reprUrl` varchar(767) DEFAULT NULL,
+`fetchInterval` int(11) DEFAULT NULL,
+`prevFetchTime` bigint(20) DEFAULT NULL,
+`inlinks` mediumblob,
+`prevSignature` blob,
+`outlinks` mediumblob,
+`fetchTime` bigint(20) DEFAULT NULL,
+`retriesSinceFetch` int(11) DEFAULT NULL,
+`protocolStatus` blob,
+`signature` blob,
+`metadata` blob,
+PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8;
+----
+
+=== Nutch
+
+J'ai créé un projet nucth à base de maven, qui permet de faire un overlay du zip des sources, de compiler automatiquement le projet (mvn compile) et de packager en zip le livrable (mvn package). Vous pouvez le consulter https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example[ici]
+
+Sinon, vous pouvez le faire manuellement, en suivant les instructions suivantes :
+
+* Télécharger le package 2.2.1 de nutch à l'adresse suivante : http://www.apache.org/dyn/closer.cgi/nutch/2.2.1/apache-nutch-2.2.1-src.tar.gz
+* Décompresser le package dans le répertoire de votre choix
+
+[source,shell]
+----
+$>tar xvzf apache-nutch-2.2.1-src.tar.gz ../workspace
+----
+
+* Editer le fichier `conf/ivy.xml`
+
+[source,shell]
+----
+$>vi conf/ivy.xml
+----
+
+* Décommenter les lignes suivantes
+
+[source,shell]
+----
+<dependency org="org.apache.gora" name="gora-sql" rev="0.1.1-incubating" conf="*->default" />
+<dependency org="mysql" name="mysql-connector-java" rev="5.1.18" conf="*->default"/>
+----
+
+* Editer le fichier `conf/gora.properties`
+
+[source,shell]
+----
+$>vi conf/gora.properties
+----
+
+* Configurer l'accès à la base de donnée "Mysql" et supprimer les autres
+
+[source,properties]
+----
+###############################
+# MySQL properties            #
+###############################
+gora.sqlstore.jdbc.driver=com.mysql.jdbc.Driver
+gora.sqlstore.jdbc.url=jdbc:mysql://localhost:3306/nutch?createDatabaseIfNotExist=true
+gora.sqlstore.jdbc.user=xxxxx
+gora.sqlstore.jdbc.password=xxxxx
+----
+
+* Editer le fichier `conf/nutch-site.xml`
+
+[source,properties]
+----
+$> vi conf/nutch-site.xml
+----
+
+* Configurer la valeur du `http.agent.name` avec le nom du robot, par exemple MySpider
+
+[source,xml]
+----
+<property>
+  <name>http.agent.name</name>
+  <value>MySpider</value>
+  <description>HTTP 'User-Agent' request header. MUST NOT be empty</description>
+</property>
+----
+
+* Configurer la valeur `http.accept.language` pour y ajouter le français
+
+[source,xml]
+----
+<property>
+  <name>http.accept.language</name>
+  <value>fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3</value>
+  <description>Value of the "Accept-Language" request header field.</description>
+</property>
+----
+
+* Configurer l'encoding par défaut du parseur
+
+[source,xml]
+----
+<property>
+  <name>parser.character.encoding.default</name>
+  <value>utf-8</value>
+  <description>The character encoding to fall back to when no other information is available</description>
+</property>
+----
+
+* Configurer le datastore pour qu'il utilise le SqlStore
+
+[source,xml]
+----
+<property>
+  <name>storage.data.store.class</name>
+  <value>org.apache.gora.memory.store.SqlStore</value>
+  <description>The Gora DataStore class for storing and retrieving data.
+  </description>
+</property>
+----
+
+* Compiler les sources de nutch avec ant
+
+[source,shell]
+----
+$>ant runtime
+----
+
+* Créer le répertoire `runtime/local/urls`
+
+[source,shell]
+----
+$>mkdir -p runtime/local/urls
+----
+
+* Créer le fichier `runtime/local/urls/seed.txt`
+
+[source,bash]
+----
+$> > runtime/local/urls/seed.txt
+----
+
+* Le contenu du répertoire `runtime/local` est le livrable
+
+=== SolR
+
+Si vous diposez déjà d'un solR, vous pouvez créer un nouveau core et d'utiliser le schema solR schema-solr4.xml livré par nutch se trouvant dans le répertoire conf. Sinon vous pouvez suivre les indications suivantes (NB: ceci est uniquement pour avoir un solR fonctionnel, ce n'est pas une bonne façon d'installer SolR).
+
+* Télécharger le package solR 4.6.0 à l'adresse suivante : http://www.apache.org/dyn/closer.cgi/lucene/solr/4.6.0
+* Décompresser le package dans le répertoire de votre choix
+[source,bash]
+----
+$>tar xvzf solr-4.6.0.tgz ../workspace
+----
+
+* Remplacer le fichier example/solr/collection1/conf/schema.xml par le fichier conf/schema-solr4.xml livré avec nutch
+[source,bash]
+----
+$>cp ../nutch/conf/schema-solr4.xml example/solr/collection1/conf/schema.xml
+----
+
+* Vous pouvez démarrer votre serveur SolR
+
+[source,bash]
+----
+$>cd example
+$>java -jar start.jar
+----
+
+Votre serveur est alors démarré et vous pouvez y accéder à l'url suivante : http://localhost:8983/solr
+
+NOTE: le schema solR fournit par Nutch ne stocke pas le contentu HTML de vos pages. Si vous pouvez l'activer en modifiant le field content comme ceci `<field name="content" type="text" stored="false" indexed="true"/>`
+
+== Comment utiliser Nucth avec SolR ?
+
+=== Configurons le crawling pour notre site
+
+Maintenant que tout est installé, tout est prêt pour venir indexer notre site. Pour se faire, il faut d'abord dire à nutch quelle est l'url de notre site : c'est la phase d'injection
+
+* Editer le fichier `urls/seed.txt` et sur y ajouter la liste des sites sites que voulez indexer
+
+----
+http://www.bsimard.com
+http://www.datalab-paysdelaloire.org
+----
+
+* Injecter ces urls à Nutch (Remarques : ici on passe le paramètre urls puisque le fichier seed.txt est compris dans ce répertoire)
+
+[source,shell]
+----
+$>bin/nutch inject urls
+----
+
+Nutch connait l'url de notre site internet. Toutefois, l'objectif est réaliser un moteur de recherche pour notre site, et pas de crawler tout internet. On va donc créer un filtre via une regex pour lui dire quelles sont les urls valides à enregistrer en base lors de la phase d'updateDB
+
+* Editer le fichier `conf/regex-urifilter.text` et sur y ajouter les regex e filtre sur les urls à prendre en compte (Remarques : utilisez ``+^http://([a-z0-9]*\.)*.bsimard.com` pour authoriser les sous-domaines)
+
+----
++^http://www.bsimard.com
++^http://www.datalab-paysdelaloire.org
+----
+
+=== Indexons
+
+Tout est enfin prêt, il nous suffit de taper les commandes suivantes pour lancer nutch :
+
+[source,shell]
+----
+$>bin/nutch generate
+$>bin/nutch fetch -all
+$>bin/nutch parse -all
+$>bin/nutch updatedb
+----
+
+Répetez ces commandes autant de fois que votre site possède de niveau (ie. la profondeur de votre site), pour que toutes les pages de votre site soient indéxées.
+
+Enfin, envoyons nos pages à SolR
+
+[source,shell]
+----
+$>bin/nutch solrindex http://localhost:8983/solr/ -reindex
+----
+
+Dans notre exemple, nous fetchons, parsons, indexons toutes les données à chaque fois. Ceci est possible pour un petit site ( < 500 pages), mais pour des sites avec beaucoup de pages. Il est tout a fait possible de le faire de manière itérative. Pour se faire, regarder :
+
+* le paramètre *topN* de la méthode generate qui permet de créer une fetchlist avec une nombre limité d'url
+* le *batchId* sur les méthodes *fetch, parse & solrindex* qui permet de faire de l'incrémentale, celui-ci étant généré par l'action generate
+
+Voici un script bash pour l'indexation incrémentale (disponible https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example/blob/master/src/main/bash/nutch.sh[ici]):
+
+[source,shell]
+----
+#!/bin/bash
+
+NUTCH_HOME=/opt/apache-nutch-2.2.1/runtime/local
+# depth in the web exploration
+nbLoop=10
+# number of selected urls for fetching
+maxUrls=50
+nbThread=2
+# solr server
+solrUrl=/save/http://localhost:8983/solr/nutch
+
+for (( i = 1 ; i <= $nbLoop ; i++ ))
+do
+
+  log=$NUTCH_HOME/logs/log
+
+  # Generate
+  echo "Generate"
+  $NUTCH_HOME/bin/nutch generate -topN $maxUrls > $log
+
+  batchId=`sed -n 's|.*batch id: \(.*\)|\1|p' < $log`
+  echo "Batch id is : $batchId"
+
+  # rename log file by appending the batch id
+  log2=$log$batchId
+  mv $log $log2
+  log=$log2
+
+  # Fetch
+  echo "Fetch"
+  $NUTCH_HOME/bin/nutch fetch $batchId -threads $nbThread >> $log
+
+  # Parse
+  echo "Parse"
+  $NUTCH_HOME/bin/nutch parse $batchId >> $log
+
+  # Update
+  echo "Updatedb"
+  $NUTCH_HOME/bin/nutch updatedb >> $log
+
+  # Index
+  echo "Solr index"
+  $NUTCH_HOME/bin/nutch solrindex $solrUrl $batchId >> $log
+
+done
+----
+
+​Voici la documentation associées aux commandes :
+
+    http://wiki.apache.org/nutch/bin/nutch%20generate
+    http://wiki.apache.org/nutch/bin/nutch%20fetch
+    http://wiki.apache.org/nutch/bin/nutch%20parse
+    http://wiki.apache.org/nutch/bin/nutch%20solrindex
+
+=== Requêtons
+
+A présent vous pouvez requêter votre solR pour votre recherche :
+
+[source,shell]
+----
+curl http://localhost:8983/solr/nutch/select?q=nutch&indent=true
+----
+
+Il ne reste plus qu'a faire une page dynamique qui vient requêter votre solR, et vous pouvez même le faire en JS.
+Pour aller plus loin
+
+* https://web.archive.org/web/20140421145534/http://nutch.apache.org/[Le site officiel de nutch]
+* https://web.archive.org/web/20140421145534/http://wiki.apache.org/nutch/[Le wiki du projet]
+* https://web.archive.org/web/20140421145534/http://nutch.sourceforge.net/[Le site de nutch sur sourceforge]
+* https://web.archive.org/web/20140421145534/http://fr.slideshare.net/digitalpebble/large-scale-crawling-with-apache-nutch[Une présentation générale de nutch sur slideshare]
+* https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example[My seed project pour nutch2 sur github]

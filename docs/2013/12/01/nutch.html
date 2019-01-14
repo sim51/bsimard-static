@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Créer votre moteur de recherche avec Nutch</title>
+<meta charset="UTF-8">
+<meta name="og:title" content="Créer votre moteur de recherche avec Nutch"/>
+<meta name="og:type" content="article"/>
+<meta name="og:url" content="http://localhost:4000/2013/12/01/nutch.html"/>
+<meta name="og:description" content="Découvrez Nutch et créer votre propre moteur de recherche"/>
+<meta name="og:image" content="http://localhost:4000/public/images/nutch/banner.png"/>
+<meta name="author" content=""/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="Découvrez Nutch et créer votre propre moteur de recherche" />
+<meta name="keywords" content="nutch, solr, recherche" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/fr/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2013/12/01/nutch.html" class="fr">fr</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Créer votre moteur de recherche avec Nutch</h1>
+            <meta itemprop="description" content=" Découvrez Nutch et créer votre propre moteur de recherche">
+            <img itemprop="image" src="/public/images/nutch/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#nutch-kesako">Nutch, Kesako ?</a>
+<ul class="sectlevel2">
+<li><a href="#quand-l-utiliser">Quand l&#8217;utiliser ?</a></li>
+<li><a href="#quelques-limitations">Quelques limitations</a></li>
+</ul>
+</li>
+<li><a href="#comment-cela-fonctionne">Comment cela fonctionne ?</a>
+<ul class="sectlevel2">
+<li><a href="#avant-tout-un-peu-de-vocabulaire">Avant tout, un peu de vocabulaire.</a></li>
+<li><a href="#le-cycle-de-vie-de-nutch">Le cycle de vie de nutch</a></li>
+</ul>
+</li>
+<li><a href="#installons-nos-composants">Installons nos composants</a>
+<ul class="sectlevel2">
+<li><a href="#mysql">Mysql</a></li>
+<li><a href="#nutch">Nutch</a></li>
+<li><a href="#solr">SolR</a></li>
+</ul>
+</li>
+<li><a href="#comment-utiliser-nucth-avec-solr">Comment utiliser Nucth avec SolR ?</a>
+<ul class="sectlevel2">
+<li><a href="#configurons-le-crawling-pour-notre-site">Configurons le crawling pour notre site</a></li>
+<li><a href="#indexons">Indexons</a></li>
+<li><a href="#requêtons">Requêtons</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="nutch-kesako">Nutch, Kesako ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Le but de cet article est de faire découvrir apache nutch, un utilitaire vous permettant d&#8217;indexer n&#8217;importe quel site internet (et plus encore) comme  un robot google : c&#8217;est ce qu&#8217;on appelle un crawler.</p>
+</div>
+<div class="paragraph">
+<p>Dans notre cas d&#8217;étude, nous allons voir comment l&#8217;utiliser pour effectuer un moteur de recherche pour un site internet, et ce sans toucher au code existant puisqu&#8217;on va venir indexer les contenus des pages web directement.</p>
+</div>
+<div class="sect2">
+<h3 id="quand-l-utiliser">Quand l&#8217;utiliser ?</h3>
+<div class="paragraph">
+<p>Nutch est très pratique lorsqu&#8217;on veut créer un moteur de recherche pour des sites internets:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>statiques (développé avec  jekyll ou hakyll, ce qui est de plus en plus répandu)</p>
+</li>
+<li>
+<p>qui sont constitués de multiple applications webs, comme des portails ou si vous utilisez ESIGate</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="quelques-limitations">Quelques limitations</h3>
+<div class="paragraph">
+<p>Comme tout outil, il faut savoir quand ne pas l&#8217;utiliser. Voici une liste des limitations de nutch :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Page vs objet de contenu :</strong> Nutch indexe les pages web, il n&#8217;indexe pas des objets de contenu. Vous ne pourrez donc pas faire avec nutch un moteur de recherche spécialisé sur un type de contenu. (A moins de faire du web semantique).</p>
+</li>
+<li>
+<p><strong>Contenu sécurisé :</strong> Nutch est un robot, il parse votre site comme un internaute lambda, il n&#8217;est pas authentifié, et donc il ne peut pas avoir accès à du contenu sécurisé. Même s&#8217;il est possible d&#8217;authentifié nutch pour votre site, il ne va pas gérer(nativement) les droits d&#8217;accès lors de son indexation.</p>
+</li>
+<li>
+<p><strong>Asycnhrone :</strong> Comme tout crawler, l&#8217;indexation de votre site n&#8217;est pas immédiate. Pour voir un nouveau contenu (ou sa suppression) pris en compte, il faut attendre le prochain passage du robot</p>
+</li>
+<li>
+<p><strong>Système d&#8217;hyperlien :</strong> pour qu&#8217;une page soit indéxée, il faut qu&#8217;un lien pointe vers elle depuis une autre page. Si une page, ou une sous-arborescence, est indépendante du point d&#8217;indéxation de votre site, celle-ci ne sera jamais indéxée.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="comment-cela-fonctionne">Comment cela fonctionne ?</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="avant-tout-un-peu-de-vocabulaire">Avant tout, un peu de vocabulaire.</h3>
+<div class="paragraph">
+<p>Pour comprendre la documentation de nutch, il est nécessaire de connaitre les types de données qu&#8217;il manipule :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>CrawlDB :</strong> ce sont les données des pages connues par nutch.</p>
+</li>
+<li>
+<p><strong>LinkDB :</strong> ce sont les informations de liaison entre les pages, cela permet de construire un graph</p>
+</li>
+<li>
+<p><strong>Segment (deperecated &gt; 2.0) :</strong> un segment est une unité qui est un ensemble de page récupérées et indéxées. Un segment est divisé en trois parties</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fetchlist :</strong> une liste de page à récupérer</p>
+</li>
+<li>
+<p><strong>fetcher output :</strong> la sortie des pages récupées (ie. la réponse de chaque page avec les headers et le body)</p>
+</li>
+<li>
+<p><strong>index :</strong> les indexes (au sens large non lucene) du fetcher output​</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="le-cycle-de-vie-de-nutch">Le cycle de vie de nutch</h3>
+<div class="paragraph">
+<p>Le travail de nutch est divisé en plusieurs tâches, dont voici le cycle de vie standard :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Inject :</strong> cette action permet d&#8217;injecter manuellement des urls dans la base crawldb de nutch. Lorsqu&#8217;on installe nutch, c&#8217;est la première étape a effectuer pour lui donner les urls des sites qu&#8217;on souhaite indexer.</p>
+</li>
+<li>
+<p><strong>Generate :</strong> à partir de la liste des pages qu&#8217;il connait, nutch va créer une liste de page à récupérer (la fetchlist)</p>
+</li>
+<li>
+<p><strong>Fetch :</strong> nutch  va interroger chaque page de la fetchlist  et enregistrer la réponse (avec le code http, les headers et le body).</p>
+</li>
+<li>
+<p><strong>Parse :</strong> c&#8217;est l&#8217;opération d&#8217;indexation des pages, mais pas au sens lucene. A partir des données récoltés, nutch va venir les parser pour créer un objet/document structuré. Il extratit le titre, le type, les metadatas, l&#8217;url, &#8230;&#8203; et les enregistre</p>
+</li>
+<li>
+<p><strong>UpdateDB :</strong> c&#8217;est l&#8217;opération qui consite a mettre à jour la base de données des pages (la crawlDB) à partir des données déjà présente. Nutch va regarder le code html et en extraire tous les liens pour les enregistrer</p>
+</li>
+<li>
+<p><strong>InvertLinks :</strong> permet à nutch de maintenir sa base de données de connaissances du web (la LinkDB), qui est un point essentiel de nutch.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+vous pouvez consulter la liste des tâches de nucth à la page suivante : <a href="http://wiki.apache.org/nutch/CommandLineOptions" class="bare">http://wiki.apache.org/nutch/CommandLineOptions</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>En répétant de multiple fois, les actions 2 à 6, nutch parcourt la toile et se constitue sa base de données de manière itérative. A présent qu&#8217;on possède les données des pages et qu&#8217;on en a extrait un document (semi-)structuré, on peut facilement les envoyer à un moteur de recherche comme solR (ou elasticsearch).</p>
+</div>
+<div class="paragraph">
+<p>Pour se faire, nutch dispose de deux actions :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>solrindex :</strong> permet d&#8217;envoyer à SolR les données des pages pour qu&#8217;ils puissent les indexers (on peut le faire par itération, ou en entier)</p>
+</li>
+<li>
+<p><strong>solrdedup :</strong> permet de supprimer les éventuels doublons de solR (ex: une page avec deux urls, font deux documents dans solR, donc un de trop).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="installons-nos-composants">Installons nos composants</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Maintenant que nous avons fait un petit tour d&#8217;horizon de nutch, mettons les mains dans le camboui et installons les différents composants dont nous avons besoin. Dans le cadre de cet article, je suis parti sur quelque chose d&#8217;assez simple puisque j&#8217;utilise Mysql pour sauvegarder les données de nutch.</p>
+</div>
+<div class="paragraph">
+<p>Ce n&#8217;est certainement pas le meilleur choix, surtout si vous voulez crawler le monde entier, puisque&#8217;il vous faudra une base de données perfomantes, scalable et simplifiant les traitement de map / reduce de nutch. Depuis la version 2, Nutch utilise Gora comme couche d&#8217;abstraction à sa base de données pour permettre la mise en place de solution NoSql et d&#8217;Hadoop (mais c&#8217;est un autre sujet).</p>
+</div>
+<div class="sect2">
+<h3 id="mysql">Mysql</h3>
+<div class="paragraph">
+<p>*Se connecter à mysql</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;mysql -uroot -p</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créer une base donnée</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">mysql&gt;CREATE DATABASE nutch DEFAULT CHARACTER SET 'UTF8';</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créer la table webpage</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">mysql&gt;use nutch;
+mysql&gt;CREATE TABLE `webpage` (
+`id` varchar(767) NOT NULL,
+`headers` blob,
+`text` longtext DEFAULT NULL,
+`status` int(11) DEFAULT NULL,
+`markers` blob,
+`parseStatus` blob,
+`modifiedTime` bigint(20) DEFAULT NULL,
+`prevModifiedTime` bigint(20) DEFAULT NULL,
+`score` float DEFAULT NULL,
+`typ` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+`batchId` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+`baseUrl` varchar(767) DEFAULT NULL,
+`content` longblob,
+`title` varchar(2048) DEFAULT NULL,
+`reprUrl` varchar(767) DEFAULT NULL,
+`fetchInterval` int(11) DEFAULT NULL,
+`prevFetchTime` bigint(20) DEFAULT NULL,
+`inlinks` mediumblob,
+`prevSignature` blob,
+`outlinks` mediumblob,
+`fetchTime` bigint(20) DEFAULT NULL,
+`retriesSinceFetch` int(11) DEFAULT NULL,
+`protocolStatus` blob,
+`signature` blob,
+`metadata` blob,
+PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="nutch">Nutch</h3>
+<div class="paragraph">
+<p>J&#8217;ai créé un projet nucth à base de maven, qui permet de faire un overlay du zip des sources, de compiler automatiquement le projet (mvn compile) et de packager en zip le livrable (mvn package). Vous pouvez le consulter <a href="https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example">ici</a></p>
+</div>
+<div class="paragraph">
+<p>Sinon, vous pouvez le faire manuellement, en suivant les instructions suivantes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Télécharger le package 2.2.1 de nutch à l&#8217;adresse suivante : <a href="http://www.apache.org/dyn/closer.cgi/nutch/2.2.1/apache-nutch-2.2.1-src.tar.gz" class="bare">http://www.apache.org/dyn/closer.cgi/nutch/2.2.1/apache-nutch-2.2.1-src.tar.gz</a></p>
+</li>
+<li>
+<p>Décompresser le package dans le répertoire de votre choix</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;tar xvzf apache-nutch-2.2.1-src.tar.gz ../workspace</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>conf/ivy.xml</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;vi conf/ivy.xml</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Décommenter les lignes suivantes</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">&lt;dependency org="org.apache.gora" name="gora-sql" rev="0.1.1-incubating" conf="*-&gt;default" /&gt;
+&lt;dependency org="mysql" name="mysql-connector-java" rev="5.1.18" conf="*-&gt;default"/&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>conf/gora.properties</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;vi conf/gora.properties</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configurer l&#8217;accès à la base de donnée "Mysql" et supprimer les autres</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-properties" data-lang="properties">###############################
+# MySQL properties            #
+###############################
+gora.sqlstore.jdbc.driver=com.mysql.jdbc.Driver
+gora.sqlstore.jdbc.url=jdbc:mysql://localhost:3306/nutch?createDatabaseIfNotExist=true
+gora.sqlstore.jdbc.user=xxxxx
+gora.sqlstore.jdbc.password=xxxxx</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>conf/nutch-site.xml</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-properties" data-lang="properties">$&gt; vi conf/nutch-site.xml</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configurer la valeur du <code>http.agent.name</code> avec le nom du robot, par exemple MySpider</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;property&gt;
+  &lt;name&gt;http.agent.name&lt;/name&gt;
+  &lt;value&gt;MySpider&lt;/value&gt;
+  &lt;description&gt;HTTP 'User-Agent' request header. MUST NOT be empty&lt;/description&gt;
+&lt;/property&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configurer la valeur <code>http.accept.language</code> pour y ajouter le français</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;property&gt;
+  &lt;name&gt;http.accept.language&lt;/name&gt;
+  &lt;value&gt;fr,fr-fr;q=0.8,en-us;q=0.5,en;q=0.3&lt;/value&gt;
+  &lt;description&gt;Value of the "Accept-Language" request header field.&lt;/description&gt;
+&lt;/property&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configurer l&#8217;encoding par défaut du parseur</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;property&gt;
+  &lt;name&gt;parser.character.encoding.default&lt;/name&gt;
+  &lt;value&gt;utf-8&lt;/value&gt;
+  &lt;description&gt;The character encoding to fall back to when no other information is available&lt;/description&gt;
+&lt;/property&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Configurer le datastore pour qu&#8217;il utilise le SqlStore</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;property&gt;
+  &lt;name&gt;storage.data.store.class&lt;/name&gt;
+  &lt;value&gt;org.apache.gora.memory.store.SqlStore&lt;/value&gt;
+  &lt;description&gt;The Gora DataStore class for storing and retrieving data.
+  &lt;/description&gt;
+&lt;/property&gt;</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Compiler les sources de nutch avec ant</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;ant runtime</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créer le répertoire <code>runtime/local/urls</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;mkdir -p runtime/local/urls</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Créer le fichier <code>runtime/local/urls/seed.txt</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt; &gt; runtime/local/urls/seed.txt</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Le contenu du répertoire <code>runtime/local</code> est le livrable</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="solr">SolR</h3>
+<div class="paragraph">
+<p>Si vous diposez déjà d&#8217;un solR, vous pouvez créer un nouveau core et d&#8217;utiliser le schema solR schema-solr4.xml livré par nutch se trouvant dans le répertoire conf. Sinon vous pouvez suivre les indications suivantes (NB: ceci est uniquement pour avoir un solR fonctionnel, ce n&#8217;est pas une bonne façon d&#8217;installer SolR).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Télécharger le package solR 4.6.0 à l&#8217;adresse suivante : <a href="http://www.apache.org/dyn/closer.cgi/lucene/solr/4.6.0" class="bare">http://www.apache.org/dyn/closer.cgi/lucene/solr/4.6.0</a></p>
+</li>
+<li>
+<p>Décompresser le package dans le répertoire de votre choix</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$&gt;tar xvzf solr-4.6.0.tgz ../workspace</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Remplacer le fichier example/solr/collection1/conf/schema.xml par le fichier conf/schema-solr4.xml livré avec nutch</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$&gt;cp ../nutch/conf/schema-solr4.xml example/solr/collection1/conf/schema.xml</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Vous pouvez démarrer votre serveur SolR</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt;cd example
+$&gt;java -jar start.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Votre serveur est alors démarré et vous pouvez y accéder à l&#8217;url suivante : <a href="http://localhost:8983/solr" class="bare">http://localhost:8983/solr</a></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+le schema solR fournit par Nutch ne stocke pas le contentu HTML de vos pages. Si vous pouvez l&#8217;activer en modifiant le field content comme ceci <code>&lt;field name="content" type="text" stored="false" indexed="true"/&gt;</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="comment-utiliser-nucth-avec-solr">Comment utiliser Nucth avec SolR ?</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="configurons-le-crawling-pour-notre-site">Configurons le crawling pour notre site</h3>
+<div class="paragraph">
+<p>Maintenant que tout est installé, tout est prêt pour venir indexer notre site. Pour se faire, il faut d&#8217;abord dire à nutch quelle est l&#8217;url de notre site : c&#8217;est la phase d&#8217;injection</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>urls/seed.txt</code> et sur y ajouter la liste des sites sites que voulez indexer</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>http://www.bsimard.com
+http://www.datalab-paysdelaloire.org</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Injecter ces urls à Nutch (Remarques : ici on passe le paramètre urls puisque le fichier seed.txt est compris dans ce répertoire)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;bin/nutch inject urls</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nutch connait l&#8217;url de notre site internet. Toutefois, l&#8217;objectif est réaliser un moteur de recherche pour notre site, et pas de crawler tout internet. On va donc créer un filtre via une regex pour lui dire quelles sont les urls valides à enregistrer en base lors de la phase d&#8217;updateDB</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Editer le fichier <code>conf/regex-urifilter.text</code> et sur y ajouter les regex e filtre sur les urls à prendre en compte (Remarques : utilisez <code>`+^http://(<strong class="a-z0-9">\.)</strong>.bsimard.com</code> pour authoriser les sous-domaines)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>+^http://www.bsimard.com
++^http://www.datalab-paysdelaloire.org</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="indexons">Indexons</h3>
+<div class="paragraph">
+<p>Tout est enfin prêt, il nous suffit de taper les commandes suivantes pour lancer nutch :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;bin/nutch generate
+$&gt;bin/nutch fetch -all
+$&gt;bin/nutch parse -all
+$&gt;bin/nutch updatedb</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Répetez ces commandes autant de fois que votre site possède de niveau (ie. la profondeur de votre site), pour que toutes les pages de votre site soient indéxées.</p>
+</div>
+<div class="paragraph">
+<p>Enfin, envoyons nos pages à SolR</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;bin/nutch solrindex http://localhost:8983/solr/ -reindex</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dans notre exemple, nous fetchons, parsons, indexons toutes les données à chaque fois. Ceci est possible pour un petit site ( &lt; 500 pages), mais pour des sites avec beaucoup de pages. Il est tout a fait possible de le faire de manière itérative. Pour se faire, regarder :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>le paramètre <strong>topN</strong> de la méthode generate qui permet de créer une fetchlist avec une nombre limité d&#8217;url</p>
+</li>
+<li>
+<p>le <strong>batchId</strong> sur les méthodes <strong>fetch, parse &amp; solrindex</strong> qui permet de faire de l&#8217;incrémentale, celui-ci étant généré par l&#8217;action generate</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Voici un script bash pour l&#8217;indexation incrémentale (disponible <a href="https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example/blob/master/src/main/bash/nutch.sh">ici</a>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">#!/bin/bash
+
+NUTCH_HOME=/opt/apache-nutch-2.2.1/runtime/local
+# depth in the web exploration
+nbLoop=10
+# number of selected urls for fetching
+maxUrls=50
+nbThread=2
+# solr server
+solrUrl=/save/http://localhost:8983/solr/nutch
+
+for (( i = 1 ; i &lt;= $nbLoop ; i++ ))
+do
+
+  log=$NUTCH_HOME/logs/log
+
+  # Generate
+  echo "Generate"
+  $NUTCH_HOME/bin/nutch generate -topN $maxUrls &gt; $log
+
+  batchId=`sed -n 's|.*batch id: \(.*\)|\1|p' &lt; $log`
+  echo "Batch id is : $batchId"
+
+  # rename log file by appending the batch id
+  log2=$log$batchId
+  mv $log $log2
+  log=$log2
+
+  # Fetch
+  echo "Fetch"
+  $NUTCH_HOME/bin/nutch fetch $batchId -threads $nbThread &gt;&gt; $log
+
+  # Parse
+  echo "Parse"
+  $NUTCH_HOME/bin/nutch parse $batchId &gt;&gt; $log
+
+  # Update
+  echo "Updatedb"
+  $NUTCH_HOME/bin/nutch updatedb &gt;&gt; $log
+
+  # Index
+  echo "Solr index"
+  $NUTCH_HOME/bin/nutch solrindex $solrUrl $batchId &gt;&gt; $log
+
+done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>​Voici la documentation associées aux commandes :</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>http://wiki.apache.org/nutch/bin/nutch%20generate
+http://wiki.apache.org/nutch/bin/nutch%20fetch
+http://wiki.apache.org/nutch/bin/nutch%20parse
+http://wiki.apache.org/nutch/bin/nutch%20solrindex</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="requêtons">Requêtons</h3>
+<div class="paragraph">
+<p>A présent vous pouvez requêter votre solR pour votre recherche :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">curl http://localhost:8983/solr/nutch/select?q=nutch&amp;indent=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Il ne reste plus qu&#8217;a faire une page dynamique qui vient requêter votre solR, et vous pouvez même le faire en JS.
+Pour aller plus loin</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://web.archive.org/web/20140421145534/http://nutch.apache.org/">Le site officiel de nutch</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140421145534/http://wiki.apache.org/nutch/">Le wiki du projet</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140421145534/http://nutch.sourceforge.net/">Le site de nutch sur sourceforge</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140421145534/http://fr.slideshare.net/digitalpebble/large-scale-crawling-with-apache-nutch">Une présentation générale de nutch sur slideshare</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20140421145534/https://github.com/sim51/nutchGora-example">My seed project pour nutch2 sur github</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Mot-Clefs :</span>
+                <span>
+                  nutch, solr, recherche
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Author :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author"></a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2013-12-01">Dec 1, 2013</time>
+              </li>
+              <li><a href="" title="Permalien : Créer votre moteur de recherche avec Nutch" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            
+            <li class="pull-right">
+              <a class="btn btn-primary" href="/2013/12/07/wget-web-static.html" title="World Wide Wget : comment créer un cache statique">World Wide Wget : comment créer un cache statique &gt;</a>
+            </li>
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2013/12/01/nutch';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>
