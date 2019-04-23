@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>Le graphe des licences</title>
+<meta charset="UTF-8">
+<meta name="og:title" content="Le graphe des licences"/>
+<meta name="og:type" content="article"/>
+<meta name="og:url" content="http://www.bsimard.com/2019/04/18/graph-licenses.html"/>
+<meta name="og:description" content=""/>
+<meta name="og:image" content="http://www.bsimard.com/public/images/graph-licenses/banner.png"/>
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="" />
+<meta name="keywords" content="graphe, licence, neo4j, open-source, libre" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/fr/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                  
+                    
+                      <li><a href="/" title="Accueil">Accueil</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/qui-suis-je" title="Qui suis-je">Qui suis-je</a></li>
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2019/04/18/graph-licenses.html" class="fr">fr</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Le graphe des licences</h1>
+            <meta itemprop="description" content=" ">
+            <img itemprop="image" src="/public/images/graph-licenses/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#import-des-données-de-choosealicense-com">Import des données de choosealicense.com</a>
+<ul class="sectlevel2">
+<li><a href="#récupérer-le-contenu-du-ficher">Récupérer le contenu du ficher</a></li>
+<li><a href="#convertir-du-yml-en-json">Convertir du YML en JSON</a></li>
+<li><a href="#modélisation-en-graphe">Modélisation en Graphe</a></li>
+<li><a href="#le-script-final">Le script final</a></li>
+<li><a href="#ajout-de-données-et-amélioration-du-processus">Ajout de données et amélioration du processus</a></li>
+</ul>
+</li>
+<li><a href="#allons-plus-loin">Allons plus loin !</a>
+<ul class="sectlevel2">
+<li><a href="#détection-de-communauté">Détection de communauté</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Des licences en informatiques il y en a beaucoup, et il est souvent dur de s&#8217;y retrouver,
+surtout quand comme moi vous n&#8217;avez aucun background juridique.</p>
+</div>
+<div class="paragraph">
+<p>Mais il existe un site web qui permet de s&#8217;y retrouver : <a href="https://choosealicense.com">Choose a license</a>
+Ce qui est bien avec ce site, c&#8217;est que chaque licence y est décrite et qu&#8217;on y retrouve une liste des <strong>permissions</strong>,
+des <strong>conditions</strong> et des <strong>limitations</strong>.</p>
+</div>
+<div class="paragraph">
+<p>De plus le contenu du site ou sous licence <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
+et est disponible au format <strong>YAML</strong> sur <a href="https://github.com/github/choosealicense.com/tree/gh-pages/_licenses">github</a>,
+donc parsable pour une machine.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import-des-données-de-choosealicense-com">Import des données de choosealicense.com</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Chaque licence est dans un fichier sur <a href="https://github.com/github/choosealicense.com/tree/gh-pages/_licenses">github</a>,
+et donc accessible en HTTP.</p>
+</div>
+<div class="paragraph">
+<p>Voici le détail des opérations pour importer un fichier :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Récupérer tout le contenu d&#8217;un fichier dans une variable</p>
+</li>
+<li>
+<p>Transformer le contenu en <code>YML</code> en <code>JSON</code></p>
+</li>
+<li>
+<p>Importer le <code>JSON</code> en graphe</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Je vais réaliser toutes ces étapes avec Cypher et <a href="https://github.com/neo4j-contrib/neo4j-apoc-procedures">APOC</a>,
+juste parceque c&#8217;est possible que je trouve cela fun et vous permet aussi de voir les possibilités du language.</p>
+</div>
+<div class="sect2">
+<h3 id="récupérer-le-contenu-du-ficher">Récupérer le contenu du ficher</h3>
+<div class="paragraph">
+<p>Vu que les fichiers sont accessibles sur github, on peut obtenir le contenu brute des fichiers.
+Par exemple : <a href="https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/afl-3.0.txt" class="bare">https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/afl-3.0.txt</a></p>
+</div>
+<div class="paragraph">
+<p>Mais comment faire pour récupérer tout le contenu du fichier dans une variable cypher ?</p>
+</div>
+<div class="paragraph">
+<p>Et bien on va utiliser <code>apoc.load.csv</code> et le hacker un peu !</p>
+</div>
+<div class="paragraph">
+<p>Si on considère que le fichier <strong>TXT</strong> est un fichier <strong>CSV</strong> ,
+on va pouvoir récupérer chaque ligne du fichier si on utilise comme séparateur un charactère improbable : <code>�</code>.</p>
+</div>
+<div class="paragraph">
+<p>Ensuite il suffit de faire de "collecter" les lignes et de les "joindres" avec un retour à la ligne.</p>
+</div>
+<div class="paragraph">
+<p>Mais si on regarde bien les fichiers, on constate qu&#8217;ils sont découpés en deux avec une partie <strong>YAML</strong>
+puis le texte de la licence . Ainsi un simple <code>split</code> sur <code>---</code> devrait suffir pour obtenir uniquement la partie <strong>YAML</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Ce qui donne :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">---
+CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+WITH apoc.convert.toString(list[0]) AS line
+WITH collect(line) AS lines
+WITH reduce(s='', x in lines | s + x + "\n") AS txt
+RETURN split(txt, '---')[1] AS yaml
+---</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Et en plus compact :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">---
+CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
+---</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="convertir-du-yml-en-json">Convertir du YML en JSON</h3>
+<div class="paragraph">
+<p>Il n&#8217;existe pas de function dans APOC qui permet de lire du YML.
+Par contre on peut utiliser une API en ligne qui peut le faire : <a href="https://www.json2yaml.com" class="bare">https://www.json2yaml.com</a></p>
+</div>
+<div class="paragraph">
+<p>Il suffit de faire un <code>POST</code> sur l&#8217;url <a href="https://www.json2yaml.com/api/j2y" class="bare">https://www.json2yaml.com/api/j2y</a> avec en payload le YAML (encodé) et en retour on reçoit du JSON.
+Et justement dans APOC il y a une procédure qui permet d&#8217;appeler une API et de parser le JSON : <code>apoc.load.jsonParams</code>.</p>
+</div>
+<div class="paragraph">
+<p>Voici ce que cela donne :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH "
+---
+json:
+  - rigid
+  - better for data interchange
+yaml:
+  - slim and flexible
+  - better for configuration"
+AS yaml
+CALL apoc.load.jsonParams('https://www.json2yaml.com/api/y2j', {method:'POST'}, "q=" + replace(yaml, ';', '%3B')) YIELD value
+RETURN value</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Et si combine cette requête avec la première, on obtient :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
+
+CALL apoc.load.jsonParams('https://www.json2yaml.com/api/y2j', {method:'POST'}, "q=" + replace(yaml, ';', '%3B')) YIELD value
+RETURN value</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ce qui nous renvoie le résultat suivant :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-json" data-lang="json">{
+  "how": "Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file.  Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders. You may take the additional step of removing the copyright notice.",
+  "using": [
+    {
+      "PickMeUp": "https:\/\/github.com\/nazar-pc\/PickMeUp\/blob\/master\/copying.md"
+    },
+    {
+      "smoltcp": "https:\/\/github.com\/m-labs\/smoltcp\/blob\/master\/LICENSE-0BSD.txt"
+    },
+    {
+      "Toybox": "https:\/\/github.com\/landley\/toybox\/blob\/master\/LICENSE"
+    }
+  ],
+  "spdx-id": "0BSD",
+  "permissions": [
+    "commercial-use",
+    "distribution",
+    "modifications",
+    "private-use"
+  ],
+  "description": "The BSD Zero Clause license goes further than the BSD 2-Clause license to allow you unlimited freedom with the software without requirements to include the copyright notice, license text, or disclaimer in either source or binary forms.",
+  "title": "BSD Zero Clause License",
+  "conditions": [
+
+  ],
+  "limitations": [
+    "liability",
+    "warranty"
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="custom-cypher-function-procedure">Custom Cypher function, procedure</h4>
+<div class="paragraph">
+<p>Vu que la lecture du YAML est contraignante à écrire en Cypher et qu&#8217;on va l&#8217;utiliser plusieurs fois,
+je vous propose d&#8217;écrire une <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions">Custom Cypher Function</a> avec APOC.</p>
+</div>
+<div class="paragraph">
+<p>Ceci nous permet d&#8217;écrire une fonction qu&#8217;on pourra appeler plus tard, directement avec du cypher.</p>
+</div>
+<div class="paragraph">
+<p>Voici comment définir notre fonction personnalisé :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.custom.asFunction(
+  'loadYml',
+  'CALL apoc.load.csv(
+    $url,
+    { header:false, sep:"�", quoteChar:"¤" }
+   ) yield list
+   WITH  reduce(s="", x in collect(apoc.convert.toString(list[0])) | s + x + "\n") AS yaml
+   CALL apoc.load.jsonParams("https://www.json2yaml.com/api/y2j", {method:"POST"}, "q=" + replace(replace(trim(yaml), ";", "%3B"), " ", "+")) YIELD value
+   RETURN value',
+   'MAP',
+   [['url','STRING', '']],
+   true,
+   "LOAD a YAML file"
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A présent nous pouvons appeler notre fonction pour charger notre fichier YML :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">RETURN custom.loadYml("https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Il nous reste plus qu&#8217;à transformer ce JSON en graph !</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="modélisation-en-graphe">Modélisation en Graphe</h3>
+<div class="paragraph">
+<p>Je vous propose la modélisation suivante :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Failed to generate image: dot failed: Error: &lt;stdin&gt;: syntax error in line 9 near '\'
+
+digraph finite_state_machine {
+    rankdir=LR;
+    node [
+         shape = Mrecord
+    ];
+
+    // NODES
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    LICENSE [label = "License | id:String* \lname: String \ldescription: String* \lurl"String \lhow_to_apply: String* \lnote: String\l" ];
+    PROJECT [label = "Project | name:String* \lurl: String \l" ];
+    PERMISSION [label = "Permission | id:String* \lname: String \ldescription: String\l"];
+    CONDITION [label = "Condition | id:String* \lname: String* \ldescription: String\l"];
+    LIMITATION [label = "Limitation | id:String* \lname: String* \ldescription: String\l"];
+
+
+    // EDGES
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PROJECT-&gt;LICENSE [label = "USES"];
+    LICENSE-&gt;PERMISSION [label = "HAS_PERMISSION"];
+    LICENSE-&gt;CONDITION [label = "HAS_CONDITION"];
+    LICENSE-&gt;LIMITATION [label = "HAS_LIMITATION"];
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Premièrement, il faut créer les contraintes d&#8217;unicités :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE CONSTRAINT ON (n:License) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Project) ASSERT n.name IS UNIQUE;
+CREATE CONSTRAINT ON (n:Permission) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Condition) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Limitation) ASSERT n.id IS UNIQUE;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Puis avec le JSON obtenu précédemment, il faut créer le script cypher pour obtenir la modélisation :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MERGE (license:License { id:json.`spdx-id` })
+  ON CREATE SET
+    license.name = json.title,
+    license.description = json.description,
+    license.url = 'https://spdx.org/licenses/' + json.`spdx-id` + '.html',
+    license.how_to_apply = json.how,
+    license.note = json.note
+
+WITH license, json
+UNWIND json.permissions AS permissionTxt
+  MERGE (permission:Permission {id:permissionTxt})
+  MERGE (license)-[:HAS_PERMISSION]-&gt;(permission)
+
+WITH license, json
+UNWIND json.conditions AS conditionTxt
+  MERGE (condition:Condition {id:conditionTxt})
+  MERGE (license)-[:HAS_CONDITION]-&gt;(condition)
+
+WITH license, json
+UNWIND json.limitations AS limitationTxt
+  MERGE (limitation:Limitation {id:limitationTxt})
+  MERGE (license)-[:HAS_LIMITATION]-&gt;(limitation)
+
+WITH license, json
+UNWIND json.using AS project
+  WITH keys(project)[0] AS name, project[keys(project)[0]] AS url, license
+  MERGE (project:Project {name:name })
+    ON CREATE SET project.url=url
+  MERGE (project)-[:USES]-&gt;(license)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="le-script-final">Le script final</h3>
+<div class="paragraph">
+<p>A présent on a toutes les briques pour faire notre import final.
+Pour ce faire il suffit de combiner nos scripts ensemble et de boucler sur les URL des fichiers de licence.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH
+[
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/afl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/agpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/apache-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/artistic-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-2-clause.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-3-clause-clear.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-3-clause.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc-by-4.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc-by-sa-4.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc0-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ecl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/epl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/epl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/eupl-1.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/eupl-1.2.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/gpl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/gpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/isc.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lgpl-2.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lgpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lppl-1.3c.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/mit.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/mpl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ms-pl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ms-rl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ncsa.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ofl-1.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/osl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/postgresql.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/unlicense.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/upl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/wtfpl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/zlib.txt"
+] AS files
+UNWIND files as file
+
+WITH custom.loadYml(file) AS json
+WITH json.value AS json
+
+MERGE (license:License { id:json.`spdx-id` })
+  ON CREATE SET
+    license.name = json.title,
+    license.description = json.description,
+    license.url = 'https://spdx.org/licenses/' + json.`spdx-id` + '.html',
+    license.how_to_apply = json.how,
+    license.note = json.note
+
+FOREACH( permissionTxt IN json.permissions |
+  MERGE (permission:Permission {id:permissionTxt})
+  MERGE (license)-[:HAS_PERMISSION]-&gt;(permission)
+)
+
+FOREACH( conditionTxt IN json.conditions |
+  MERGE (condition:Condition {id:conditionTxt})
+  MERGE (license)-[:HAS_CONDITION]-&gt;(condition)
+)
+
+FOREACH( limitationTxt IN json.limitations |
+  MERGE (limitation:Limitation {id:limitationTxt})
+  MERGE (license)-[:HAS_LIMITATION]-&gt;(limitation)
+)
+
+FOREACH( proj IN json.using |
+  MERGE (project:Project {name: keys(proj)[0] })
+    ON CREATE SET project.url = project[keys(proj)[0]]
+  MERGE (project)-[:USES]-&gt;(license)
+)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ajout-de-données-et-amélioration-du-processus">Ajout de données et amélioration du processus</h3>
+<div class="paragraph">
+<p>Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permissions, conditions et limitations.
+Ce serait pas mal de l&#8217;importer, surtout maintenant qu&#8217;on sait comment faire !</p>
+</div>
+<div class="paragraph">
+<p>Voici le script :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">WITH custom.loadYml("https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_data/rules.yml") AS json
+WITH json.value AS json
+
+FOREACH( condition IN json.conditions |
+  MERGE (c:Condition { id: condition.tag})
+  SET c.name = condition.label,
+      c.description = condition.description
+)
+
+FOREACH( permission IN json.permissions |
+  MERGE (p:Permission { id: permission.tag})
+  SET p.name = permission.label,
+      p.description = permission.description
+)
+
+FOREACH( limitation IN json.limitations |
+  MERGE (l:Limitation { id: limitation.tag})
+  SET l.name = limitation.label,
+      l.description = limitation.description
+)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="allons-plus-loin">Allons plus loin !</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>J&#8217;aimerai bien ajouter plus de données dans ce graphe comme la compabilité entre les licences, ou la reconnaissance des licences par des organisme (FSF, Linux Fondation, &#8230;&#8203;)
+Mais je n&#8217;ai pas trouvé d&#8217;autres jeux de données exploitable par informatique&#8230;&#8203;
+Si vous en connaissez je suis preneur !</p>
+</div>
+<div class="sect2">
+<h3 id="détection-de-communauté">Détection de communauté</h3>
+<div class="paragraph">
+<p>En attendant, un petit truc sympa qu&#8217;on peut faire avec notre jeux de données, c&#8217;est de la recherche de communauté entre ces licences.
+Neo4j dispose d&#8217;un plugin de <a href="https://neo4j.com/docs/graph-algorithms/current/algorithms/">graph-algo</a> que vous pouvez installer.
+Celui-ci dispose de plusieurs algorithmes de détection de communauté, et je vais vous montrer comment utiliser celui de <a href="https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Louvain">Louvain</a>.</p>
+</div>
+<div class="paragraph">
+<p>Pour utiliser une procédure de <strong>graph-algo</strong> il faut à chaque fois définir deux requêtes :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>La requête qui renvoie les noeuds qui nous intéressent. Ici on va prendre les noeuds <code>License</code>, et donc la requête est <code>MATCH (l:License) RETURN id(l) AS id</code>.</p>
+</li>
+<li>
+<p>La requête de projection qui permet de créer les relations entre les noeuds sélectionnés.
+Dans notre cas, on va dire que deux noeuds licences sont reliés s&#8217;ils partagent une même <strong>permission</strong>, <strong>limitation</strong> ou <strong>condition</strong> : 'MATCH (l1:License)-&#8594;()&#8592;-(l2:License) WHERE id(l1)&lt; id(l2) RETURN id(l1) as source, id(l2) as target'.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>CALL algo.louvain(
+  'MATCH (l:License) RETURN id(l) as id',
+  'MATCH (l1:License)--&gt;()&lt;--(l2:License) WHERE id(l1)&lt; id(l2) RETURN id(l1) as source, id(l2) as target',
+  {
+    graph: 'cypher',
+    write:true,
+    writeProperty:'community'
+  }
+);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sur notre dataset le résultat est instantané, mais sachez que ce plugin est développé pour être utilisé sur de grand datasets.</p>
+</div>
+<div class="paragraph">
+<p>L&#8217;algorithme a détecté <strong>deux</strong> communautés</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Communauté 1</th>
+<th class="tableblock halign-left valign-top">Communauté 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (l:License) WHERE l.community=0 RETURN l.name</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (l:License) WHERE l.community=1 RETURN l.name</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="ulist">
+<ul>
+<li>
+<p>BSD Zero Clause License</p>
+</li>
+<li>
+<p>BSD 2-Clause "Simplified" License</p>
+</li>
+<li>
+<p>BSD 3-Clause Clear License</p>
+</li>
+<li>
+<p>BSD 3-Clause "New" or "Revised" License</p>
+</li>
+<li>
+<p>Boost Software License 1.0</p>
+</li>
+<li>
+<p>Creative Commons Zero v1.0 Universal</p>
+</li>
+<li>
+<p>ISC License</p>
+</li>
+<li>
+<p>GNU Lesser General Public License v2.1</p>
+</li>
+<li>
+<p>MIT License</p>
+</li>
+<li>
+<p>University of Illinois/NCSA Open Source License</p>
+</li>
+<li>
+<p>SIL Open Font License 1.1</p>
+</li>
+<li>
+<p>PostgreSQL License</p>
+</li>
+<li>
+<p>The Unlicense</p>
+</li>
+<li>
+<p>Do What The F*ck You Want To Public License</p>
+</li>
+<li>
+<p>zlib License</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="ulist">
+<ul>
+<li>
+<p>Academic Free License v3.0</p>
+</li>
+<li>
+<p>GNU Affero General Public License v3.0</p>
+</li>
+<li>
+<p>Apache License 2.0</p>
+</li>
+<li>
+<p>Artistic License 2.0</p>
+</li>
+<li>
+<p>Creative Commons Attribution 4.0 International</p>
+</li>
+<li>
+<p>Creative Commons Attribution Share Alike 4.0 International</p>
+</li>
+<li>
+<p>Educational Community License v2.0</p>
+</li>
+<li>
+<p>Eclipse Public License 1.0</p>
+</li>
+<li>
+<p>Eclipse Public License 2.0</p>
+</li>
+<li>
+<p>European Union Public License 1.1</p>
+</li>
+<li>
+<p>European Union Public License 1.2</p>
+</li>
+<li>
+<p>GNU General Public License v2.0</p>
+</li>
+<li>
+<p>GNU General Public License v3.0</p>
+</li>
+<li>
+<p>GNU Lesser General Public License v3.0</p>
+</li>
+<li>
+<p>LaTeX Project Public License v1.3c</p>
+</li>
+<li>
+<p>Mozilla Public License 2.0</p>
+</li>
+<li>
+<p>Microsoft Public License</p>
+</li>
+<li>
+<p>Microsoft Reciprocal License</p>
+</li>
+<li>
+<p>Open Software License 3.0</p>
+</li>
+<li>
+<p>Universal Permissive License v1.0</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Après faut analyser les communautés pour pouvoir les comprendre,
+mais déjà on constate que les licences BSD sont à gauches et les GPL à droite.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion">Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ce billet est juste un exemple pour vous montrer la simplicité d&#8217;utilisation de cette librairie
+et de voir ce qu&#8217;il est possible de réaliser avec Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>Je reitère, mais si vous savez où trouver de la données pour aggrémenter ce dataset,
+et/ou si vous avez des idées d&#8217;analyse, n&#8217;hésitez pas à me le signaler !</p>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Mot-Clefs :</span>
+                <span>
+                  graphe, licence, neo4j, open-source, libre
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Author :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Créé le :</span>
+                <time itemprop="dateCreated" datetime="2019-04-18">Apr 18, 2019</time>
+              </li>
+              <li><a href="" title="Permalien : Le graphe des licences" itemprop="url">Permalien</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2018/10/20/neo4j-spark-cypher.draft" title="Neo4j Spark Cypher">&lt; Neo4j Spark Cypher</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Me contacter">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Suivez-moi sur Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="Mon compte github">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="Mon profile Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2019/04/18/graph-licenses';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

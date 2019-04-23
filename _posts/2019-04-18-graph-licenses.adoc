@@ -1,0 +1,481 @@
+= Le graphe des licences
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-locale: fr
+:page-description:
+:page-image: /public/images/graph-licenses/banner.png
+:page-tags: graphe, licence, neo4j, open-source, libre
+:page-ref: graphe-licences
+:toc:
+
+== Introduction
+
+Des licences en informatiques il y en a beaucoup, et il est souvent dur de s'y retrouver,
+surtout quand comme moi vous n'avez aucun background juridique.
+
+Mais il existe un site web qui permet de s'y retrouver : https://choosealicense.com[Choose a license]
+Ce qui est bien avec ce site, c'est que chaque licence y est décrite et qu'on y retrouve une liste des **permissions**,
+des **conditions** et des **limitations**.
+
+De plus le contenu du site ou sous licence https://creativecommons.org/licenses/by/3.0/[CC BY 3.0]
+et est disponible au format *YAML* sur https://github.com/github/choosealicense.com/tree/gh-pages/_licenses[github],
+donc parsable pour une machine.
+
+== Import des données de choosealicense.com
+
+Chaque licence est dans un fichier sur https://github.com/github/choosealicense.com/tree/gh-pages/_licenses[github],
+et donc accessible en HTTP.
+
+Voici le détail des opérations pour importer un fichier :
+
+* Récupérer tout le contenu d'un fichier dans une variable
+* Transformer le contenu en `YML` en `JSON`
+* Importer le `JSON` en graphe
+
+Je vais réaliser toutes ces étapes avec Cypher et https://github.com/neo4j-contrib/neo4j-apoc-procedures[APOC],
+juste parceque c'est possible que je trouve cela fun et vous permet aussi de voir les possibilités du language.
+
+=== Récupérer le contenu du ficher
+
+Vu que les fichiers sont accessibles sur github, on peut obtenir le contenu brute des fichiers.
+Par exemple : https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/afl-3.0.txt
+
+Mais comment faire pour récupérer tout le contenu du fichier dans une variable cypher ?
+
+Et bien on va utiliser `apoc.load.csv` et le hacker un peu !
+
+Si on considère que le fichier *TXT* est un fichier *CSV* ,
+on va pouvoir récupérer chaque ligne du fichier si on utilise comme séparateur un charactère improbable : `�`.
+
+Ensuite il suffit de faire de "collecter" les lignes et de les "joindres" avec un retour à la ligne.
+
+Mais si on regarde bien les fichiers, on constate qu'ils sont découpés en deux avec une partie *YAML*
+puis le texte de la licence . Ainsi un simple `split` sur `---` devrait suffir pour obtenir uniquement la partie *YAML*.
+
+
+Ce qui donne :
+
+[source,cypher]
+---
+CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+WITH apoc.convert.toString(list[0]) AS line
+WITH collect(line) AS lines
+WITH reduce(s='', x in lines | s + x + "\n") AS txt
+RETURN split(txt, '---')[1] AS yaml
+---
+
+Et en plus compact :
+
+[source,cypher]
+---
+CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
+---
+
+=== Convertir du YML en JSON
+
+Il n'existe pas de function dans APOC qui permet de lire du YML.
+Par contre on peut utiliser une API en ligne qui peut le faire : https://www.json2yaml.com
+
+Il suffit de faire un `POST` sur l'url https://www.json2yaml.com/api/j2y avec en payload le YAML (encodé) et en retour on reçoit du JSON.
+Et justement dans APOC il y a une procédure qui permet d'appeler une API et de parser le JSON : `apoc.load.jsonParams`.
+
+Voici ce que cela donne :
+
+[source,cypher]
+----
+WITH "
+---
+json:
+  - rigid
+  - better for data interchange
+yaml:
+  - slim and flexible
+  - better for configuration"
+AS yaml
+CALL apoc.load.jsonParams('https://www.json2yaml.com/api/y2j', {method:'POST'}, "q=" + replace(yaml, ';', '%3B')) YIELD value
+RETURN value
+----
+
+Et si combine cette requête avec la première, on obtient :
+
+[source,cypher]
+----
+CALL apoc.load.csv(
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  { header:false, sep:'�', quoteChar:'¤' }
+) yield list
+split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
+
+CALL apoc.load.jsonParams('https://www.json2yaml.com/api/y2j', {method:'POST'}, "q=" + replace(yaml, ';', '%3B')) YIELD value
+RETURN value
+----
+
+Ce qui nous renvoie le résultat suivant :
+
+[source,json]
+----
+{
+  "how": "Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file.  Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders. You may take the additional step of removing the copyright notice.",
+  "using": [
+    {
+      "PickMeUp": "https:\/\/github.com\/nazar-pc\/PickMeUp\/blob\/master\/copying.md"
+    },
+    {
+      "smoltcp": "https:\/\/github.com\/m-labs\/smoltcp\/blob\/master\/LICENSE-0BSD.txt"
+    },
+    {
+      "Toybox": "https:\/\/github.com\/landley\/toybox\/blob\/master\/LICENSE"
+    }
+  ],
+  "spdx-id": "0BSD",
+  "permissions": [
+    "commercial-use",
+    "distribution",
+    "modifications",
+    "private-use"
+  ],
+  "description": "The BSD Zero Clause license goes further than the BSD 2-Clause license to allow you unlimited freedom with the software without requirements to include the copyright notice, license text, or disclaimer in either source or binary forms.",
+  "title": "BSD Zero Clause License",
+  "conditions": [
+
+  ],
+  "limitations": [
+    "liability",
+    "warranty"
+  ]
+}
+----
+
+==== Custom Cypher function, procedure
+
+Vu que la lecture du YAML est contraignante à écrire en Cypher et qu'on va l'utiliser plusieurs fois,
+je vous propose d'écrire une https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions[Custom Cypher Function] avec APOC.
+
+Ceci nous permet d'écrire une fonction qu'on pourra appeler plus tard, directement avec du cypher.
+
+Voici comment définir notre fonction personnalisé :
+
+[source,cypher]
+----
+CALL apoc.custom.asFunction(
+  'loadYml',
+  'CALL apoc.load.csv(
+    $url,
+    { header:false, sep:"�", quoteChar:"¤" }
+   ) yield list
+   WITH  reduce(s="", x in collect(apoc.convert.toString(list[0])) | s + x + "\n") AS yaml
+   CALL apoc.load.jsonParams("https://www.json2yaml.com/api/y2j", {method:"POST"}, "q=" + replace(replace(trim(yaml), ";", "%3B"), " ", "+")) YIELD value
+   RETURN value',
+   'MAP',
+   [['url','STRING', '']],
+   true,
+   "LOAD a YAML file"
+)
+----
+
+A présent nous pouvons appeler notre fonction pour charger notre fichier YML :
+
+[source,cypher]
+----
+RETURN custom.loadYml("https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt")
+----
+
+Il nous reste plus qu'à transformer ce JSON en graph !
+
+=== Modélisation en Graphe
+
+Je vous propose la modélisation suivante :
+
+[graphviz]
+----
+digraph finite_state_machine {
+    rankdir=LR;
+    node [
+         shape = Mrecord
+    ];
+
+    // NODES
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    LICENSE [label = "License | id:String* \lname: String \ldescription: String* \lurl"String \lhow_to_apply: String* \lnote: String\l" ];
+    PROJECT [label = "Project | name:String* \lurl: String \l" ];
+    PERMISSION [label = "Permission | id:String* \lname: String \ldescription: String\l"];
+    CONDITION [label = "Condition | id:String* \lname: String* \ldescription: String\l"];
+    LIMITATION [label = "Limitation | id:String* \lname: String* \ldescription: String\l"];
+
+
+    // EDGES
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PROJECT->LICENSE [label = "USES"];
+    LICENSE->PERMISSION [label = "HAS_PERMISSION"];
+    LICENSE->CONDITION [label = "HAS_CONDITION"];
+    LICENSE->LIMITATION [label = "HAS_LIMITATION"];
+}
+----
+
+Premièrement, il faut créer les contraintes d'unicités :
+
+[source,cypher]
+----
+CREATE CONSTRAINT ON (n:License) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Project) ASSERT n.name IS UNIQUE;
+CREATE CONSTRAINT ON (n:Permission) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Condition) ASSERT n.id IS UNIQUE;
+CREATE CONSTRAINT ON (n:Limitation) ASSERT n.id IS UNIQUE;
+----
+
+Puis avec le JSON obtenu précédemment, il faut créer le script cypher pour obtenir la modélisation :
+
+[source,cypher]
+----
+MERGE (license:License { id:json.`spdx-id` })
+  ON CREATE SET
+    license.name = json.title,
+    license.description = json.description,
+    license.url = 'https://spdx.org/licenses/' + json.`spdx-id` + '.html',
+    license.how_to_apply = json.how,
+    license.note = json.note
+
+WITH license, json
+UNWIND json.permissions AS permissionTxt
+  MERGE (permission:Permission {id:permissionTxt})
+  MERGE (license)-[:HAS_PERMISSION]->(permission)
+
+WITH license, json
+UNWIND json.conditions AS conditionTxt
+  MERGE (condition:Condition {id:conditionTxt})
+  MERGE (license)-[:HAS_CONDITION]->(condition)
+
+WITH license, json
+UNWIND json.limitations AS limitationTxt
+  MERGE (limitation:Limitation {id:limitationTxt})
+  MERGE (license)-[:HAS_LIMITATION]->(limitation)
+
+WITH license, json
+UNWIND json.using AS project
+  WITH keys(project)[0] AS name, project[keys(project)[0]] AS url, license
+  MERGE (project:Project {name:name })
+    ON CREATE SET project.url=url
+  MERGE (project)-[:USES]->(license)
+----
+
+=== Le script final
+
+A présent on a toutes les briques pour faire notre import final.
+Pour ce faire il suffit de combiner nos scripts ensemble et de boucler sur les URL des fichiers de licence.
+
+[source,cypher]
+----
+WITH
+[
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/afl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/agpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/apache-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/artistic-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-2-clause.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-3-clause-clear.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsd-3-clause.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/bsl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc-by-4.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc-by-sa-4.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/cc0-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ecl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/epl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/epl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/eupl-1.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/eupl-1.2.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/gpl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/gpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/isc.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lgpl-2.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lgpl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/lppl-1.3c.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/mit.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/mpl-2.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ms-pl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ms-rl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ncsa.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/ofl-1.1.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/osl-3.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/postgresql.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/unlicense.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/upl-1.0.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/wtfpl.txt",
+  "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/zlib.txt"
+] AS files
+UNWIND files as file
+
+WITH custom.loadYml(file) AS json
+WITH json.value AS json
+
+MERGE (license:License { id:json.`spdx-id` })
+  ON CREATE SET
+    license.name = json.title,
+    license.description = json.description,
+    license.url = 'https://spdx.org/licenses/' + json.`spdx-id` + '.html',
+    license.how_to_apply = json.how,
+    license.note = json.note
+
+FOREACH( permissionTxt IN json.permissions |
+  MERGE (permission:Permission {id:permissionTxt})
+  MERGE (license)-[:HAS_PERMISSION]->(permission)
+)
+
+FOREACH( conditionTxt IN json.conditions |
+  MERGE (condition:Condition {id:conditionTxt})
+  MERGE (license)-[:HAS_CONDITION]->(condition)
+)
+
+FOREACH( limitationTxt IN json.limitations |
+  MERGE (limitation:Limitation {id:limitationTxt})
+  MERGE (license)-[:HAS_LIMITATION]->(limitation)
+)
+
+FOREACH( proj IN json.using |
+  MERGE (project:Project {name: keys(proj)[0] })
+    ON CREATE SET project.url = project[keys(proj)[0]]
+  MERGE (project)-[:USES]->(license)
+)
+----
+
+=== Ajout de données et amélioration du processus
+
+Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permissions, conditions et limitations.
+Ce serait pas mal de l'importer, surtout maintenant qu'on sait comment faire !
+
+Voici le script :
+
+[source,cypher]
+----
+WITH custom.loadYml("https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_data/rules.yml") AS json
+WITH json.value AS json
+
+FOREACH( condition IN json.conditions |
+  MERGE (c:Condition { id: condition.tag})
+  SET c.name = condition.label,
+      c.description = condition.description
+)
+
+FOREACH( permission IN json.permissions |
+  MERGE (p:Permission { id: permission.tag})
+  SET p.name = permission.label,
+      p.description = permission.description
+)
+
+FOREACH( limitation IN json.limitations |
+  MERGE (l:Limitation { id: limitation.tag})
+  SET l.name = limitation.label,
+      l.description = limitation.description
+)
+----
+
+== Allons plus loin !
+
+J'aimerai bien ajouter plus de données dans ce graphe comme la compabilité entre les licences, ou la reconnaissance des licences par des organisme (FSF, Linux Fondation, ...)
+Mais je n'ai pas trouvé d'autres jeux de données exploitable par informatique...
+Si vous en connaissez je suis preneur !
+
+=== Détection de communauté
+
+En attendant, un petit truc sympa qu'on peut faire avec notre jeux de données, c'est de la recherche de communauté entre ces licences.
+Neo4j dispose d'un plugin de https://neo4j.com/docs/graph-algorithms/current/algorithms/[graph-algo] que vous pouvez installer.
+Celui-ci dispose de plusieurs algorithmes de détection de communauté, et je vais vous montrer comment utiliser celui de https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Louvain[Louvain].
+
+Pour utiliser une procédure de *graph-algo* il faut à chaque fois définir deux requêtes :
+
+* La requête qui renvoie les noeuds qui nous intéressent. Ici on va prendre les noeuds `License`, et donc la requête est `MATCH (l:License) RETURN id(l) AS id`.
+* La requête de projection qui permet de créer les relations entre les noeuds sélectionnés.
+Dans notre cas, on va dire que deux noeuds licences sont reliés s'ils partagent une même *permission*, *limitation* ou *condition* : 'MATCH (l1:License)-->()<--(l2:License) WHERE id(l1)< id(l2) RETURN id(l1) as source, id(l2) as target'.
+
+----
+CALL algo.louvain(
+  'MATCH (l:License) RETURN id(l) as id',
+  'MATCH (l1:License)-->()<--(l2:License) WHERE id(l1)< id(l2) RETURN id(l1) as source, id(l2) as target',
+  {
+    graph: 'cypher',
+    write:true,
+    writeProperty:'community'
+  }
+);
+----
+
+Sur notre dataset le résultat est instantané, mais sachez que ce plugin est développé pour être utilisé sur de grand datasets.
+
+L'algorithme a détecté *deux* communautés
+
+[%header,cols='4a,4a']
+|===
+
+| Communauté 1
+| Communauté 2
+
+|
+[source,cypher]
+----
+MATCH (l:License) WHERE l.community=0 RETURN l.name
+----
+|
+[source,cypher]
+----
+MATCH (l:License) WHERE l.community=1 RETURN l.name
+----
+
+|
+* BSD Zero Clause License
+* BSD 2-Clause "Simplified" License
+* BSD 3-Clause Clear License
+* BSD 3-Clause "New" or "Revised" License
+* Boost Software License 1.0
+* Creative Commons Zero v1.0 Universal
+* ISC License
+* GNU Lesser General Public License v2.1
+* MIT License
+* University of Illinois/NCSA Open Source License
+* SIL Open Font License 1.1
+* PostgreSQL License
+* The Unlicense
+* Do What The F*ck You Want To Public License
+* zlib License
+|
+* Academic Free License v3.0
+* GNU Affero General Public License v3.0
+* Apache License 2.0
+* Artistic License 2.0
+* Creative Commons Attribution 4.0 International
+* Creative Commons Attribution Share Alike 4.0 International
+* Educational Community License v2.0
+* Eclipse Public License 1.0
+* Eclipse Public License 2.0
+* European Union Public License 1.1
+* European Union Public License 1.2
+* GNU General Public License v2.0
+* GNU General Public License v3.0
+* GNU Lesser General Public License v3.0
+* LaTeX Project Public License v1.3c
+* Mozilla Public License 2.0
+* Microsoft Public License
+* Microsoft Reciprocal License
+* Open Software License 3.0
+* Universal Permissive License v1.0
+
+|===
+
+Après faut analyser les communautés pour pouvoir les comprendre,
+mais déjà on constate que les licences BSD sont à gauches et les GPL à droite.
+
+== Conclusion
+
+Ce billet est juste un exemple pour vous montrer la simplicité d'utilisation de cette librairie
+et de voir ce qu'il est possible de réaliser avec Neo4j.
+
+Je reitère, mais si vous savez où trouver de la données pour aggrémenter ce dataset,
+et/ou si vous avez des idées d'analyse, n'hésitez pas à me le signaler !
+
+
