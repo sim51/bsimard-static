@@ -5,9 +5,9 @@
 <meta charset="UTF-8">
 <meta name="og:title" content="Le graphe des licences"/>
 <meta name="og:type" content="article"/>
-<meta name="og:url" content="http://www.bsimard.com/2019/04/18/graph-licenses.html"/>
+<meta name="og:url" content="http://localhost:4000/2019/04/18/graph-licenses.html"/>
 <meta name="og:description" content=""/>
-<meta name="og:image" content="http://www.bsimard.com/public/images/graph-licenses/banner.png"/>
+<meta name="og:image" content="http://localhost:4000/public/images/graph-licenses/banner.jpg"/>
 <meta name="author" content="Benoit Simard"/>
 <meta name="robots" content="index, follow" />
 <meta name="description" content="" />
@@ -91,7 +91,7 @@
           <header>
             <h1 itemprop="name"> Le graphe des licences</h1>
             <meta itemprop="description" content=" ">
-            <img itemprop="image" src="/public/images/graph-licenses/banner.png"/>
+            <img itemprop="image" src="/public/images/graph-licenses/banner.jpg"/>
           </header>
           <section itemprop="articleBody">
             <div id="toc" class="toc">
@@ -189,16 +189,14 @@ puis le texte de la licence . Ainsi un simple <code>split</code> sur <code>---</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cypher" data-lang="cypher">---
-CALL apoc.load.csv(
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.load.csv(
   "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
   { header:false, sep:'�', quoteChar:'¤' }
 ) yield list
 WITH apoc.convert.toString(list[0]) AS line
 WITH collect(line) AS lines
 WITH reduce(s='', x in lines | s + x + "\n") AS txt
-RETURN split(txt, '---')[1] AS yaml
----</code></pre>
+RETURN split(txt, '---')[1] AS yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -206,13 +204,11 @@ RETURN split(txt, '---')[1] AS yaml
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-cypher" data-lang="cypher">---
-CALL apoc.load.csv(
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.load.csv(
   "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
   { header:false, sep:'�', quoteChar:'¤' }
 ) yield list
-RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
----</code></pre>
+RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml</code></pre>
 </div>
 </div>
 </div>
@@ -344,32 +340,9 @@ je vous propose d&#8217;écrire une <a href="https://neo4j-contrib.github.io/neo
 <div class="paragraph">
 <p>Je vous propose la modélisation suivante :</p>
 </div>
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>Failed to generate image: dot failed: Error: &lt;stdin&gt;: syntax error in line 9 near '\'
-
-digraph finite_state_machine {
-    rankdir=LR;
-    node [
-         shape = Mrecord
-    ];
-
-    // NODES
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    LICENSE [label = "License | id:String* \lname: String \ldescription: String* \lurl"String \lhow_to_apply: String* \lnote: String\l" ];
-    PROJECT [label = "Project | name:String* \lurl: String \l" ];
-    PERMISSION [label = "Permission | id:String* \lname: String \ldescription: String\l"];
-    CONDITION [label = "Condition | id:String* \lname: String* \ldescription: String\l"];
-    LIMITATION [label = "Limitation | id:String* \lname: String* \ldescription: String\l"];
-
-
-    // EDGES
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    PROJECT-&gt;LICENSE [label = "USES"];
-    LICENSE-&gt;PERMISSION [label = "HAS_PERMISSION"];
-    LICENSE-&gt;CONDITION [label = "HAS_CONDITION"];
-    LICENSE-&gt;LIMITATION [label = "HAS_LIMITATION"];
-}</pre>
+<img src="/public/images/diag/diag-527a41766c031f27dca61fc4ffb8f165.png" alt="diag 527a41766c031f27dca61fc4ffb8f165" width="796" height="367">
 </div>
 </div>
 <div class="paragraph">

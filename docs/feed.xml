@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 23 Apr 2019 18:09:16 +0200</pubDate>
-    <lastBuildDate>Tue, 23 Apr 2019 18:09:16 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 25 Apr 2019 15:41:44 +0200</pubDate>
+    <lastBuildDate>Thu, 25 Apr 2019 15:41:44 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -108,16 +108,14 @@ puis le texte de la licence . Ainsi un simple &lt;code&gt;split&lt;/code&gt; sur
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;---
-CALL apoc.load.csv(
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.load.csv(
   &quot;https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt&quot;,
   { header:false, sep:'�', quoteChar:'¤' }
 ) yield list
 WITH apoc.convert.toString(list[0]) AS line
 WITH collect(line) AS lines
 WITH reduce(s='', x in lines | s + x + &quot;\n&quot;) AS txt
-RETURN split(txt, '---')[1] AS yaml
----&lt;/code&gt;&lt;/pre&gt;
+RETURN split(txt, '---')[1] AS yaml&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -125,13 +123,11 @@ RETURN split(txt, '---')[1] AS yaml
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;---
-CALL apoc.load.csv(
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.load.csv(
   &quot;https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt&quot;,
   { header:false, sep:'�', quoteChar:'¤' }
 ) yield list
-RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + &quot;\n&quot;), '---')[1] AS yaml
----&lt;/code&gt;&lt;/pre&gt;
+RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + &quot;\n&quot;), '---')[1] AS yaml&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -263,32 +259,9 @@ je vous propose d&amp;#8217;écrire une &lt;a href=&quot;https://neo4j-contrib.g
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Je vous propose la modélisation suivante :&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;Failed to generate image: dot failed: Error: &amp;lt;stdin&amp;gt;: syntax error in line 9 near '\'
-
-digraph finite_state_machine {
-    rankdir=LR;
-    node [
-         shape = Mrecord
-    ];
-
-    // NODES
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    LICENSE [label = &quot;License | id:String* \lname: String \ldescription: String* \lurl&quot;String \lhow_to_apply: String* \lnote: String\l&quot; ];
-    PROJECT [label = &quot;Project | name:String* \lurl: String \l&quot; ];
-    PERMISSION [label = &quot;Permission | id:String* \lname: String \ldescription: String\l&quot;];
-    CONDITION [label = &quot;Condition | id:String* \lname: String* \ldescription: String\l&quot;];
-    LIMITATION [label = &quot;Limitation | id:String* \lname: String* \ldescription: String\l&quot;];
-
-
-    // EDGES
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    PROJECT-&amp;gt;LICENSE [label = &quot;USES&quot;];
-    LICENSE-&amp;gt;PERMISSION [label = &quot;HAS_PERMISSION&quot;];
-    LICENSE-&amp;gt;CONDITION [label = &quot;HAS_CONDITION&quot;];
-    LICENSE-&amp;gt;LIMITATION [label = &quot;HAS_LIMITATION&quot;];
-}&lt;/pre&gt;
+&lt;img src=&quot;/public/images/diag/diag-527a41766c031f27dca61fc4ffb8f165.png&quot; alt=&quot;diag 527a41766c031f27dca61fc4ffb8f165&quot; width=&quot;796&quot; height=&quot;367&quot;&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -668,8 +641,8 @@ et/ou si vous avez des idées d&amp;#8217;analyse, n&amp;#8217;hésitez pas à m
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 18 Apr 2019 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2019/04/18/graph-licenses.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2019/04/18/graph-licenses.html</guid>
+        <link>http://localhost:4000/2019/04/18/graph-licenses.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/04/18/graph-licenses.html</guid>
         
         
         <category>graphe</category>
@@ -701,8 +674,8 @@ et/ou si vous avez des idées d&amp;#8217;analyse, n&amp;#8217;hésitez pas à m
 &lt;p&gt;Et les slides sont ici : &lt;a href=&quot;https://sim51.github.io/presentations/graphql-neo4j/&quot; class=&quot;bare&quot;&gt;https://sim51.github.io/presentations/graphql-neo4j/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;</description>
         <pubDate>Fri, 14 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/14/fr-graphql-et-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/14/fr-graphql-et-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/14/fr-graphql-et-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/14/fr-graphql-et-neo4j.html</guid>
         
         
         <category>JUGSummerCamp</category>
@@ -1031,8 +1004,8 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
         
         
         <category>Kettle</category>
@@ -1799,8 +1772,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
         
         <category>monitoring</category>
@@ -1982,8 +1955,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         
         <category>neo4j</category>

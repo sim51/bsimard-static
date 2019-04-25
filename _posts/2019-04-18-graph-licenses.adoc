@@ -3,7 +3,7 @@ Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-locale: fr
 :page-description:
-:page-image: /public/images/graph-licenses/banner.png
+:page-image: /public/images/graph-licenses/banner.jpg
 :page-tags: graphe, licence, neo4j, open-source, libre
 :page-ref: graphe-licences
 :toc:
@@ -56,7 +56,7 @@ puis le texte de la licence . Ainsi un simple `split` sur `---` devrait suffir p
 Ce qui donne :
 
 [source,cypher]
----
+----
 CALL apoc.load.csv(
   "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
   { header:false, sep:'�', quoteChar:'¤' }
@@ -65,18 +65,18 @@ WITH apoc.convert.toString(list[0]) AS line
 WITH collect(line) AS lines
 WITH reduce(s='', x in lines | s + x + "\n") AS txt
 RETURN split(txt, '---')[1] AS yaml
----
+----
 
 Et en plus compact :
 
 [source,cypher]
----
+----
 CALL apoc.load.csv(
   "https://raw.githubusercontent.com/github/choosealicense.com/gh-pages/_licenses/0bsd.txt",
   { header:false, sep:'�', quoteChar:'¤' }
 ) yield list
 RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x + "\n"), '---')[1] AS yaml
----
+----
 
 === Convertir du YML en JSON
 
@@ -203,11 +203,11 @@ digraph finite_state_machine {
 
     // NODES
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    LICENSE [label = "License | id:String* \lname: String \ldescription: String* \lurl"String \lhow_to_apply: String* \lnote: String\l" ];
-    PROJECT [label = "Project | name:String* \lurl: String \l" ];
-    PERMISSION [label = "Permission | id:String* \lname: String \ldescription: String\l"];
-    CONDITION [label = "Condition | id:String* \lname: String* \ldescription: String\l"];
-    LIMITATION [label = "Limitation | id:String* \lname: String* \ldescription: String\l"];
+    LICENSE [label = "License | id:String* \l name: String \l description: String* \l url: String \l how_to_apply: String* \l note: String \l" ];
+    PROJECT [label = "Project | name:String* \l url: String \l" ];
+    PERMISSION [label = "Permission | id:String* \l name: String \l description: String \l"];
+    CONDITION [label = "Condition | id:String* \l name: String* \l description: String \l"];
+    LIMITATION [label = "Limitation | id:String* \l name: String* \l description: String \l"];
 
 
     // EDGES
