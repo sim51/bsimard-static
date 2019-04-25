@@ -2,10 +2,10 @@
 Benoit Simard <contact@bsimard.com>
 :page-layout: post
 :page-locale: fr
-:page-description:
+:page-description: Découvrez comment se réaliser un graphe des licences open-source en important les données de "Choose a License".
 :page-image: /public/images/graph-licenses/banner.jpg
 :page-tags: graphe, licence, neo4j, open-source, libre
-:page-ref: graphe-licences
+:page-ref: graphe-licenses
 :toc:
 
 == Introduction
