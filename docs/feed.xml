@@ -5,8 +5,8 @@
     <description>Site de Benoit Simard</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 25 Apr 2019 15:53:20 +0200</pubDate>
-    <lastBuildDate>Thu, 25 Apr 2019 15:53:20 +0200</lastBuildDate>
+    <pubDate>Thu, 25 Apr 2019 16:34:46 +0200</pubDate>
+    <lastBuildDate>Thu, 25 Apr 2019 16:34:46 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -38,18 +38,18 @@
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Des licences en informatiques il y en a beaucoup, et il est souvent dur de s&amp;#8217;y retrouver,
-surtout quand comme moi vous n&amp;#8217;avez aucun background juridique.&lt;/p&gt;
+&lt;p&gt;Des licences en informatiques il y en a beaucoup, et il est souvent dure de s&amp;#8217;y retrouver,
+surtout quand comme moi vous n&amp;#8217;avez aucune connaissance juridique.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Mais il existe un site web qui permet de s&amp;#8217;y retrouver : &lt;a href=&quot;https://choosealicense.com&quot;&gt;Choose a license&lt;/a&gt;
-Ce qui est bien avec ce site, c&amp;#8217;est que chaque licence y est décrite et qu&amp;#8217;on y retrouve une liste des &lt;strong&gt;permissions&lt;/strong&gt;,
-des &lt;strong&gt;conditions&lt;/strong&gt; et des &lt;strong&gt;limitations&lt;/strong&gt;.&lt;/p&gt;
+Ce qui est bien avec ce site, c&amp;#8217;est que chaque licence ouverte est décrite et qu&amp;#8217;on y retrouve une liste de &lt;strong&gt;permission&lt;/strong&gt;,
+de &lt;strong&gt;condition&lt;/strong&gt; et des &lt;strong&gt;limitation&lt;/strong&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;De plus le contenu du site ou sous licence &lt;a href=&quot;https://creativecommons.org/licenses/by/3.0/&quot;&gt;CC BY 3.0&lt;/a&gt;
-et est disponible au format &lt;strong&gt;YAML&lt;/strong&gt; sur &lt;a href=&quot;https://github.com/github/choosealicense.com/tree/gh-pages/_licenses&quot;&gt;github&lt;/a&gt;,
-donc parsable pour une machine.&lt;/p&gt;
+et disponible au format &lt;strong&gt;YAML&lt;/strong&gt; sur &lt;a href=&quot;https://github.com/github/choosealicense.com/tree/gh-pages/_licenses&quot;&gt;github&lt;/a&gt;,
+et donc compréhensible par une machine.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -78,7 +78,7 @@ et donc accessible en HTTP.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Je vais réaliser toutes ces étapes avec Cypher et &lt;a href=&quot;https://github.com/neo4j-contrib/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt;,
-juste parceque c&amp;#8217;est possible que je trouve cela fun et vous permet aussi de voir les possibilités du language.&lt;/p&gt;
+juste parce que c&amp;#8217;est possible et que je trouve cela fun. Deplus cela  permet aussi de voir les possibilités du langage et d&amp;#8217;APOC.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;récupérer-le-contenu-du-ficher&quot;&gt;Récupérer le contenu du ficher&lt;/h3&gt;
@@ -93,11 +93,9 @@ Par exemple : &lt;a href=&quot;https://raw.githubusercontent.com/github/chooseal
 &lt;p&gt;Et bien on va utiliser &lt;code&gt;apoc.load.csv&lt;/code&gt; et le hacker un peu !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Si on considère que le fichier &lt;strong&gt;TXT&lt;/strong&gt; est un fichier &lt;strong&gt;CSV&lt;/strong&gt; ,
-on va pouvoir récupérer chaque ligne du fichier si on utilise comme séparateur un charactère improbable : &lt;code&gt;�&lt;/code&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ensuite il suffit de faire de &quot;collecter&quot; les lignes et de les &quot;joindres&quot; avec un retour à la ligne.&lt;/p&gt;
+&lt;p&gt;Si on considère que le fichier &lt;strong&gt;TXT&lt;/strong&gt; est un fichier &lt;strong&gt;CSV&lt;/strong&gt;,
+on va pouvoir récupérer chaque ligne du fichier en utilisant un caractère improbable comme séparateur : &lt;code&gt;�&lt;/code&gt;.
+Ensuite il suffit de &quot;collecter&quot; les lignes et de les &quot;joindre&quot; avec un retour à la ligne.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Mais si on regarde bien les fichiers, on constate qu&amp;#8217;ils sont découpés en deux avec une partie &lt;strong&gt;YAML&lt;/strong&gt;
@@ -119,7 +117,7 @@ RETURN split(txt, '---')[1] AS yaml&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Et en plus compact :&lt;/p&gt;
+&lt;p&gt;Et en plus compact, cela donne :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -134,12 +132,15 @@ RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x +
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;convertir-du-yml-en-json&quot;&gt;Convertir du YML en JSON&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il n&amp;#8217;existe pas de function dans APOC qui permet de lire du YML.
+&lt;p&gt;Il n&amp;#8217;existe pas de fonction dans APOC qui permet de lire du YML.
 Par contre on peut utiliser une API en ligne qui peut le faire : &lt;a href=&quot;https://www.json2yaml.com&quot; class=&quot;bare&quot;&gt;https://www.json2yaml.com&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il suffit de faire un &lt;code&gt;POST&lt;/code&gt; sur l&amp;#8217;url &lt;a href=&quot;https://www.json2yaml.com/api/j2y&quot; class=&quot;bare&quot;&gt;https://www.json2yaml.com/api/j2y&lt;/a&gt; avec en payload le YAML (encodé) et en retour on reçoit du JSON.
-Et justement dans APOC il y a une procédure qui permet d&amp;#8217;appeler une API et de parser le JSON : &lt;code&gt;apoc.load.jsonParams&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Il suffit de faire un &lt;code&gt;POST&lt;/code&gt; sur l&amp;#8217;url &lt;a href=&quot;https://www.json2yaml.com/api/j2y&quot; class=&quot;bare&quot;&gt;https://www.json2yaml.com/api/j2y&lt;/a&gt; avec en payload le YAML (encodé).
+En retour on reçoit du JSON correspondant au YAML.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Et justement dans APOC il y a une procédure qui permet d&amp;#8217;appeler une API et de parser le JSON : &lt;code&gt;apoc.load.jsonParams&lt;/code&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Voici ce que cela donne :&lt;/p&gt;
@@ -212,16 +213,17 @@ RETURN value&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;custom-cypher-function-procedure&quot;&gt;Custom Cypher function, procedure&lt;/h4&gt;
+&lt;h4 id=&quot;custom-cypher-function-procedure&quot;&gt;Custom Cypher function / procedure&lt;/h4&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Vu que la lecture du YAML est contraignante à écrire en Cypher et qu&amp;#8217;on va l&amp;#8217;utiliser plusieurs fois,
 je vous propose d&amp;#8217;écrire une &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions&quot;&gt;Custom Cypher Function&lt;/a&gt; avec APOC.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ceci nous permet d&amp;#8217;écrire une fonction qu&amp;#8217;on pourra appeler plus tard, directement avec du cypher.&lt;/p&gt;
+&lt;p&gt;Ceci nous permet d&amp;#8217;écrire une fonction qu&amp;#8217;on pourra appeler plus tard, directement avec du cypher.
+Bref, c&amp;#8217;est un alias de requête cypher.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Voici comment définir notre fonction personnalisé :&lt;/p&gt;
+&lt;p&gt;Voici comment définir notre fonction personnalisée :&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -398,7 +400,7 @@ FOREACH( proj IN json.using |
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;ajout-de-données-et-amélioration-du-processus&quot;&gt;Ajout de données et amélioration du processus&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permissions, conditions et limitations.
+&lt;p&gt;Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permission, condition et limitation.
 Ce serait pas mal de l&amp;#8217;importer, surtout maintenant qu&amp;#8217;on sait comment faire !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -435,8 +437,8 @@ FOREACH( limitation IN json.limitations |
 &lt;h2 id=&quot;allons-plus-loin&quot;&gt;Allons plus loin !&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;J&amp;#8217;aimerai bien ajouter plus de données dans ce graphe comme la compabilité entre les licences, ou la reconnaissance des licences par des organisme (FSF, Linux Fondation, &amp;#8230;&amp;#8203;)
-Mais je n&amp;#8217;ai pas trouvé d&amp;#8217;autres jeux de données exploitable par informatique&amp;#8230;&amp;#8203;
+&lt;p&gt;J&amp;#8217;aimerai bien ajouter plus de données dans ce graphe comme la compatibilité entre les licences, ou la reconnaissance des licences par des organismes (FSF, Linux Fondation, &amp;#8230;&amp;#8203;), etc.
+Mais je n&amp;#8217;ai pas trouvé d&amp;#8217;autres jeux de données exploitable &amp;#8230;&amp;#8203;
 Si vous en connaissez je suis preneur !&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
@@ -635,7 +637,7 @@ mais déjà on constate que les licences BSD sont à gauches et les GPL à droit
 et de voir ce qu&amp;#8217;il est possible de réaliser avec Neo4j.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Je reitère, mais si vous savez où trouver de la données pour aggrémenter ce dataset,
+&lt;p&gt;Je ré-itère, mais si vous savez où trouver de la données pour agrémenter ce jeux de données,
 et/ou si vous avez des idées d&amp;#8217;analyse, n&amp;#8217;hésitez pas à me le signaler !&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;

@@ -10,16 +10,16 @@ Benoit Simard <contact@bsimard.com>
 
 == Introduction
 
-Des licences en informatiques il y en a beaucoup, et il est souvent dur de s'y retrouver,
-surtout quand comme moi vous n'avez aucun background juridique.
+Des licences en informatiques il y en a beaucoup, et il est souvent dure de s'y retrouver,
+surtout quand comme moi vous n'avez aucune connaissance juridique.
 
 Mais il existe un site web qui permet de s'y retrouver : https://choosealicense.com[Choose a license]
-Ce qui est bien avec ce site, c'est que chaque licence y est décrite et qu'on y retrouve une liste des **permissions**,
-des **conditions** et des **limitations**.
+Ce qui est bien avec ce site, c'est que chaque licence ouverte est décrite et qu'on y retrouve une liste de **permission**,
+de **condition** et des **limitation**.
 
 De plus le contenu du site ou sous licence https://creativecommons.org/licenses/by/3.0/[CC BY 3.0]
-et est disponible au format *YAML* sur https://github.com/github/choosealicense.com/tree/gh-pages/_licenses[github],
-donc parsable pour une machine.
+et disponible au format *YAML* sur https://github.com/github/choosealicense.com/tree/gh-pages/_licenses[github],
+et donc compréhensible par une machine.
 
 == Import des données de choosealicense.com
 
@@ -33,7 +33,7 @@ Voici le détail des opérations pour importer un fichier :
 * Importer le `JSON` en graphe
 
 Je vais réaliser toutes ces étapes avec Cypher et https://github.com/neo4j-contrib/neo4j-apoc-procedures[APOC],
-juste parceque c'est possible que je trouve cela fun et vous permet aussi de voir les possibilités du language.
+juste parce que c'est possible et que je trouve cela fun. Deplus cela  permet aussi de voir les possibilités du langage et d'APOC.
 
 === Récupérer le contenu du ficher
 
@@ -44,10 +44,9 @@ Mais comment faire pour récupérer tout le contenu du fichier dans une variable
 
 Et bien on va utiliser `apoc.load.csv` et le hacker un peu !
 
-Si on considère que le fichier *TXT* est un fichier *CSV* ,
-on va pouvoir récupérer chaque ligne du fichier si on utilise comme séparateur un charactère improbable : `�`.
-
-Ensuite il suffit de faire de "collecter" les lignes et de les "joindres" avec un retour à la ligne.
+Si on considère que le fichier *TXT* est un fichier *CSV*,
+on va pouvoir récupérer chaque ligne du fichier en utilisant un caractère improbable comme séparateur : `�`.
+Ensuite il suffit de "collecter" les lignes et de les "joindre" avec un retour à la ligne.
 
 Mais si on regarde bien les fichiers, on constate qu'ils sont découpés en deux avec une partie *YAML*
 puis le texte de la licence . Ainsi un simple `split` sur `---` devrait suffir pour obtenir uniquement la partie *YAML*.
@@ -67,7 +66,7 @@ WITH reduce(s='', x in lines | s + x + "\n") AS txt
 RETURN split(txt, '---')[1] AS yaml
 ----
 
-Et en plus compact :
+Et en plus compact, cela donne :
 
 [source,cypher]
 ----
@@ -80,10 +79,12 @@ RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x +
 
 === Convertir du YML en JSON
 
-Il n'existe pas de function dans APOC qui permet de lire du YML.
+Il n'existe pas de fonction dans APOC qui permet de lire du YML.
 Par contre on peut utiliser une API en ligne qui peut le faire : https://www.json2yaml.com
 
-Il suffit de faire un `POST` sur l'url https://www.json2yaml.com/api/j2y avec en payload le YAML (encodé) et en retour on reçoit du JSON.
+Il suffit de faire un `POST` sur l'url https://www.json2yaml.com/api/j2y avec en payload le YAML (encodé).
+En retour on reçoit du JSON correspondant au YAML.
+
 Et justement dans APOC il y a une procédure qui permet d'appeler une API et de parser le JSON : `apoc.load.jsonParams`.
 
 Voici ce que cela donne :
@@ -153,14 +154,15 @@ Ce qui nous renvoie le résultat suivant :
 }
 ----
 
-==== Custom Cypher function, procedure
+==== Custom Cypher function / procedure
 
 Vu que la lecture du YAML est contraignante à écrire en Cypher et qu'on va l'utiliser plusieurs fois,
 je vous propose d'écrire une https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions[Custom Cypher Function] avec APOC.
 
 Ceci nous permet d'écrire une fonction qu'on pourra appeler plus tard, directement avec du cypher.
+Bref, c'est un alias de requête cypher.
 
-Voici comment définir notre fonction personnalisé :
+Voici comment définir notre fonction personnalisée :
 
 [source,cypher]
 ----
@@ -347,7 +349,7 @@ FOREACH( proj IN json.using |
 
 === Ajout de données et amélioration du processus
 
-Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permissions, conditions et limitations.
+Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permission, condition et limitation.
 Ce serait pas mal de l'importer, surtout maintenant qu'on sait comment faire !
 
 Voici le script :
@@ -378,8 +380,8 @@ FOREACH( limitation IN json.limitations |
 
 == Allons plus loin !
 
-J'aimerai bien ajouter plus de données dans ce graphe comme la compabilité entre les licences, ou la reconnaissance des licences par des organisme (FSF, Linux Fondation, ...)
-Mais je n'ai pas trouvé d'autres jeux de données exploitable par informatique...
+J'aimerai bien ajouter plus de données dans ce graphe comme la compatibilité entre les licences, ou la reconnaissance des licences par des organismes (FSF, Linux Fondation, ...), etc.
+Mais je n'ai pas trouvé d'autres jeux de données exploitable ...
 Si vous en connaissez je suis preneur !
 
 === Détection de communauté
@@ -476,7 +478,7 @@ mais déjà on constate que les licences BSD sont à gauches et les GPL à droit
 Ce billet est juste un exemple pour vous montrer la simplicité d'utilisation de cette librairie
 et de voir ce qu'il est possible de réaliser avec Neo4j.
 
-Je reitère, mais si vous savez où trouver de la données pour aggrémenter ce dataset,
+Je ré-itère, mais si vous savez où trouver de la données pour agrémenter ce jeux de données,
 et/ou si vous avez des idées d'analyse, n'hésitez pas à me le signaler !
 
 

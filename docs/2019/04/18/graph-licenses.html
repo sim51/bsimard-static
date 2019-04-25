@@ -119,18 +119,18 @@
 <h2 id="introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Des licences en informatiques il y en a beaucoup, et il est souvent dur de s&#8217;y retrouver,
-surtout quand comme moi vous n&#8217;avez aucun background juridique.</p>
+<p>Des licences en informatiques il y en a beaucoup, et il est souvent dure de s&#8217;y retrouver,
+surtout quand comme moi vous n&#8217;avez aucune connaissance juridique.</p>
 </div>
 <div class="paragraph">
 <p>Mais il existe un site web qui permet de s&#8217;y retrouver : <a href="https://choosealicense.com">Choose a license</a>
-Ce qui est bien avec ce site, c&#8217;est que chaque licence y est décrite et qu&#8217;on y retrouve une liste des <strong>permissions</strong>,
-des <strong>conditions</strong> et des <strong>limitations</strong>.</p>
+Ce qui est bien avec ce site, c&#8217;est que chaque licence ouverte est décrite et qu&#8217;on y retrouve une liste de <strong>permission</strong>,
+de <strong>condition</strong> et des <strong>limitation</strong>.</p>
 </div>
 <div class="paragraph">
 <p>De plus le contenu du site ou sous licence <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
-et est disponible au format <strong>YAML</strong> sur <a href="https://github.com/github/choosealicense.com/tree/gh-pages/_licenses">github</a>,
-donc parsable pour une machine.</p>
+et disponible au format <strong>YAML</strong> sur <a href="https://github.com/github/choosealicense.com/tree/gh-pages/_licenses">github</a>,
+et donc compréhensible par une machine.</p>
 </div>
 </div>
 </div>
@@ -159,7 +159,7 @@ et donc accessible en HTTP.</p>
 </div>
 <div class="paragraph">
 <p>Je vais réaliser toutes ces étapes avec Cypher et <a href="https://github.com/neo4j-contrib/neo4j-apoc-procedures">APOC</a>,
-juste parceque c&#8217;est possible que je trouve cela fun et vous permet aussi de voir les possibilités du language.</p>
+juste parce que c&#8217;est possible et que je trouve cela fun. Deplus cela  permet aussi de voir les possibilités du langage et d&#8217;APOC.</p>
 </div>
 <div class="sect2">
 <h3 id="récupérer-le-contenu-du-ficher">Récupérer le contenu du ficher</h3>
@@ -174,11 +174,9 @@ Par exemple : <a href="https://raw.githubusercontent.com/github/choosealicense.c
 <p>Et bien on va utiliser <code>apoc.load.csv</code> et le hacker un peu !</p>
 </div>
 <div class="paragraph">
-<p>Si on considère que le fichier <strong>TXT</strong> est un fichier <strong>CSV</strong> ,
-on va pouvoir récupérer chaque ligne du fichier si on utilise comme séparateur un charactère improbable : <code>�</code>.</p>
-</div>
-<div class="paragraph">
-<p>Ensuite il suffit de faire de "collecter" les lignes et de les "joindres" avec un retour à la ligne.</p>
+<p>Si on considère que le fichier <strong>TXT</strong> est un fichier <strong>CSV</strong>,
+on va pouvoir récupérer chaque ligne du fichier en utilisant un caractère improbable comme séparateur : <code>�</code>.
+Ensuite il suffit de "collecter" les lignes et de les "joindre" avec un retour à la ligne.</p>
 </div>
 <div class="paragraph">
 <p>Mais si on regarde bien les fichiers, on constate qu&#8217;ils sont découpés en deux avec une partie <strong>YAML</strong>
@@ -200,7 +198,7 @@ RETURN split(txt, '---')[1] AS yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Et en plus compact :</p>
+<p>Et en plus compact, cela donne :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -215,12 +213,15 @@ RETURN split(reduce(s='', x in collect(apoc.convert.toString(list[0])) | s + x +
 <div class="sect2">
 <h3 id="convertir-du-yml-en-json">Convertir du YML en JSON</h3>
 <div class="paragraph">
-<p>Il n&#8217;existe pas de function dans APOC qui permet de lire du YML.
+<p>Il n&#8217;existe pas de fonction dans APOC qui permet de lire du YML.
 Par contre on peut utiliser une API en ligne qui peut le faire : <a href="https://www.json2yaml.com" class="bare">https://www.json2yaml.com</a></p>
 </div>
 <div class="paragraph">
-<p>Il suffit de faire un <code>POST</code> sur l&#8217;url <a href="https://www.json2yaml.com/api/j2y" class="bare">https://www.json2yaml.com/api/j2y</a> avec en payload le YAML (encodé) et en retour on reçoit du JSON.
-Et justement dans APOC il y a une procédure qui permet d&#8217;appeler une API et de parser le JSON : <code>apoc.load.jsonParams</code>.</p>
+<p>Il suffit de faire un <code>POST</code> sur l&#8217;url <a href="https://www.json2yaml.com/api/j2y" class="bare">https://www.json2yaml.com/api/j2y</a> avec en payload le YAML (encodé).
+En retour on reçoit du JSON correspondant au YAML.</p>
+</div>
+<div class="paragraph">
+<p>Et justement dans APOC il y a une procédure qui permet d&#8217;appeler une API et de parser le JSON : <code>apoc.load.jsonParams</code>.</p>
 </div>
 <div class="paragraph">
 <p>Voici ce que cela donne :</p>
@@ -293,16 +294,17 @@ RETURN value</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="custom-cypher-function-procedure">Custom Cypher function, procedure</h4>
+<h4 id="custom-cypher-function-procedure">Custom Cypher function / procedure</h4>
 <div class="paragraph">
 <p>Vu que la lecture du YAML est contraignante à écrire en Cypher et qu&#8217;on va l&#8217;utiliser plusieurs fois,
 je vous propose d&#8217;écrire une <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions">Custom Cypher Function</a> avec APOC.</p>
 </div>
 <div class="paragraph">
-<p>Ceci nous permet d&#8217;écrire une fonction qu&#8217;on pourra appeler plus tard, directement avec du cypher.</p>
+<p>Ceci nous permet d&#8217;écrire une fonction qu&#8217;on pourra appeler plus tard, directement avec du cypher.
+Bref, c&#8217;est un alias de requête cypher.</p>
 </div>
 <div class="paragraph">
-<p>Voici comment définir notre fonction personnalisé :</p>
+<p>Voici comment définir notre fonction personnalisée :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -479,7 +481,7 @@ FOREACH( proj IN json.using |
 <div class="sect2">
 <h3 id="ajout-de-données-et-amélioration-du-processus">Ajout de données et amélioration du processus</h3>
 <div class="paragraph">
-<p>Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permissions, conditions et limitations.
+<p>Sur le github du projet, on peut trouver un autre fichier YAML avec le descriptif de chaque permission, condition et limitation.
 Ce serait pas mal de l&#8217;importer, surtout maintenant qu&#8217;on sait comment faire !</p>
 </div>
 <div class="paragraph">
@@ -516,8 +518,8 @@ FOREACH( limitation IN json.limitations |
 <h2 id="allons-plus-loin">Allons plus loin !</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>J&#8217;aimerai bien ajouter plus de données dans ce graphe comme la compabilité entre les licences, ou la reconnaissance des licences par des organisme (FSF, Linux Fondation, &#8230;&#8203;)
-Mais je n&#8217;ai pas trouvé d&#8217;autres jeux de données exploitable par informatique&#8230;&#8203;
+<p>J&#8217;aimerai bien ajouter plus de données dans ce graphe comme la compatibilité entre les licences, ou la reconnaissance des licences par des organismes (FSF, Linux Fondation, &#8230;&#8203;), etc.
+Mais je n&#8217;ai pas trouvé d&#8217;autres jeux de données exploitable &#8230;&#8203;
 Si vous en connaissez je suis preneur !</p>
 </div>
 <div class="sect2">
@@ -716,7 +718,7 @@ mais déjà on constate que les licences BSD sont à gauches et les GPL à droit
 et de voir ce qu&#8217;il est possible de réaliser avec Neo4j.</p>
 </div>
 <div class="paragraph">
-<p>Je reitère, mais si vous savez où trouver de la données pour aggrémenter ce dataset,
+<p>Je ré-itère, mais si vous savez où trouver de la données pour agrémenter ce jeux de données,
 et/ou si vous avez des idées d&#8217;analyse, n&#8217;hésitez pas à me le signaler !</p>
 </div>
 </div>
