@@ -543,7 +543,7 @@ Dans notre cas, on va dire que deux noeuds licences sont reliés s&#8217;ils par
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>CALL algo.louvain(
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL algo.louvain(
   'MATCH (l:License) RETURN id(l) as id',
   'MATCH (l1:License)--&gt;()&lt;--(l2:License) WHERE id(l1)&lt; id(l2) RETURN id(l1) as source, id(l2) as target',
   {
@@ -551,7 +551,7 @@ Dans notre cas, on va dire que deux noeuds licences sont reliés s&#8217;ils par
     write:true,
     writeProperty:'community'
   }
-);</pre>
+);</code></pre>
 </div>
 </div>
 <div class="paragraph">

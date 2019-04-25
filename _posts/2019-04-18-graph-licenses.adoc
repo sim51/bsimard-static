@@ -394,6 +394,7 @@ Pour utiliser une procédure de *graph-algo* il faut à chaque fois définir deu
 * La requête de projection qui permet de créer les relations entre les noeuds sélectionnés.
 Dans notre cas, on va dire que deux noeuds licences sont reliés s'ils partagent une même *permission*, *limitation* ou *condition* : 'MATCH (l1:License)-->()<--(l2:License) WHERE id(l1)< id(l2) RETURN id(l1) as source, id(l2) as target'.
 
+[source,cypher]
 ----
 CALL algo.louvain(
   'MATCH (l:License) RETURN id(l) as id',
