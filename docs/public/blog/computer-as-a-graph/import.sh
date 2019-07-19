@@ -4,6 +4,7 @@
 ### Loading the environment file with the extention ".cfg" intead of ".sh"
 ###############################################################################
 source  ./`basename $0 .sh`.cfg
+# See getent command
 
 ###############################################################################
 # CONSTANTS
