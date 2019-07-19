@@ -393,21 +393,26 @@ I will split in two parts (with sub-parts), the import of this file :
 
 [source,cypher]
 ----
-include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=4..28]
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=4..29]
 ----
 
 ====== On Ipv6
 
 [source,cypher]
 ----
-include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=31..55]
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=32..57]
 ----
 
 ====== On all interfaces
 
 [source,cypher]
 ----
-include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=58..80]
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=60..82]
+----
+
+[source,cypher]
+----
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=85..107]
 ----
 
 ====== Graph example
@@ -430,14 +435,14 @@ This time, I import all the connections (incoming/outgoing) that computers have.
 
 [source,cypher]
 ----
-include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=83..119]
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=110..146]
 ----
 
 ====== On Ipv6
 
 [source,cypher]
 ----
-include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=122..156]
+include::../public/blog/computer-as-a-graph/cypher/07_NETWORK_CONNECTIONS.cyp[lines=149..183]
 ----
 
 ====== Graph example

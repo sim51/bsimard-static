@@ -5,8 +5,8 @@
     <description>Benoit's Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 19 Jul 2019 15:21:28 +0200</pubDate>
-    <lastBuildDate>Fri, 19 Jul 2019 15:21:28 +0200</lastBuildDate>
+    <pubDate>Fri, 19 Jul 2019 15:36:54 +0200</pubDate>
+    <lastBuildDate>Fri, 19 Jul 2019 15:36:54 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -694,7 +694,8 @@ tcp        0      0 127.0.0.1:39046         127.0.0.1:7687          ESTABLISHED 
 
     FOREACH( x IN ifPid |
       MERGE (process:Process {pid:pid, fqdn:$fqdn})
-      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)&lt;/code&gt;&lt;/pre&gt;
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -702,8 +703,7 @@ tcp        0      0 127.0.0.1:39046         127.0.0.1:7687          ESTABLISHED 
 &lt;h6 id=&quot;on-ipv6&quot;&gt;On Ipv6&lt;/h6&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;// listen port on IPv6 and not on all interfaces
-LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
   WITH
     row,
     toInteger(last(split(row.local, ':'))) AS local_port,
@@ -726,7 +726,9 @@ LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connect
         p.ipv6 = i.ipv6
 
     FOREACH( x IN ifPid |
-      MERGE (process:Process {pid:pid, fqdn:$fqdn})&lt;/code&gt;&lt;/pre&gt;
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -734,8 +736,7 @@ LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connect
 &lt;h6 id=&quot;on-all-interfaces&quot;&gt;On all interfaces&lt;/h6&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;// listen port on all ipv4 interfaces
-LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
   WITH
     row,
     toInteger(last(split(row.local, ':'))) AS local_port,
@@ -755,7 +756,36 @@ LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connect
     MERGE (i)-[:USES_PORT]-&amp;gt;(p)
 
     FOREACH( x IN ifPid |
-      MERGE (process:Process {pid:pid, fqdn:$fqdn})&lt;/code&gt;&lt;/pre&gt;
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    ( row.local STARTS WITH ':::*') //  all interfaces
+  WITH
+    row,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface {fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ipv6:i.ipv6})
+    SET p.ip = i.ip
+    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -786,33 +816,7 @@ RETURN path&lt;/code&gt;&lt;/pre&gt;
 &lt;h6 id=&quot;on-ipv4-2&quot;&gt;On Ipv4&lt;/h6&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;// listen port on all ipv6 interfaces
-LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
-  WITH
-    row,
-    toInteger(last(split(row.local, ':'))) AS local_port,
-    toInteger(split(row.pid,'/')[0]) AS pid
-  WHERE
-    row.state = 'LISTEN' AND
-    ( row.local STARTS WITH ':::*') //  all interfaces
-  WITH
-    row,
-    local_port,
-    pid,
-    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
-
-    MATCH (i:Interface {fqdn:$fqdn })
-    MERGE (p:Port { number: local_port, ipv6:i.ipv6})
-    SET p.ip = i.ip
-    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
-
-    FOREACH( x IN ifPid |
-      MERGE (process:Process {pid:pid, fqdn:$fqdn})
-      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
-    );
-
-// IPv4 connections
-LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
   WITH
     row,
     toInteger(last(split(row.local, ':'))) AS local_port,
@@ -821,15 +825,10 @@ LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connect
   WHERE
     row.state = 'ESTABLISHED' AND
     size(split(row.local, '.')) &amp;gt; 1 // only ipv4
-  WITH&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect5&quot;&gt;
-&lt;h6 id=&quot;on-ipv6-2&quot;&gt;On Ipv6&lt;/h6&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;    local_port,
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
     replace(row.remote, ':'+ remote_port, '') AS remote_ip,
     remote_port,
     pid,
@@ -853,17 +852,49 @@ LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connect
     FOREACH( x IN ifPid |
       MERGE (process:Process {pid:pid, fqdn:$fqdn})
       MERGE (process)-[:HAS_CONNECTION]-&amp;gt;(con)
-    );
-
-// IPv6 connections
-LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-ipv6-2&quot;&gt;On Ipv6&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
   WITH
     row,
     toInteger(last(split(row.local, ':'))) AS local_port,
     toInteger(last(split(row.remote, ':'))) AS remote_port,
     toInteger(split(row.pid,'/')[0]) AS pid
   WHERE
-    row.state = 'ESTABLISHED' AND&lt;/code&gt;&lt;/pre&gt;
+    row.state = 'ESTABLISHED' AND
+    size(split(row.local, '.')) = 0
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    replace(row.remote, ':'+ remote_port, '') AS remote_ip,
+    remote_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (s:Server {fqdn:$fqdn})
+
+    MATCH (iLocal:Interface {ipv6: local_ip, fqdn:$fqdn })
+    MERGE (iLocal)-[:USES_PORT]-&amp;gt;(pLocal:Port { number: local_port})
+    SET pLocal.ip = iLocal.ip,
+        pLocal.ipv6 = iLocal.ipv6
+
+    MERGE (pRemote:Port { number: remote_port, ip:remote_ip })
+
+    MERGE (con:Connection { fqdn:$fqdn, pid:coalesce(pid,'-'), local:row.local, remote:row.remote})
+    MERGE (con)-[:SOURCE]-&amp;gt;(pLocal)
+    MERGE (con)-[:TARGET]-&amp;gt;(pRemote)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:HAS_CONNECTION]-&amp;gt;(con)
+    );&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
