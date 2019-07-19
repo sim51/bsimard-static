@@ -3,12 +3,14 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Site de Benoit Simard</description>
-    <link>http://www.bsimard.com/</link>
-    <atom:link href="http://www.bsimard.com/fr/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 25 Apr 2019 16:38:14 +0200</pubDate>
-    <lastBuildDate>Thu, 25 Apr 2019 16:38:14 +0200</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/fr/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 19 Jul 2019 15:21:28 +0200</pubDate>
+    <lastBuildDate>Fri, 19 Jul 2019 15:21:28 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
+    
+     
     
      
       <item>
@@ -643,8 +645,8 @@ et/ou si vous avez des idées d&amp;#8217;analyse, n&amp;#8217;hésitez pas à m
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 18 Apr 2019 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2019/04/18/graph-licenses.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2019/04/18/graph-licenses.html</guid>
+        <link>http://localhost:4000/2019/04/18/graph-licenses.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/04/18/graph-licenses.html</guid>
         
         
         <category>graphe</category>
@@ -674,8 +676,8 @@ et/ou si vous avez des idées d&amp;#8217;analyse, n&amp;#8217;hésitez pas à m
 &lt;p&gt;Et les slides sont ici : &lt;a href=&quot;https://sim51.github.io/presentations/graphql-neo4j/&quot; class=&quot;bare&quot;&gt;https://sim51.github.io/presentations/graphql-neo4j/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;</description>
         <pubDate>Fri, 14 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/14/fr-graphql-et-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/14/fr-graphql-et-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/14/fr-graphql-et-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/14/fr-graphql-et-neo4j.html</guid>
         
         
         <category>JUGSummerCamp</category>
@@ -1004,8 +1006,8 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/fr-kettle-neo4j.html</guid>
+        <link>http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/09/03/fr-kettle-neo4j.html</guid>
         
         
         <category>Kettle</category>
@@ -1772,8 +1774,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
+        <link>http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/22/fr-monitoring-neo4j-influxdb.html</guid>
         
         
         <category>monitoring</category>
@@ -1955,8 +1957,8 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Thu, 23 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/23/fr-import-matrice-adjacence.html</guid>
+        <link>http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/11/23/fr-import-matrice-adjacence.html</guid>
         
         
         <category>neo4j</category>
@@ -1973,462 +1975,6 @@ apoc.import.file.enabled=true&lt;/code&gt;&lt;/pre&gt;
       
     
      
-    
-     
-      <item>
-        <title>Connecter Neo4j à un annuaire LDAP</title>
-        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
-&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
-&lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#objectif&quot;&gt;Objectif&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#installation-d-un-serveur-openldap&quot;&gt;Installation d&amp;#8217;un serveur OpenLDAP&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#la-configuration-de-neo4j&quot;&gt;La configuration de Neo4j&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#détail-du-fonctionnement&quot;&gt;Détail du fonctionnement&lt;/a&gt;
-&lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#l-authentification&quot;&gt;L&amp;#8217;authentification&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#la-gestion-des-accès&quot;&gt;La gestion des accès&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#en-bref&quot;&gt;En bref&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;objectif&quot;&gt;Objectif&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Vous allez découvrir comment connecter un annuaire LDAP à Neo4j pour lui confier la gestion de l&amp;#8217;authentification et des accès.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;installation-d-un-serveur-openldap&quot;&gt;Installation d&amp;#8217;un serveur OpenLDAP&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Au lieu d&amp;#8217;installer un serveur OpenLDAP sur ma machine, je vais utiliser Docker avec l&amp;#8217;image suivante : &lt;a href=&quot;https://github.com/osixia/docker-openldap&quot; class=&quot;bare&quot;&gt;https://github.com/osixia/docker-openldap&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Celle-ci me permet de lancer un serveur OpenLDAP pré-configuré où :
-  * le domaine par défault est  &lt;code&gt;dc=example,dc=org&lt;/code&gt;
-  * l&amp;#8217;administrateur est &lt;code&gt;cn=admin,dc=example,dc=org&lt;/code&gt; avec le password &lt;code&gt;admin&lt;/code&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;De plus on peut lui passer en paramètre le chemin d&amp;#8217;accès d&amp;#8217;un répertoire contenant des fichiers LDIF, qui vont être éxécutés à son lancement.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ainsi, voici le fichier LDIF que j&amp;#8217;ai réalisé pour créer la structure de mon LDAP et importer les données au démarrage du serveur :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-ldif&quot; data-lang=&quot;ldif&quot;&gt;dn: ou=users,dc=example,dc=org
-objectClass: organizationalUnit
-objectClass: top
-ou: users
-
-dn: ou=groups,dc=example,dc=org
-objectClass: organizationalUnit
-objectClass: top
-ou: groups
-
-
-dn: cn=reader,ou=groups,dc=example,dc=org
-objectClass: groupOfNames
-objectClass: top
-cn: reader
-member:uid=reader,ou=users,dc=example,dc=org
-
-dn: cn=publisher,ou=groups,dc=example,dc=org
-objectClass: groupOfNames
-objectClass: top
-cn: publisher
-member:uid=publisher,ou=users,dc=example,dc=org
-
-dn: cn=architect,ou=groups,dc=example,dc=org
-objectClass: groupOfNames
-objectClass: top
-cn: architect
-member:uid=architect,ou=users,dc=example,dc=org
-
-dn: cn=admin,ou=groups,dc=example,dc=org
-objectClass: groupOfNames
-objectClass: top
-cn: admin
-member:uid=admin,ou=users,dc=example,dc=org
-
-dn: uid=reader,ou=users,dc=example,dc=org
-objectClass: organizationalPerson
-objectClass: person
-objectClass: extensibleObject
-objectClass: uidObject
-objectClass: inetOrgPerson
-objectClass: top
-cn: Reader User
-givenName: Reader
-sn: reader
-uid: reader
-mail: reader@example.com
-ou: users
-userpassword: test
-memberOf: cn=reader,ou=groups,dc=example,dc=org
-
-dn: uid=publisher,ou=users,dc=example,dc=org
-objectClass: organizationalPerson
-objectClass: person
-objectClass: extensibleObject
-objectClass: uidObject
-objectClass: inetOrgPerson
-objectClass: top
-cn: Publisher User
-givenName: Publisher
-sn: publisher
-uid: publisher
-mail: publisher@example.com
-ou: users
-userpassword: test
-memberOf: cn=publisher,ou=groups,dc=example,dc=org
-
-dn: uid=architect,ou=users,dc=example,dc=org
-objectClass: organizationalPerson
-objectClass: person
-objectClass: extensibleObject
-objectClass: uidObject
-objectClass: inetOrgPerson
-objectClass: top
-cn: Architect User
-givenName: Architect
-sn: architect
-uid: architect
-mail: architect@example.com
-ou: users
-userpassword: test
-memberOf: cn=architect,ou=groups,dc=example,dc=org
-
-dn: uid=admin,ou=users,dc=example,dc=org
-objectClass: organizationalPerson
-objectClass: person
-objectClass: extensibleObject
-objectClass: uidObject
-objectClass: inetOrgPerson
-objectClass: top
-cn: Admin User
-givenName: Architect
-sn: admin
-uid: admin
-mail: admin@example.com
-ou: users
-userpassword: test
-memberOf: cn=admin,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Comme vous pouvez le constater, j&amp;#8217;y définis les éléments suivants :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;une &lt;em&gt;organization unit&lt;/em&gt;  &lt;strong&gt;groups&lt;/strong&gt; : &lt;code&gt;ou=groups,dc=example,dc=org&lt;/code&gt;, contenant la définition des groupes suivants&lt;/p&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;groupe &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;cn=admin,ou=groupss,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;groupe &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;cn=architect,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;groupe &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;cn=publisher,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;groupe &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;cn=reader,ou=groups,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;une &lt;em&gt;organization unit&lt;/em&gt; &lt;strong&gt;users&lt;/strong&gt; : &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;, contenant la définition des utilisateurs suivants&lt;/p&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;admin&lt;/strong&gt; &lt;code&gt;uid=admin,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;architect&lt;/strong&gt; &lt;code&gt;uid=architect,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;publisher&lt;/strong&gt; &lt;code&gt;uid=publisher,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;l&amp;#8217;utilisateur &lt;strong&gt;reader&lt;/strong&gt; &lt;code&gt;uid=reader,ou=users,dc=example,dc=org&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;INFO: les utilisateurs doivent être liés a leurs groupes via l&amp;#8217;attribut &lt;code&gt;memberOf&lt;/code&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Dans mon cas, j&amp;#8217;ai sauvegardé ce fichier dans le répertoire &lt;code&gt;/home/bsimard/ldif&lt;/code&gt;,
-ce qui donne la commande suivante pour démarrer le container docker :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;docker run \
-   --volume /home/bsimard/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom \
-   osixia/openldap:1.1.10 \
-   --copy-service \
-   --loglevel debug&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;la-configuration-de-neo4j&quot;&gt;La configuration de Neo4j&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;La configuration de Neo4j est centralisée dans le fichier &lt;code&gt;NEO4J_HOME/conf/neo4j.conf&lt;/code&gt;.
-Ainsi il suffit de l&amp;#8217;éditer et d&amp;#8217;y ajouter les propriétés suivantes :&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;#********************************************************************
-# Security Configuration
-#********************************************************************
-
-# The authentication and authorization provider that contains both users and roles.
-# This can be one of the built-in `native` or `ldap` auth providers,
-# or it can be an externally provided plugin, with a custom name prefixed by `plugin`,
-# i.e. `plugin-&amp;lt;AUTH_PROVIDER_NAME&amp;gt;`.
-dbms.security.auth_provider=ldap
-
-# The time to live (TTL) for cached authentication and authorization info when using
-# external auth providers (LDAP or plugin). Setting the TTL to 0 will
-# disable auth caching.
-#dbms.security.auth_cache_ttl=10m
-
-# The maximum capacity for authentication and authorization caches (respectively).
-#dbms.security.auth_cache_max_capacity=10000
-
-# Set to log successful authentication events to the security log.
-# If this is set to `false` only failed authentication events will be logged, which
-# could be useful if you find that the successful events spam the logs too much,
-# and you do not require full auditing capability.
-#dbms.security.log_successful_authentication=true
-
-#================================================
-# LDAP Auth Provider Configuration
-#================================================
-
-# URL of LDAP server to use for authentication and authorization.
-# The format of the setting is `&amp;lt;protocol&amp;gt;://&amp;lt;hostname&amp;gt;:&amp;lt;port&amp;gt;`, where hostname is the only required field.
-# The supported values for protocol are `ldap` (default) and `ldaps`.
-# The default port for `ldap` is 389 and for `ldaps` 636.
-# For example: `ldaps://ldap.example.com:10389`.
-#
-# NOTE: You may want to consider using STARTTLS (`dbms.security.ldap.use_starttls`) instead of LDAPS
-# for secure connections, in which case the correct protocol is `ldap`.
-dbms.security.ldap.host=172.17.0.2
-
-# Use secure communication with the LDAP server using opportunistic TLS.
-# First an initial insecure connection will be made with the LDAP server, and then a STARTTLS command
-# will be issued to negotiate an upgrade of the connection to TLS before initiating authentication.
-#dbms.security.ldap.use_starttls=false
-
-# The LDAP referral behavior when creating a connection. This is one of `follow`, `ignore` or `throw`.
-# `follow` automatically follows any referrals
-# `ignore` ignores any referrals
-# `throw` throws an exception, which will lead to authentication failure
-#dbms.security.ldap.referral=follow
-
-# The timeout for establishing an LDAP connection. If a connection with the LDAP server cannot be
-# established within the given time the attempt is aborted.
-# A value of 0 means to use the network protocol's (i.e., TCP's) timeout value.
-#dbms.security.ldap.connection_timeout=30s
-
-# The timeout for an LDAP read request (i.e. search). If the LDAP server does not respond within
-# the given time the request will be aborted. A value of 0 means wait for a response indefinitely.
-#dbms.security.ldap.read_timeout=30s
-
-#----------------------------------
-# LDAP Authentication Configuration
-#----------------------------------
-
-# LDAP authentication mechanism. This is one of `simple` or a SASL mechanism supported by JNDI,
-# for example `DIGEST-MD5`. `simple` is basic username
-# and password authentication and SASL is used for more advanced mechanisms. See RFC 2251 LDAPv3
-# documentation for more details.
-dbms.security.ldap.authentication.mechanism=simple
-
-# LDAP user DN template. An LDAP object is referenced by its distinguished name (DN), and a user DN is
-# an LDAP fully-qualified unique user identifier. This setting is used to generate an LDAP DN that
-# conforms with the LDAP directory's schema from the user principal that is submitted with the
-# authentication token when logging in.
-# The special token {0} is a placeholder where the user principal will be substituted into the DN string.
-dbms.security.ldap.authentication.user_dn_template=uid={0},ou=users,dc=example,dc=org
-
-# Determines if the result of authentication via the LDAP server should be cached or not.
-# Caching is used to limit the number of LDAP requests that have to be made over the network
-# for users that have already been authenticated successfully. A user can be authenticated against
-# an existing cache entry (instead of via an LDAP server) as long as it is alive
-# (see `dbms.security.auth_cache_ttl`).
-# An important consequence of setting this to `true` is that
-# Neo4j then needs to cache a hashed version of the credentials in order to perform credentials
-# matching. This hashing is done using a cryptographic hash function together with a random salt.
-# Preferably a conscious decision should be made if this method is considered acceptable by
-# the security standards of the organization in which this Neo4j instance is deployed.
-dbms.security.ldap.authentication.cache_enabled=false
-
-#----------------------------------
-# LDAP Authorization Configuration
-#----------------------------------
-# Authorization is performed by searching the directory for the groups that
-# the user is a member of, and then map those groups to Neo4j roles.
-
-# Perform LDAP search for authorization info using a system account instead of the user's own account.
-#
-# If this is set to `false` (default), the search for group membership will be performed
-# directly after authentication using the LDAP context bound with the user's own account.
-# The mapped roles will be cached for the duration of `dbms.security.auth_cache_ttl`,
-# and then expire, requiring re-authentication. To avoid frequently having to re-authenticate
-# sessions you may want to set a relatively long auth cache expiration time together with this option.
-# NOTE: This option will only work if the users are permitted to search for their
-# own group membership attributes in the directory.
-#
-# If this is set to `true`, the search will be performed using a special system account user
-# with read access to all the users in the directory.
-# You need to specify the username and password using the settings
-# `dbms.security.ldap.authorization.system_username` and
-# `dbms.security.ldap.authorization.system_password` with this option.
-# Note that this account only needs read access to the relevant parts of the LDAP directory
-# and does not need to have access rights to Neo4j, or any other systems.
-dbms.security.ldap.authorization.use_system_account=true
-
-# An LDAP system account username to use for authorization searches when
-# `dbms.security.ldap.authorization.use_system_account` is `true`.
-# Note that the `dbms.security.ldap.authentication.user_dn_template` will not be applied to this username,
-# so you may have to specify a full DN.
-dbms.security.ldap.authorization.system_username=cn=admin,dc=example,dc=org
-
-# An LDAP system account password to use for authorization searches when
-# `dbms.security.ldap.authorization.use_system_account` is `true`.
-dbms.security.ldap.authorization.system_password=admin
-
-# The name of the base object or named context to search for user objects when LDAP authorization is enabled.
-# A common case is that this matches the last part of `dbms.security.ldap.authentication.user_dn_template`.
-dbms.security.ldap.authorization.user_search_base=ou=users,dc=example,dc=org
-
-# The LDAP search filter to search for a user principal when LDAP authorization is
-# enabled. The filter should contain the placeholder token {0} which will be substituted for the
-# user principal.
-dbms.security.ldap.authorization.user_search_filter=(&amp;amp;(objectClass=*)(uid={0}))
-
-# A list of attribute names on a user object that contains groups to be used for mapping to roles
-# when LDAP authorization is enabled.
-dbms.security.ldap.authorization.group_membership_attributes=memberOf
-
-# An authorization mapping from LDAP group names to Neo4j role names.
-# The map should be formatted as a semicolon separated list of key-value pairs, where the
-# key is the LDAP group name and the value is a comma separated list of corresponding role names.
-# For example: group1=role1;group2=role2;group3=role3,role4,role5
-#
-# You could also use whitespaces and quotes around group names to make this mapping more readable,
-# for example: dbms.security.ldap.authorization.group_to_role_mapping=\
-#          &quot;cn=Neo4j Read Only,cn=users,dc=example,dc=com&quot;      = reader;    \
-#          &quot;cn=Neo4j Read-Write,cn=users,dc=example,dc=com&quot;     = publisher; \
-#          &quot;cn=Neo4j Schema Manager,cn=users,dc=example,dc=com&quot; = architect; \
-#          &quot;cn=Neo4j Administrator,cn=users,dc=example,dc=com&quot;  = admin
-dbms.security.ldap.authorization.group_to_role_mapping=\
-          &quot;cn=reader,ou=groups,dc=example,dc=org&quot;  = reader; \
-          &quot;cn=publisher,ou=groups,dc=example,dc=org&quot;  = publisher; \
-          &quot;cn=architect,ou=groups,dc=example,dc=org&quot;  = architect; \
-          &quot;cn=admin,ou=groups,dc=example,dc=org&quot;  = admin&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Après un redémarrage du service, la nouvelle configuration est prise en compte,
-et on peut tester la connection LDAP directement avec le navigateur Neo4j : &lt;a href=&quot;http://localhost:7474/browser&quot; class=&quot;bare&quot;&gt;http://localhost:7474/browser&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;détail-du-fonctionnement&quot;&gt;Détail du fonctionnement&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Il y a deux étapes dans le processus : l&amp;#8217;authentification et la gestion des accès&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;l-authentification&quot;&gt;L&amp;#8217;authentification&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Celle-ci est réalisée directement par un &lt;code&gt;BIND&lt;/code&gt; sur le LDAP avec le &lt;strong&gt;DN&lt;/strong&gt; de l&amp;#8217;utilisateur.
-Le &lt;strong&gt;DN&lt;/strong&gt; est calculé par Neo4j grâce à la clef de configuration &lt;strong&gt;dbms.security.ldap.authentication.user_dn_template&lt;/strong&gt;.
-Le &lt;code&gt;{0}&lt;/code&gt; est remplacé par le login de l&amp;#8217;utilisateur.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ainsi dans notre exemple, si on essaye de se connecter avec l&amp;#8217;utilisateur &lt;code&gt;admin&lt;/code&gt;,
-le &lt;code&gt;BIND&lt;/code&gt; sera effectué avec le DN &lt;code&gt;uid=admin,ou=Users,dc=example,dc=org&lt;/code&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;la-gestion-des-accès&quot;&gt;La gestion des accès&lt;/h3&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Une fois que le couple login/password est validé, on peut passer à la gestion des accès.
-Celle-ci est déléguée à un utilisateur système qui va effecuter une recherche dans le LDAP pour retrouver l&amp;#8217;utilisateur et ses groupes associés.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ainsi il effectue :
-  * la requête LDAP configurée via la clef &lt;strong&gt;dbms.security.ldap.authorization.user_search_filter&lt;/strong&gt; (dans notre cas &lt;code&gt;(&amp;amp;(objectClass=*)(uid={0}))&lt;/code&gt;). Neo4j remplace &lt;code&gt;{0}&lt;/code&gt; par le login de l&amp;#8217;utilisateur.
-  * dans le sous-arbre définit vi la clef &lt;strong&gt;dbms.security.ldap.authorization.user_search_base&lt;/strong&gt; (dans notre cas &lt;code&gt;ou=users,dc=example,dc=org&lt;/code&gt;).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Ceci lui permet de retrouver l&amp;#8217;utilisateur dans l&amp;#8217;annuaire,
-puis de récupérer ses groupe via l&amp;#8217;attribut configuré par la clef &lt;strong&gt;dbms.security.ldap.authorization.group_membership_attributes&lt;/strong&gt;
-(donc &lt;code&gt;memberOf&lt;/code&gt; dans l&amp;#8217;exemple).&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Pour finir, la correspondance entre les groupes LDAP et les roles Neo4j est effectué en respectant les règles définie dans la clef de configuration
-&lt;strong&gt;dbms.security.ldap.authorization.group_to_role_mapping&lt;/strong&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;en-bref&quot;&gt;En bref&lt;/h2&gt;
-&lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;ulist&quot;&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Le connecteur LDAP est uniquement présent dans l&amp;#8217;édition &lt;strong&gt;Entreprise&lt;/strong&gt; de Neo4j&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;La configuratin est simple et permet de gérer à la fois l&amp;#8217;authentification et les accès&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Les utilisateurs &lt;strong&gt;doivent impérativement&lt;/strong&gt; être liés aux groupes via un attribut comme &lt;strong&gt;memberOf&lt;/strong&gt; (relation utilisateur &amp;#8594; groupes, et pas l&amp;#8217;inverse)&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;L&amp;#8217;exemple utilise un utilisateur système, mais ce n&amp;#8217;est pas une obligation. Il est possible de modifier la configuration pour que l&amp;#8217;utilisateur effectue à la fois l&amp;#8217;authenfication et les droits d&amp;#8217;accès.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;</description>
-        <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/fr-neo4j-ldap.html</guid>
-        
-        
-        <category>neo4j</category>
-        
-        <category> ldap</category>
-        
-        <category> authenfication</category>
-        
-        <category> authorisation</category>
-        
-        
-        
-      </item>
-      
     
   </channel>
 </rss>

@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Your computer is a graph !</title>
+<meta charset="UTF-8">
+<meta name="og:title" content="Your computer is a graph !"/>
+<meta name="og:type" content="article"/>
+<meta name="og:url" content="http://localhost:4000/2019/06/29/computer-as-a-graph.html"/>
+<meta name="og:description" content="Discover your computer by importing its hardwares, packages, network connection , ..., and see it as a graph"/>
+<meta name="og:image" content="http://localhost:4000/public/images/computer-as-a-graph/banner.png"/>
+<meta name="author" content="Benoit Simard"/>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="Discover your computer by importing its hardwares, packages, network connection , ..., and see it as a graph" />
+<meta name="keywords" content="graph,neo4j, cmdb, linux, discovery" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="Aer6BmLRp_kjily3ltrCqys_5KBaRaS_iVIe73dlgVw" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/png" href="/public/images/bsimard.png">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" type="text/css" media="all" href="/public/stylesheets/main.css">
+
+<!-- RSS feed -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/en/feed.xml" />
+
+</head>
+<body class="page">
+
+  <!-- Navbar -->
+<header class="navbar navbar-inverse navbar-fixed-top hidden-print">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="/en" title="Benoît Simard">
+                <img class="baseline" src="/public/images/bsimard.png" alt="Benoît SImard"/>
+            </a>
+            <nav class="nav-collapse collapse">
+                <ul class="nav navbar-nav">
+                  
+                  
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/" title="Home">Home</a></li>
+                    
+                  
+                    
+                  
+                    
+                      <li><a href="/en/blog/" title="Blog">Blog</a></li>
+                    
+                  
+                    
+                  
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  
+                  
+                    
+                        <li>
+                        <a href="/2019/06/29/computer-as-a-graph.html" class="en">en</a>
+                        </li>
+                    
+                  
+
+                  
+                  
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+  <section class="firstBlock blockDefault mainContainer container">
+    <section>
+      <article class="row-fluid" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="span12">
+          <header>
+            <h1 itemprop="name"> Your computer is a graph !</h1>
+            <meta itemprop="description" content=" Discover your computer by importing its hardwares, packages, network connection , ..., and see it as a graph">
+            <img itemprop="image" src="/public/images/computer-as-a-graph/banner.png"/>
+          </header>
+          <section itemprop="articleBody">
+            <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#the-model">The model</a></li>
+<li><a href="#import-items">Import items</a>
+<ul class="sectlevel2">
+<li><a href="#computer-name">Computer name</a></li>
+<li><a href="#hardware">Hardware</a></li>
+<li><a href="#user-group">User &amp; Group</a></li>
+<li><a href="#process-list">Process list</a></li>
+<li><a href="#list-of-installed-packages">List of installed packages</a></li>
+<li><a href="#network">Network</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this article I will show you how to import all the components of a Linux computer (package network connection, user, group, &#8230;&#8203;),
+into a graph with the help of Neo4j.</p>
+</div>
+<div class="paragraph">
+<p>In an next article, we will play with this dataset and see what we value we can get.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-model">The model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the model I want to produce :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/diag/diag-a43d29d5a7438ea5e0741d034529c6c1.png" alt="diag a43d29d5a7438ea5e0741d034529c6c1" width="1108" height="766">
+</div>
+</div>
+<div class="paragraph">
+<p>Basicaly, I have a server that is composed of a list of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>installed packages with their dependencies</p>
+</li>
+<li>
+<p>network interfaces with their connections</p>
+</li>
+<li>
+<p>hardware (as tree)</p>
+</li>
+<li>
+<p>groups and users</p>
+</li>
+<li>
+<p>process (as a tree)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>From that model, we can create the indexes/constraints for the database :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CREATE CONSTRAINT ON (n:Server) ASSERT (n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Group) ASSERT (n.gid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:User) ASSERT (n.uid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Process) ASSERT (n.pid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageSection) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Package) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageVersion) ASSERT (n.version, n.architecture,n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Hardware) ASSERT (n.id, n.fqdn ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Vendor) ASSERT (n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Product) ASSERT (n.name, n.vendor ) IS NODE KEY;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="import-items">Import items</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="computer-name">Computer name</h3>
+<div class="paragraph">
+<p>The first thing to retrieve is the <a href="https://fr.wikipedia.org/wiki/Fully_qualified_domain_name">FQDN</a> of the computer.
+For this I will use the command : <code>hostname --fqdn</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt; hostname --fqdn
+pythagore</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will help us to create the node <code>Server</code> :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">MERGE (:Server {fqdn:$fqdn});</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="hardware">Hardware</h3>
+<div class="paragraph">
+<p>To retrieve the entire composition of the server,
+I will use the command <code>lshw</code> that list all the hardware in a tree format.</p>
+</div>
+<div class="paragraph">
+<p>Moreover, the command can generate a JSON file if we pass the argument <code>-json</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">FILE="$NEO4J_HOME/import/$1/hardware.json"
+  sudo lshw -json &gt; $FILE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The import process of this file will be a little complexe,
+because it&#8217;s a <strong>JSON tree</strong> with an undeterminated depth. So I need to create a <strong>recursive query</strong> to create its structure in neo4j.</p>
+</div>
+<div class="paragraph">
+<p>For this I will use massively <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures">APOC</a> for that !</p>
+</div>
+<div class="paragraph">
+<p>For each item of the JSON, I want to create this : <code>(Vendor)-&#8594;(Product)&#8592;-(ProductInstance)&#8592;-(ParentHardwareInstance)</code></p>
+</div>
+<div class="paragraph">
+<p>If I translate that in Cypher in a custom procedure, it gives that :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.custom.asProcedure(
+	'hardware',
+  "
+  MATCH (p) WHERE id(p)=$parent
+
+  MERGE (vendor:Vendor { name:coalesce($item.vendor, 'unknown')})
+  MERGE (product:Product { name:coalesce($item.product, 'unknown'), vendor:coalesce($item.vendor, 'unknown')})
+    ON CREATE SET product.description = $item.description
+  MERGE (vendor)-[:HAS_PRODUCT]-&gt;(product)
+
+  MERGE (hardware:Hardware {id:$item.id + '-' + coalesce($item.physid, '') + '-' + coalesce($item.handle, '') , fqdn:$fqdn})
+  SET hardware +=apoc.map.removeKeys($item,['id', 'children', 'capabilities', 'configuration', 'vendor', 'product'])
+  MERGE (p)-[:HAS_HARDWARE]-&gt;(hardware)
+  MERGE (hardware)-[:TYPE_OF]-&gt;(product)
+
+  WITH  hardware
+  UNWIND coalesce($item.children, []) AS newItem
+    CALL custom.hardware($fqdn, id(hardware), newItem) YIELD row
+    RETURN row
+  ",
+  "write",
+  [["row","MAP"]],
+  [
+    ['fqdn','STRING'],
+    ['parent','LONG'],
+    ['item','MAP']
+  ]
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you see at the <strong>line 18</strong>, I recall the procedure itself if there are some children.
+Pretty cool no ?</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The documentation for the cypher custom procedure feature is available  here : <a href="https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions" class="bare">https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Then I just have to call the procedure with the data like that :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">CALL apoc.load.json("file:///" + $fqdn + "/hardware.json") YIELD value WITH value
+ MATCH (s:Server {fqdn:$fqdn})
+ CALL custom.hardware($fqdn, id(s), value) YIELD row
+ RETURN count(*);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And to finish, I put the <code>class</code> attribut as a Label :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (n:Hardware)
+CALL apoc.create.addLabels( id(n), [ n.class ] ) YIELD node
+REMOVE node.class
+RETURN count(*)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you want to see the result in the browser, this is the query for just displaying the tree structure of hardwares :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH p=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_HARDWARE]-&gt;(:Hardware)-[:HAS_HARDWARE*]-&gt;(h:Hardware)
+WHERE NOT (h)-[:HAS_HARDWARE]-&gt;()
+RETURN *</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/hardware-tree.svg" alt="hardware tree" width="70%">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="user-group">User &amp; Group</h3>
+<div class="sect3">
+<h4 id="users">Users</h4>
+<div class="paragraph">
+<p>Users are stored in the file <code>/etc/users</code>, where each line represents a user.
+For example : <code>bsimard:x:1000:1000:Benoit Simard,,,:/home/bsimard:/bin/bash</code></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Username:</strong> The login of the user, <code>bsimard</code></p>
+</li>
+<li>
+<p><strong>Password:</strong>  Generally password is set to <code>x</code>. It indicates that password are stored in the file <code>/etc/shadow</code>.</p>
+</li>
+<li>
+<p><strong>User ID (UID):</strong>  The ID of the user.</p>
+</li>
+<li>
+<p><strong>Group ID (GID):</strong>  The ID of the main group of the user</p>
+</li>
+<li>
+<p><strong>User ID Info:</strong> Some information about the user seperated by a <code>,</code>, like the fullname, phone, email</p>
+</li>
+<li>
+<p><strong>Home directory:</strong> The home directory of the user <code>/home/bsimard</code></p>
+</li>
+<li>
+<p><strong>Command/shell:</strong> The command for the shell, in my case <code>/bin/bash</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This is the Cypher script to import this file in Neo4j :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/users.csv" AS row FIELDTERMINATOR ':'
+  MERGE (g:Group { gid:toInteger(row.gid), fqdn:$fqdn})
+  MERGE(u:User {uid: toInteger(row.uid), fqdn:$fqdn})
+  SET u.username = row.username,
+      u.fullname = split(row.info, ',')[0],
+      u.home_directory = row.home,
+      u.shell = row.shell
+  MERGE (g)-[:HAS_USER]-&gt;(u);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="groups">Groups</h4>
+<div class="paragraph">
+<p>Groups are stored in the file <code>/etc/groups</code>, where each line represents a group.
+For example : <code>adm:x:4:syslog,bsimard</code></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Group name:</strong> Name of the group, in our example it&#8217;s <code>adm</code></p>
+</li>
+<li>
+<p><strong>Password:</strong>  Generally password is not used, hence it is empty/blan, ie. <code>x</code></p>
+</li>
+<li>
+<p><strong>Group ID (GID):</strong> Each group must be assigned a group ID, , in our example it&#8217;s <code>4</code></p>
+</li>
+<li>
+<p><strong>Group List:</strong> It is a list of user names of users who are members of the group, separated by a <code>,</code>. In our example <code>syslog</code> and <code>bsimard</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This is the Cypher script to import this file in Neo4j :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/groups.csv" AS row FIELDTERMINATOR ':'
+  MATCH (s:Server {fqdn:$fqdn})
+  MERGE (g:Group { gid:toInteger(row.gid), fqdn:$fqdn })
+  MERGE (s)-[:HAS_GROUP]-&gt;(g)
+  SET g.name = row.name
+  WITH row, g
+  UNWIND split(row.users, ",") AS username
+    MATCH (u:User { username:username, fqdn:$fqdn})
+    MERGE (g)-[:HAS_USER]-&gt;(u);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="the-result">The result</h4>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/user-all.svg" alt="user all" width="70%">
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="process-list">Process list</h3>
+<div class="paragraph">
+<p>To retrieve the list of all the running process, with their dependencies,
+I will use the <strong>ps</strong> command with those arguments :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>e:</strong> Select all processes</p>
+</li>
+<li>
+<p><strong>o:</strong> To specify the format with</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>pid:</strong> The ID of the process</p>
+</li>
+<li>
+<p><strong>ppid:</strong> The ID of the parent process</p>
+</li>
+<li>
+<p><strong>comm:</strong> The command that has launched the process</p>
+</li>
+<li>
+<p><strong>ruser:</strong> The username of the user that owns the process</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">$&gt; ps -eo pid,ppid,comm,ruser
+
+PID,PPID,%CPU,SIZE,COMMAND,RUSER
+1,0,0.0,18964,systemd,root
+2,0,0.0,0,kthreadd,root
+4,2,0.0,0,kworker/0:0H,root
+6,2,0.0,0,mm_percpu_wq,root</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the help of <strong>awk</strong>, we can generate a CSV file :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">FILE="$NEO4J_HOME/import/$1/processes.csv"
+  ps -eo pid,ppid,comm,ruser | awk '{print $1","$2","$3","$4}' &gt; $FILE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And this is the cypher script to import it :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (s:Server {fqdn:$fqdn})
+MERGE (p:Process {pid:0, command:'init', fqdn:$fqdn})
+MERGE (s)-[:HAS_PROCESS]-&gt;(p);
+
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/processes.csv" AS row
+WITH row ORDER BY row.PPID, row.PID  ASC
+  MATCH (u:User {username:row.RUSER, fqdn:$fqdn})
+  MERGE (pp:Process {pid:toInteger(row.PPID), fqdn:$fqdn})
+  MERGE (p:Process {pid:toInteger(row.PID), fqdn:$fqdn})
+  SET p.command = split(row.COMMAND, '/')[0]
+  MERGE (pp)-[:HAS_PROCESS]-&gt;(p)
+  MERGE (p)-[:OWNED_BY]-&gt;(u);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When the import is finished, you should have something similar to this by excuting the following query :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_PROCESS]-&gt;(:Process)-[:HAS_PROCESS*]-&gt;(p:Process)
+WHERE NOT (p)-[:HAS_PROCESS]-&gt;()
+RETURN *</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/process-tree.svg" alt="process tree" width="70%">
+</div>
+</div>
+<div class="paragraph">
+<p>We can also search all the processes of a user :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (n:Server {fqdn:'pythagore.logisima'})-[:HAS_GROUP|:HAS_USER*2..2]-&gt;(u:User {name:'bsimard'})
+WITH u
+MATCH (u)&lt;-[:OWNED_BY]-(p)
+RETURN *</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/process-user.svg" alt="process user" width="40%">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="list-of-installed-packages">List of installed packages</h3>
+<div class="paragraph">
+<p>Because I have a debian system, I will use the <strong>dpkg</strong> command, and produce a CSV from its output :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">FILE="$NEO4J_HOME/import/$1/packages.csv"
+if [[ $# -eq 0  || "$1" == "$LOCAL_SERVER_NAME" ]] ; then</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I can import it with the following cypher script :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/packages.csv" AS row FIELDTERMINATOR '\t'
+  MATCH (s:Server {fqdn:$fqdn})
+
+  MERGE (section:PackageSection {name:coalesce(row.section, 'None') })
+  MERGE (package:Package {name:row.package})
+  SET package.url = row.homepage
+  MERGE (section)-[:HAS_PACKAGE]-&gt;(package)
+
+  MERGE (pv:PackageVersion { version:row.version, architecture:row.architecture, name:row.package})
+  MERGE (package)-[:HAS_VERSION]-&gt;(pv)
+
+  MERGE (s)-[:HAS_PACKAGE]-&gt;(pv)
+
+  FOREACH( dep IN split(row.dependencies, ',') |
+    MERGE (depNode:Package {name:split(dep, '(')[0] })
+    MERGE (pv)-[r:HAS_DEPENDENCY]-&gt;(depNode)
+    SET r.constraint = replace(split(dep, '(' )[1], ')','')
+  );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you want to see the result, you can run the following query :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH (n:Server {fqdn:'pythagore.logisima'})-[:HAS_PACKAGE]-&gt;(:Package)-[:HAS_PACKAGE*]-&gt;(p:Package)
+WHERE NOT (p)-[:HAS_PACKAGE]-&gt;()
+RETURN *</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/packages.svg" alt="packages" width="70%">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="network">Network</h3>
+<div class="sect3">
+<h4 id="network-interfaces">Network interfaces</h4>
+<div class="paragraph">
+<p>To get the list of the network interface, I will use the <strong>ip</strong> command with the following arguments :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>r:</strong> See the routing table</p>
+</li>
+<li>
+<p><strong>n:</strong> Display the IP adresses</p>
+</li>
+<li>
+<p><strong>w:</strong> Don&#8217;t truncate IP addresses</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt;ip -o addr show
+
+1: lo    inet 127.0.0.1/8 scope host lo\       valid_lft forever preferred_lft forever
+1: lo    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever
+2: wlp58s0    inet 10.0.1.11/24 brd 10.0.1.255 scope global dynamic wlp58s0\       valid_lft 2720sec preferred_lft 2720sec
+2: wlp58s0    inet6 fe80::cc06:f22c:2e3b:6aaf/64 scope link \       valid_lft forever preferred_lft forever
+3: br-8a43a73a9b0d    inet 172.24.0.1/16 brd 172.24.255.255 scope global br-8a43a73a9b0d\       valid_lft forever preferred_lft forever
+4: br-f8fefbd33c18    inet 172.18.0.1/16 brd 172.18.255.255 scope global br-f8fefbd33c18\       valid_lft forever preferred_lft forever
+5: br-0ba6b709cb23    inet 172.21.0.1/16 brd 172.21.255.255 scope global br-0ba6b709cb23\       valid_lft forever preferred_lft forever
+6: docker0    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0\       valid_lft forever preferred_lft forever
+7: br-667de2307c35    inet 172.22.0.1/16 brd 172.22.255.255 scope global br-667de2307c35\       valid_lft forever preferred_lft forever
+8: br-72683ea3a3d0    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-72683ea3a3d0\       valid_lft forever preferred_lft forever</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For my need, I need the IP addresses (v4 &amp; v6) of the Interface and its name.
+So by using awk, we can produce a CSV file :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">FILE="$NEO4J_HOME/import/$1/network_interfaces.csv"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now I can load it in Neo4j :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_interfaces.csv" AS row
+WITH row,
+  CASE  WHEN  row.type = 'inet' THEN split(row.ip, '/')[0] ELSE NULL END AS ipv4,
+  CASE  WHEN  row.type = 'inet6' THEN split(row.ip, '/')[0] ELSE NULL END AS ipv6
+
+  MATCH (s:Server {fqdn:$fqdn})
+
+  MERGE (i:Interface { name: row.name, fqdn:$fqdn })
+  SET i.ip = coalesce(ipv4, i.ip),
+      i.ipv6 = coalesce(ipv6, i.ipv6)
+
+  MERGE (s)-[:HAS_INTERFACE]-&gt;(i);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It gives me the following graph  :</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/interfaces.svg" alt="interfaces" width="30%">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="network-connections">Network connections</h4>
+<div class="paragraph">
+<p>To see all the connections on our computer, I will use the <strong>netstat</strong> command,
+with the following arguments :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>a:</strong> Display every socket</p>
+</li>
+<li>
+<p><strong>u:</strong> Filter on UDP sockets</p>
+</li>
+<li>
+<p><strong>t:</strong> Filter on TCP sockets</p>
+</li>
+<li>
+<p><strong>p:</strong> Display the process ID that use the socket</p>
+</li>
+<li>
+<p><strong>n:</strong> Display the IP adresses</p>
+</li>
+<li>
+<p><strong>w:</strong> Don&#8217;t truncate IP addresses</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+you need to run this command as a root to see all the connections
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">$&gt; netstat -alpuetn
+
+Connexions Internet actives (serveurs et établies)
+Proto Recv-Q Send-Q Adresse locale          Adresse distante        Etat       User       Inode       PID/Program name
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      124        28742       1317/mysqld
+tcp        0      0 127.0.1.1:53            0.0.0.0:*               LISTEN      0          35483       3192/dnsmasq
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      0          4024761     5070/cupsd
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      125        28000       1434/postgres
+tcp        0      0 127.0.0.1:38630         127.0.0.1:7687          ESTABLISHED 1000       4856935     14182/firefox
+tcp        0      0 10.0.1.11:39694         198.252.206.25:443      ESTABLISHED 1000       5159133     14182/firefox
+tcp        0      0 127.0.0.1:39044         127.0.0.1:7687          ESTABLISHED 1000       4908177     14182/firefox
+tcp        0      0 10.0.1.11:38388         52.222.163.46:443       ESTABLISHED 1000       5190592     14182/firefox
+tcp        0      0 127.0.0.1:39034         127.0.0.1:7687          ESTABLISHED 1000       4903190     14182/firefox
+tcp        0      0 10.0.1.11:49408         216.58.209.238:443      ESTABLISHED 1000       4994841     14182/firefox
+tcp        0      0 10.0.1.11:42724         172.217.18.197:443      ESTABLISHED 1000       5163155     14182/firefox
+tcp        0      0 10.0.1.11:38316         52.222.163.46:443       ESTABLISHED 1000       5157419     7587/libpepflashpla
+tcp        0      0 127.0.0.1:38632         127.0.0.1:7687          ESTABLISHED 1000       4853218     14182/firefox
+tcp        0      0 10.0.1.11:39698         198.252.206.25:443      ESTABLISHED 1000       5159174     14182/firefox
+tcp        0      0 10.0.1.11:58296         10.0.0.1:445            ESTABLISHED 0          4628873     -
+tcp        0      0 127.0.0.1:39046         127.0.0.1:7687          ESTABLISHED 1000       4914563     14182/firefox</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Like above, I will create a CSV :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-shell" data-lang="shell">FILE="$NEO4J_HOME/import/$1/network_connections.csv"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I will split in two parts (with sub-parts), the import of this file :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>processes that listen on a port</p>
+<div class="ulist">
+<ul>
+<li>
+<p>On IPv4</p>
+</li>
+<li>
+<p>On IPv6</p>
+</li>
+<li>
+<p>On all interfaces</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>processes that have an established connection</p>
+<div class="ulist">
+<ul>
+<li>
+<p>With an IPv4</p>
+</li>
+<li>
+<p>With an IPv6</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect4">
+<h5 id="processes-that-listen">Processes that listen</h5>
+<div class="sect5">
+<h6 id="on-ipv4">On Ipv4</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    size(split(row.local, '.')) &gt; 1 AND // only IPv4
+    (NOT row.local = '::' AND NOT row.local = '0.0.0.0') // Not for all interfaces
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface { ip: local_ip, fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ip:local_ip })
+    MERGE (i)-[:USES_PORT]-&gt;(p)
+    SET p.ip = i.ip,
+        p.ipv6 = i.ipv6
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&gt;(p)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="on-ipv6">On Ipv6</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">// listen port on IPv6 and not on all interfaces
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    size(split(row.local, '.')) = 0 AND // only IPv6
+    (NOT row.local STARTS WITH '::' AND NOT row.local STARTS WITH '0.0.0.0') // Not for all interfaces
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface { ipv6: local_ip, fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ipv6:local_ip})
+    MERGE (i)-[:USES_PORT]-&gt;(p)
+    SET p.ip = i.ip,
+        p.ipv6 = i.ipv6
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="on-all-interfaces">On all interfaces</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">// listen port on all ipv4 interfaces
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    ( row.local STARTS WITH '0.0.0.0') //  all interfaces
+  WITH
+    row,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface {fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ip:i.ip})
+    SET p.ipv6 = i.ipv6
+    MERGE (i)-[:USES_PORT]-&gt;(p)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="graph-example">Graph example</h6>
+<div class="paragraph">
+<p>This is so cool, at the end we obtain the graph below just by running the following query :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_INTERFACE]-&gt;(i:Interface)-[:USES_PORT]-&gt;(:Port)&lt;-[:LISTEN_ON]-(p:Process)
+RETURN path</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/network-listen.svg" alt="network listen" width="70%">
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="processes-with-a-connection">Processes with a connection</h5>
+<div class="paragraph">
+<p>This time, I import all the connections (incoming/outgoing) that computers have.</p>
+</div>
+<div class="sect5">
+<h6 id="on-ipv4-2">On Ipv4</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">// listen port on all ipv6 interfaces
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    ( row.local STARTS WITH ':::*') //  all interfaces
+  WITH
+    row,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface {fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ipv6:i.ipv6})
+    SET p.ip = i.ip
+    MERGE (i)-[:USES_PORT]-&gt;(p)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&gt;(p)
+    );
+
+// IPv4 connections
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(last(split(row.remote, ':'))) AS remote_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'ESTABLISHED' AND
+    size(split(row.local, '.')) &gt; 1 // only ipv4
+  WITH</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="on-ipv6-2">On Ipv6</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">    local_port,
+    replace(row.remote, ':'+ remote_port, '') AS remote_ip,
+    remote_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (s:Server {fqdn:$fqdn})
+
+    MATCH (iLocal:Interface {ip: local_ip, fqdn:$fqdn })
+    MERGE (iLocal)-[:USES_PORT]-&gt;(pLocal:Port { number: local_port})
+    SET pLocal.ip = iLocal.ip,
+        pLocal.ipv6 = iLocal.ipv6
+
+    MERGE (iLocal)-[:USES_PORT]-&gt;(pLocal)
+
+    MERGE (pRemote:Port { number: remote_port, ip:remote_ip })
+
+    MERGE (con:Connection { fqdn:$fqdn, pid:coalesce(pid,'-'), local:row.local, remote:row.remote})
+    MERGE (con)-[:SOURCE]-&gt;(pLocal)
+    MERGE (con)-[:TARGET]-&gt;(pRemote)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:HAS_CONNECTION]-&gt;(con)
+    );
+
+// IPv6 connections
+LOAD CSV WITH HEADERS FROM "file:///" + $fqdn + "/network_connections.csv" AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(last(split(row.remote, ':'))) AS remote_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'ESTABLISHED' AND</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="graph-example-2">Graph example</h6>
+<div class="paragraph">
+<p>And the result is :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-cypher" data-lang="cypher">MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_INTERFACE]-&gt;(i:Interface)-[:USES_PORT]-&gt;(:Port)&lt;-[:SOURCE]-(:Connection)-[:TARGET]-&gt;(p:Port)
+OPTIONAL MATCH path2=(p)&lt;-[:USES_PORT]-(:Interface)&lt;-[:HAS_INTERFACE]-(:Server)
+RETURN path, path2</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/public/images/computer-as-a-graph/network-connections.svg" alt="network connections" width="70%">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion">Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It&#8217;s really cool to see all the components of a computer as a graph,
+and if we do that on every computer of a network (hey <code>nmap</code>), we can have a complete vision of it, just with a discovery process.</p>
+</div>
+<div class="paragraph">
+<p>In a next article, I will show you what we can do with those data, stay tune !</p>
+</div>
+</div>
+</div>
+          </section>
+          <footer>
+            <ul class="inline pull-right metadata">
+              <li >
+                <span class="metadata">Tags :</span>
+                <span>
+                  graph,neo4j, cmdb, linux, discovery
+                </span>,
+              </li>
+              <li >
+                <span class="metadata">Auteur :</span>
+                <span>
+                  <a itemprop="author" href="about-me.html" title="Benoît Simard" rel="author">Benoit Simard</a>
+                </span>,
+              </li>
+              <li>
+                <span class="metadata">Created at :</span>
+                <time itemprop="dateCreated" datetime="2019-06-29">Jun 29, 2019</time>
+              </li>
+              <li><a href="" title="Permalien : Your computer is a graph !" itemprop="url">Permalink</a></li>
+            </ul>
+          </footer>
+        </div>
+      </article>
+
+      <section id="disqus_thread"></section>
+
+      <nav class="row-fluid blog" data-spy="affix" data-offset-top="200">
+        <div class="alpha-wrapper"></div>
+        <div class="span12">
+          <ul class="unstyled">
+            
+            <li class="pull-left">
+              <a class="btn btn-primary" href="/2019/04/18/graph-licenses.html" title="Le graphe des licences">&lt; Le graphe des licences</a>
+            </li>
+            
+            
+          </ul>
+        </div>
+      </nav>
+
+    </section>
+  </section>
+
+  <footer id="footer" class="hidden-print">
+  <div class=" blockOdd">
+    <div class="container">
+      <div class="row-fluid">
+
+        <div class="span4">
+          <ul class="pull-left inline">
+            <li>
+              <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative commons : BY-SA">
+                <img alt="CC-BY-SA" src="/public/images/cc-by-sa.png" class="middle">
+              </a>
+            </li>
+            <li>|</li>
+            <li id="mentions">
+            </li>
+          </ul>
+        </div>
+
+        <div class="span8">
+          <ul class="pull-right inline">
+            <li>
+              <a href="mailto:contact@bsimard.com" title="Contact me">
+                <i class="icon-envelope"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.twitter.com/logisima" title="Follow-me on Twitter">
+                <i class="icon-twitter"></i>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.github.com/sim51" title="My github account">
+                <i class="icon-github-alt"></i>
+              </a>
+            </li>
+            <li>
+              <a href="http://www.linkedin.com/pub/beno%C3%AEt-simard/5/8a5/124" title="My profile on Linked-in">
+                <i class="icon-linkedin"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="/public/javascripts/jquery.min.js" type="text/javascript"></script>
+<script src="/public/javascripts/bootstrap.min.js" type="text/javascript"></script>
+<script src="/public/codemirror/lib/codemirror.js"></script>
+<script src="/public/codemirror/mode/cypher/cypher.js"></script>
+<script src="/public/codemirror/mode/javascript/javascript.js"></script>
+<script src="/public/codemirror/mode/properties/properties.js"></script>
+<script src="/public/codemirror/mode/sql/sql.js"></script>
+<script src="/public/codemirror/mode/xml/xml.js"></script>
+<script src="/public/codemirror/mode/shell/shell.js"></script>
+<script src="/public/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<!-- Addthis -->
+<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-4fe07fd564a65b88"></script>
+<script type="text/javascript">
+  addthis.layers({
+    'theme' : 'transparent',
+    'share' : {
+      'position' : 'right',
+      'numPreferredServices' : 5
+    }
+  });
+</script>
+
+<!-- Disqus -->
+<script type="text/javascript">
+  
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'bsimard';
+  var disqus_identifier = '/2019/06/29/computer-as-a-graph';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<!-- GA -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-10125951-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-10125951-1');
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+    $("code").each(function() {
+        var lang = $(this).attr('data-lang');
+
+        if(lang) {
+            $(this).html("<textarea>" + $(this).html() + "<\/textarea>");
+            CodeMirror.fromTextArea($(this).find('textarea')[0], { 'readonly':true, 'mode':lang, 'theme':'neo', 'lineNumbers':true, 'lineWrapping':true});
+        }
+    });
+  </script>
+</body>
+</html>

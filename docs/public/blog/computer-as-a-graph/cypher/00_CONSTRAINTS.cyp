@@ -1,0 +1,10 @@
+CREATE CONSTRAINT ON (n:Server) ASSERT (n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Group) ASSERT (n.gid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:User) ASSERT (n.uid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Process) ASSERT (n.pid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageSection) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Package) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageVersion) ASSERT (n.version, n.architecture,n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Hardware) ASSERT (n.id, n.fqdn ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Vendor) ASSERT (n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Product) ASSERT (n.name, n.vendor ) IS NODE KEY;
