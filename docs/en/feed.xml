@@ -3,10 +3,10 @@
   <channel>
     <title>Benoit Simard</title>
     <description>Benoit's Blog</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 19 Jul 2019 15:36:54 +0200</pubDate>
-    <lastBuildDate>Fri, 19 Jul 2019 15:36:54 +0200</lastBuildDate>
+    <link>http://www.bsimard.com/</link>
+    <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 19 Jul 2019 15:38:18 +0200</pubDate>
+    <lastBuildDate>Fri, 19 Jul 2019 15:38:18 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
@@ -934,8 +934,8 @@ and if we do that on every computer of a network (hey &lt;code&gt;nmap&lt;/code&
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Sat, 29 Jun 2019 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2019/06/29/computer-as-a-graph.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2019/06/29/computer-as-a-graph.html</guid>
+        <link>http://www.bsimard.com/2019/06/29/computer-as-a-graph.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2019/06/29/computer-as-a-graph.html</guid>
         
         
         <category>graph</category>
@@ -1250,8 +1250,8 @@ I recommend you to test it, and if you have questions, requests or issues, don&a
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 03 Sep 2018 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2018/09/03/kettle-neo4j.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/09/03/kettle-neo4j.html</guid>
+        <link>http://www.bsimard.com/2018/09/03/kettle-neo4j.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/09/03/kettle-neo4j.html</guid>
         
         
         <category>Kettle</category>
@@ -2002,8 +2002,8 @@ So if you are interested, please leave a comment, it will motivate me to write i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Tue, 22 May 2018 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/05/22/monitoring-neo4j-influxdb.html</guid>
+        <link>http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/05/22/monitoring-neo4j-influxdb.html</guid>
         
         
         <category>monitoring</category>
@@ -2799,8 +2799,8 @@ By default, a node is black, with a size of 5, and the label is its Neo4j&amp;#8
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Wed, 25 Apr 2018 00:00:00 +0200</pubDate>
-        <link>http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/25/graph-viz-with-sigmajs.html</guid>
+        <link>http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2018/04/25/graph-viz-with-sigmajs.html</guid>
         
         
         <category>sigma</category>
@@ -3245,8 +3245,8 @@ Finally, it can makes the &lt;strong&gt;role&lt;/strong&gt; mapping as defined i
 &lt;/div&gt;
 &lt;/div&gt;</description>
         <pubDate>Mon, 13 Nov 2017 00:00:00 +0100</pubDate>
-        <link>http://localhost:4000/2017/11/13/neo4j-ldap.html</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/11/13/neo4j-ldap.html</guid>
+        <link>http://www.bsimard.com/2017/11/13/neo4j-ldap.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2017/11/13/neo4j-ldap.html</guid>
         
         
         <category>neo4j</category>
