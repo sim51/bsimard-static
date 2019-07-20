@@ -1,0 +1,11 @@
+= Your computer is a graph - part 2!
+Benoit Simard <contact@bsimard.com>
+:page-layout: post
+:page-locale: en
+:page-description: Discover your computer by importing its hardwares, packages, network connection , ..., and see it as a graph
+:page-image: /public/images/computer-as-a-graph/banner.png
+:page-tags: graph,neo4j, cmdb, linux, discovery
+:page-ref: computer-as-a-graph
+:toc:
+
+==
