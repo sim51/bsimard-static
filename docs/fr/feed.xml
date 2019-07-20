@@ -5,20 +5,975 @@
     <description>Benoit's Blog</description>
     <link>http://www.bsimard.com/</link>
     <atom:link href="http://www.bsimard.com/en/feed" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 20 Jul 2019 11:21:46 +0200</pubDate>
-    <lastBuildDate>Sat, 20 Jul 2019 11:21:46 +0200</lastBuildDate>
+    <pubDate>Sat, 20 Jul 2019 11:23:40 +0200</pubDate>
+    <lastBuildDate>Sat, 20 Jul 2019 11:23:40 +0200</lastBuildDate>
     <generator>Jekyll v3.3.1</generator>
 
     
      
+    
+     
       <item>
-        <title>Your computer is a graph - part 2!</title>
-        <description>&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;==&lt;/p&gt;
+        <title>Your computer is a graph !</title>
+        <description>&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#the-model&quot;&gt;The model&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#import-items&quot;&gt;Import items&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#computer-name&quot;&gt;Computer name&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#hardware&quot;&gt;Hardware&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#user-group&quot;&gt;User &amp;amp; Group&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#process-list&quot;&gt;Process list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#list-of-installed-packages&quot;&gt;List of installed packages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#network&quot;&gt;Network&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In this article I will show you how to import all the components of a Linux computer (package network connection, user, group, &amp;#8230;&amp;#8203;),
+into a graph with the help of Neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In an next article, we will play with this dataset and see what we value we can get.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;the-model&quot;&gt;The model&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the model I want to produce :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/diag/diag-a43d29d5a7438ea5e0741d034529c6c1.png&quot; alt=&quot;diag a43d29d5a7438ea5e0741d034529c6c1&quot; width=&quot;1108&quot; height=&quot;766&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Basicaly, I have a server that is composed of a list of:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;installed packages with their dependencies&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;network interfaces with their connections&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;hardware (as tree)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;groups and users&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;process (as a tree)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;From that model, we can create the indexes/constraints for the database :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CREATE CONSTRAINT ON (n:Server) ASSERT (n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Group) ASSERT (n.gid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:User) ASSERT (n.uid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Process) ASSERT (n.pid, n.fqdn) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageSection) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Package) ASSERT (n.name) IS NODE KEY;
+CREATE CONSTRAINT ON (n:PackageVersion) ASSERT (n.version, n.architecture,n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Hardware) ASSERT (n.id, n.fqdn ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Vendor) ASSERT (n.name ) IS NODE KEY;
+CREATE CONSTRAINT ON (n:Product) ASSERT (n.name, n.vendor ) IS NODE KEY;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;import-items&quot;&gt;Import items&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;computer-name&quot;&gt;Computer name&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The first thing to retrieve is the &lt;a href=&quot;https://fr.wikipedia.org/wiki/Fully_qualified_domain_name&quot;&gt;FQDN&lt;/a&gt; of the computer.
+For this I will use the command : &lt;code&gt;hostname --fqdn&lt;/code&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; hostname --fqdn
+pythagore&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This will help us to create the node &lt;code&gt;Server&lt;/code&gt; :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;MERGE (:Server {fqdn:$fqdn});&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;hardware&quot;&gt;Hardware&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To retrieve the entire composition of the server,
+I will use the command &lt;code&gt;lshw&lt;/code&gt; that list all the hardware in a tree format.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Moreover, the command can generate a JSON file if we pass the argument &lt;code&gt;-json&lt;/code&gt;:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;FILE=&quot;$NEO4J_HOME/import/$1/hardware.json&quot;
+  sudo lshw -json &amp;gt; $FILE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;{
+  &quot;id&quot; : &quot;pythagore&quot;,
+  &quot;class&quot; : &quot;system&quot;,
+  &quot;claimed&quot; : true,
+  &quot;description&quot; : &quot;Computer&quot;,
+  &quot;width&quot; : 64,
+  &quot;capabilities&quot; : {
+    &quot;vsyscall32&quot; : &quot;processus 32 bits&quot;
+  },
+  &quot;children&quot; : [
+    {
+      &quot;id&quot; : &quot;core&quot;,
+      &quot;class&quot; : &quot;bus&quot;,
+      &quot;claimed&quot; : true,
+      &quot;description&quot; : &quot;Motherboard&quot;,
+      &quot;physid&quot; : &quot;0&quot;,
+      &quot;children&quot; : [
+        {
+          &quot;id&quot; : &quot;memory&quot;,
+          &quot;class&quot; : &quot;memory&quot;,
+          &quot;claimed&quot; : true,
+          &quot;description&quot; : &quot;Mémoire système&quot;,
+          &quot;physid&quot; : &quot;0&quot;,
+          &quot;units&quot; : &quot;bytes&quot;,
+          &quot;size&quot; : 16695070720
+        }
+        ...
+      ]
+    }
+  ]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The import process of this file will be a little complexe,
+because it&amp;#8217;s a &lt;strong&gt;JSON tree&lt;/strong&gt; with an undeterminated depth. So I need to create a &lt;strong&gt;recursive query&lt;/strong&gt; to create its structure in neo4j.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For this I will use massively &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures&quot;&gt;APOC&lt;/a&gt; for that !&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For each item of the JSON, I want to create this : &lt;code&gt;(Vendor)-&amp;#8594;(Product)&amp;#8592;-(ProductInstance)&amp;#8592;-(ParentHardwareInstance)&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If I translate that in Cypher in a custom procedure, it gives that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.custom.asProcedure(
+	'hardware',
+  &quot;
+  MATCH (p) WHERE id(p)=$parent
+
+  MERGE (vendor:Vendor { name:coalesce($item.vendor, 'unknown')})
+  MERGE (product:Product { name:coalesce($item.product, 'unknown'), vendor:coalesce($item.vendor, 'unknown')})
+    ON CREATE SET product.description = $item.description
+  MERGE (vendor)-[:HAS_PRODUCT]-&amp;gt;(product)
+
+  MERGE (hardware:Hardware {id:$item.id + '-' + coalesce($item.physid, '') + '-' + coalesce($item.handle, '') , fqdn:$fqdn})
+  SET hardware +=apoc.map.removeKeys($item,['id', 'children', 'capabilities', 'configuration', 'vendor', 'product'])
+  MERGE (p)-[:HAS_HARDWARE]-&amp;gt;(hardware)
+  MERGE (hardware)-[:TYPE_OF]-&amp;gt;(product)
+
+  WITH  hardware
+  UNWIND coalesce($item.children, []) AS newItem
+    CALL custom.hardware($fqdn, id(hardware), newItem) YIELD row
+    RETURN row
+  &quot;,
+  &quot;write&quot;,
+  [[&quot;row&quot;,&quot;MAP&quot;]],
+  [
+    ['fqdn','STRING'],
+    ['parent','LONG'],
+    ['item','MAP']
+  ]
+);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;As you see at the &lt;strong&gt;line 18&lt;/strong&gt;, I recall the procedure itself if there are some children.
+Pretty cool no ?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+The documentation for the cypher custom procedure feature is available  here : &lt;a href=&quot;https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions&quot; class=&quot;bare&quot;&gt;https://neo4j-contrib.github.io/neo4j-apoc-procedures/#cypher-based-procedures-functions&lt;/a&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Then I just have to call the procedure with the data like that :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;CALL apoc.load.json(&quot;file:///&quot; + $fqdn + &quot;/hardware.json&quot;) YIELD value WITH value
+ MATCH (s:Server {fqdn:$fqdn})
+ CALL custom.hardware($fqdn, id(s), value) YIELD row
+ RETURN count(*);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And to finish, I put the &lt;code&gt;class&lt;/code&gt; attribut as a Label :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (n:Hardware)
+CALL apoc.create.addLabels( id(n), [ n.class ] ) YIELD node
+REMOVE node.class
+RETURN count(*)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you want to see the result in the browser, this is the query for just displaying the tree structure of hardwares :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH p=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_HARDWARE]-&amp;gt;(:Hardware)-[:HAS_HARDWARE*]-&amp;gt;(h:Hardware)
+WHERE NOT (h)-[:HAS_HARDWARE]-&amp;gt;()
+RETURN *&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/hardware-tree.svg&quot; alt=&quot;hardware tree&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;user-group&quot;&gt;User &amp;amp; Group&lt;/h3&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;users&quot;&gt;Users&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Users are stored in the file &lt;code&gt;/etc/users&lt;/code&gt;, where each line represents a user.
+For example : &lt;code&gt;bsimard:x:1000:1000:Benoit Simard,,,:/home/bsimard:/bin/bash&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;olist arabic&quot;&gt;
+&lt;ol class=&quot;arabic&quot;&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Username:&lt;/strong&gt; The login of the user, &lt;code&gt;bsimard&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Password:&lt;/strong&gt;  Generally password is set to &lt;code&gt;x&lt;/code&gt;. It indicates that password are stored in the file &lt;code&gt;/etc/shadow&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;User ID (UID):&lt;/strong&gt;  The ID of the user.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Group ID (GID):&lt;/strong&gt;  The ID of the main group of the user&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;User ID Info:&lt;/strong&gt; Some information about the user seperated by a &lt;code&gt;,&lt;/code&gt;, like the fullname, phone, email&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Home directory:&lt;/strong&gt; The home directory of the user &lt;code&gt;/home/bsimard&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Command/shell:&lt;/strong&gt; The command for the shell, in my case &lt;code&gt;/bin/bash&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the Cypher script to import this file in Neo4j :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/users.csv&quot; AS row FIELDTERMINATOR ':'
+  MERGE (g:Group { gid:toInteger(row.gid), fqdn:$fqdn})
+  MERGE(u:User {uid: toInteger(row.uid), fqdn:$fqdn})
+  SET u.username = row.username,
+      u.fullname = split(row.info, ',')[0],
+      u.home_directory = row.home,
+      u.shell = row.shell
+  MERGE (g)-[:HAS_USER]-&amp;gt;(u);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;groups&quot;&gt;Groups&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Groups are stored in the file &lt;code&gt;/etc/groups&lt;/code&gt;, where each line represents a group.
+For example : &lt;code&gt;adm:x:4:syslog,bsimard&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;olist arabic&quot;&gt;
+&lt;ol class=&quot;arabic&quot;&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Group name:&lt;/strong&gt; Name of the group, in our example it&amp;#8217;s &lt;code&gt;adm&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Password:&lt;/strong&gt;  Generally password is not used, hence it is empty/blan, ie. &lt;code&gt;x&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Group ID (GID):&lt;/strong&gt; Each group must be assigned a group ID, , in our example it&amp;#8217;s &lt;code&gt;4&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Group List:&lt;/strong&gt; It is a list of user names of users who are members of the group, separated by a &lt;code&gt;,&lt;/code&gt;. In our example &lt;code&gt;syslog&lt;/code&gt; and &lt;code&gt;bsimard&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is the Cypher script to import this file in Neo4j :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/groups.csv&quot; AS row FIELDTERMINATOR ':'
+  MATCH (s:Server {fqdn:$fqdn})
+  MERGE (g:Group { gid:toInteger(row.gid), fqdn:$fqdn })
+  MERGE (s)-[:HAS_GROUP]-&amp;gt;(g)
+  SET g.name = row.name
+  WITH row, g
+  UNWIND split(row.users, &quot;,&quot;) AS username
+    MATCH (u:User { username:username, fqdn:$fqdn})
+    MERGE (g)-[:HAS_USER]-&amp;gt;(u);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;the-result&quot;&gt;The result&lt;/h4&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/user-all.svg&quot; alt=&quot;user all&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;process-list&quot;&gt;Process list&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To retrieve the list of all the running process, with their dependencies,
+I will use the &lt;strong&gt;ps&lt;/strong&gt; command with those arguments :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;e:&lt;/strong&gt; Select all processes&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;o:&lt;/strong&gt; To specify the format with&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;pid:&lt;/strong&gt; The ID of the process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ppid:&lt;/strong&gt; The ID of the parent process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;comm:&lt;/strong&gt; The command that has launched the process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ruser:&lt;/strong&gt; The username of the user that owns the process&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$&amp;gt; ps -eo pid,ppid,comm,ruser
+
+PID,PPID,%CPU,SIZE,COMMAND,RUSER
+1,0,0.0,18964,systemd,root
+2,0,0.0,0,kthreadd,root
+4,2,0.0,0,kworker/0:0H,root
+6,2,0.0,0,mm_percpu_wq,root&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;With the help of &lt;strong&gt;awk&lt;/strong&gt;, we can generate a CSV file :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;FILE=&quot;$NEO4J_HOME/import/$1/processes.csv&quot;
+  ps -eo pid,ppid,comm,ruser | awk '{print $1&quot;,&quot;$2&quot;,&quot;$3&quot;,&quot;$4}' &amp;gt; $FILE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And this is the cypher script to import it :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (s:Server {fqdn:$fqdn})
+MERGE (p:Process {pid:0, command:'init', fqdn:$fqdn})
+MERGE (s)-[:HAS_PROCESS]-&amp;gt;(p);
+
+LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/processes.csv&quot; AS row
+WITH row ORDER BY row.PPID, row.PID  ASC
+  MATCH (u:User {username:row.RUSER, fqdn:$fqdn})
+  MERGE (pp:Process {pid:toInteger(row.PPID), fqdn:$fqdn})
+  MERGE (p:Process {pid:toInteger(row.PID), fqdn:$fqdn})
+  SET p.command = split(row.COMMAND, '/')[0]
+  MERGE (pp)-[:HAS_PROCESS]-&amp;gt;(p)
+  MERGE (p)-[:OWNED_BY]-&amp;gt;(u);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;When the import is finished, you should have something similar to this by excuting the following query :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_PROCESS]-&amp;gt;(:Process)-[:HAS_PROCESS*]-&amp;gt;(p:Process)
+WHERE NOT (p)-[:HAS_PROCESS]-&amp;gt;()
+RETURN *&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/process-tree.svg&quot; alt=&quot;process tree&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;We can also search all the processes of a user :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (n:Server {fqdn:'pythagore.logisima'})-[:HAS_GROUP|:HAS_USER*2..2]-&amp;gt;(u:User {name:'bsimard'})
+WITH u
+MATCH (u)&amp;lt;-[:OWNED_BY]-(p)
+RETURN *&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/process-user.svg&quot; alt=&quot;process user&quot; width=&quot;40%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;list-of-installed-packages&quot;&gt;List of installed packages&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Because I have a debian system, I will use the &lt;strong&gt;dpkg&lt;/strong&gt; command, and produce a CSV from its output :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;FILE=&quot;$NEO4J_HOME/import/$1/packages.csv&quot;
+  dpkg-query -Wf '${Section}\t${Package}\t${Version}\t${Architecture}\t${Homepage}\t${Depends}\n' &amp;gt;&amp;gt; $FILE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I can import it with the following cypher script :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/packages.csv&quot; AS row FIELDTERMINATOR '\t'
+  MATCH (s:Server {fqdn:$fqdn})
+
+  MERGE (section:PackageSection {name:coalesce(row.section, 'None') })
+  MERGE (package:Package {name:row.package})
+  SET package.url = row.homepage
+  MERGE (section)-[:HAS_PACKAGE]-&amp;gt;(package)
+
+  MERGE (pv:PackageVersion { version:row.version, architecture:row.architecture, name:row.package})
+  MERGE (package)-[:HAS_VERSION]-&amp;gt;(pv)
+
+  MERGE (s)-[:HAS_PACKAGE]-&amp;gt;(pv)
+
+  FOREACH( dep IN split(row.dependencies, ',') |
+    MERGE (depNode:Package {name:split(dep, '(')[0] })
+    MERGE (pv)-[r:HAS_DEPENDENCY]-&amp;gt;(depNode)
+    SET r.constraint = replace(split(dep, '(' )[1], ')','')
+  );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;If you want to see the result, you can run the following query :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH (n:Server {fqdn:'pythagore.logisima'})-[:HAS_PACKAGE]-&amp;gt;(:Package)-[:HAS_PACKAGE*]-&amp;gt;(p:Package)
+WHERE NOT (p)-[:HAS_PACKAGE]-&amp;gt;()
+RETURN *&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/packages.svg&quot; alt=&quot;packages&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;network&quot;&gt;Network&lt;/h3&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;network-interfaces&quot;&gt;Network interfaces&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To get the list of the network interface, I will use the &lt;strong&gt;ip&lt;/strong&gt; command with the following arguments :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;r:&lt;/strong&gt; See the routing table&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;n:&lt;/strong&gt; Display the IP adresses&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;w:&lt;/strong&gt; Don&amp;#8217;t truncate IP addresses&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;$&amp;gt;ip -o addr show
+
+1: lo    inet 127.0.0.1/8 scope host lo\       valid_lft forever preferred_lft forever
+1: lo    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever
+2: wlp58s0    inet 10.0.1.11/24 brd 10.0.1.255 scope global dynamic wlp58s0\       valid_lft 2720sec preferred_lft 2720sec
+2: wlp58s0    inet6 fe80::cc06:f22c:2e3b:6aaf/64 scope link \       valid_lft forever preferred_lft forever
+3: br-8a43a73a9b0d    inet 172.24.0.1/16 brd 172.24.255.255 scope global br-8a43a73a9b0d\       valid_lft forever preferred_lft forever
+4: br-f8fefbd33c18    inet 172.18.0.1/16 brd 172.18.255.255 scope global br-f8fefbd33c18\       valid_lft forever preferred_lft forever
+5: br-0ba6b709cb23    inet 172.21.0.1/16 brd 172.21.255.255 scope global br-0ba6b709cb23\       valid_lft forever preferred_lft forever
+6: docker0    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0\       valid_lft forever preferred_lft forever
+7: br-667de2307c35    inet 172.22.0.1/16 brd 172.22.255.255 scope global br-667de2307c35\       valid_lft forever preferred_lft forever
+8: br-72683ea3a3d0    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-72683ea3a3d0\       valid_lft forever preferred_lft forever&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;For my need, I need the IP addresses (v4 &amp;amp; v6) of the Interface and its name.
+So by using awk, we can produce a CSV file :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;FILE=&quot;$NEO4J_HOME/import/$1/network_interfaces.csv&quot;
+  ip -o addr show  | awk '{print $2&quot;,&quot;$3&quot;,&quot;$4}' &amp;gt;&amp;gt; $FILE&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Now I can load it in Neo4j :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_interfaces.csv&quot; AS row
+WITH row,
+  CASE  WHEN  row.type = 'inet' THEN split(row.ip, '/')[0] ELSE NULL END AS ipv4,
+  CASE  WHEN  row.type = 'inet6' THEN split(row.ip, '/')[0] ELSE NULL END AS ipv6
+
+  MATCH (s:Server {fqdn:$fqdn})
+
+  MERGE (i:Interface { name: row.name, fqdn:$fqdn })
+  SET i.ip = coalesce(ipv4, i.ip),
+      i.ipv6 = coalesce(ipv6, i.ipv6)
+
+  MERGE (s)-[:HAS_INTERFACE]-&amp;gt;(i);&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It gives me the following graph  :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/interfaces.svg&quot; alt=&quot;interfaces&quot; width=&quot;30%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect3&quot;&gt;
+&lt;h4 id=&quot;network-connections&quot;&gt;Network connections&lt;/h4&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To see all the connections on our computer, I will use the &lt;strong&gt;netstat&lt;/strong&gt; command,
+with the following arguments :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;a:&lt;/strong&gt; Display every socket&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;u:&lt;/strong&gt; Filter on UDP sockets&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;t:&lt;/strong&gt; Filter on TCP sockets&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;p:&lt;/strong&gt; Display the process ID that use the socket&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;n:&lt;/strong&gt; Display the IP adresses&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;w:&lt;/strong&gt; Don&amp;#8217;t truncate IP addresses&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;admonitionblock note&quot;&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td class=&quot;icon&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Note&lt;/div&gt;
+&lt;/td&gt;
+&lt;td class=&quot;content&quot;&gt;
+you need to run this command as a root to see all the connections
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;$&amp;gt; netstat -alpuetn
+
+Connexions Internet actives (serveurs et établies)
+Proto Recv-Q Send-Q Adresse locale          Adresse distante        Etat       User       Inode       PID/Program name
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      124        28742       1317/mysqld
+tcp        0      0 127.0.1.1:53            0.0.0.0:*               LISTEN      0          35483       3192/dnsmasq
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      0          4024761     5070/cupsd
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      125        28000       1434/postgres
+tcp        0      0 127.0.0.1:38630         127.0.0.1:7687          ESTABLISHED 1000       4856935     14182/firefox
+tcp        0      0 10.0.1.11:39694         198.252.206.25:443      ESTABLISHED 1000       5159133     14182/firefox
+tcp        0      0 127.0.0.1:39044         127.0.0.1:7687          ESTABLISHED 1000       4908177     14182/firefox
+tcp        0      0 10.0.1.11:38388         52.222.163.46:443       ESTABLISHED 1000       5190592     14182/firefox
+tcp        0      0 127.0.0.1:39034         127.0.0.1:7687          ESTABLISHED 1000       4903190     14182/firefox
+tcp        0      0 10.0.1.11:49408         216.58.209.238:443      ESTABLISHED 1000       4994841     14182/firefox
+tcp        0      0 10.0.1.11:42724         172.217.18.197:443      ESTABLISHED 1000       5163155     14182/firefox
+tcp        0      0 10.0.1.11:38316         52.222.163.46:443       ESTABLISHED 1000       5157419     7587/libpepflashpla
+tcp        0      0 127.0.0.1:38632         127.0.0.1:7687          ESTABLISHED 1000       4853218     14182/firefox
+tcp        0      0 10.0.1.11:39698         198.252.206.25:443      ESTABLISHED 1000       5159174     14182/firefox
+tcp        0      0 10.0.1.11:58296         10.0.0.1:445            ESTABLISHED 0          4628873     -
+tcp        0      0 127.0.0.1:39046         127.0.0.1:7687          ESTABLISHED 1000       4914563     14182/firefox&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Like above, I will create a CSV :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;FILE=&quot;$NEO4J_HOME/import/$1/network_connections.csv&quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I will split in two parts (with sub-parts), the import of this file :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;processes that listen on a port&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;On IPv4&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On IPv6&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On all interfaces&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;processes that have an established connection&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;With an IPv4&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;With an IPv6&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect4&quot;&gt;
+&lt;h5 id=&quot;processes-that-listen&quot;&gt;Processes that listen&lt;/h5&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-ipv4&quot;&gt;On Ipv4&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    size(split(row.local, '.')) &amp;gt; 1 AND // only IPv4
+    (NOT row.local = '::' AND NOT row.local = '0.0.0.0') // Not for all interfaces
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface { ip: local_ip, fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ip:local_ip })
+    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
+    SET p.ip = i.ip,
+        p.ipv6 = i.ipv6
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-ipv6&quot;&gt;On Ipv6&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    size(split(row.local, '.')) = 0 AND // only IPv6
+    (NOT row.local STARTS WITH '::' AND NOT row.local STARTS WITH '0.0.0.0') // Not for all interfaces
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface { ipv6: local_ip, fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ipv6:local_ip})
+    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
+    SET p.ip = i.ip,
+        p.ipv6 = i.ipv6
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-all-interfaces&quot;&gt;On all interfaces&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    ( row.local STARTS WITH '0.0.0.0') //  all interfaces
+  WITH
+    row,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface {fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ip:i.ip})
+    SET p.ipv6 = i.ipv6
+    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'LISTEN' AND
+    ( row.local STARTS WITH ':::*') //  all interfaces
+  WITH
+    row,
+    local_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (i:Interface {fqdn:$fqdn })
+    MERGE (p:Port { number: local_port, ipv6:i.ipv6})
+    SET p.ip = i.ip
+    MERGE (i)-[:USES_PORT]-&amp;gt;(p)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:LISTEN_ON]-&amp;gt;(p)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;graph-example&quot;&gt;Graph example&lt;/h6&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This is so cool, at the end we obtain the graph below just by running the following query :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_INTERFACE]-&amp;gt;(i:Interface)-[:USES_PORT]-&amp;gt;(:Port)&amp;lt;-[:LISTEN_ON]-(p:Process)
+RETURN path&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/network-listen.svg&quot; alt=&quot;network listen&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect4&quot;&gt;
+&lt;h5 id=&quot;processes-with-a-connection&quot;&gt;Processes with a connection&lt;/h5&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;This time, I import all the connections (incoming/outgoing) that computers have.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-ipv4-2&quot;&gt;On Ipv4&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(last(split(row.remote, ':'))) AS remote_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'ESTABLISHED' AND
+    size(split(row.local, '.')) &amp;gt; 1 // only ipv4
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    replace(row.remote, ':'+ remote_port, '') AS remote_ip,
+    remote_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (s:Server {fqdn:$fqdn})
+
+    MATCH (iLocal:Interface {ip: local_ip, fqdn:$fqdn })
+    MERGE (iLocal)-[:USES_PORT]-&amp;gt;(pLocal:Port { number: local_port})
+    SET pLocal.ip = iLocal.ip,
+        pLocal.ipv6 = iLocal.ipv6
+
+    MERGE (iLocal)-[:USES_PORT]-&amp;gt;(pLocal)
+
+    MERGE (pRemote:Port { number: remote_port, ip:remote_ip })
+
+    MERGE (con:Connection { fqdn:$fqdn, pid:coalesce(pid,'-'), local:row.local, remote:row.remote})
+    MERGE (con)-[:SOURCE]-&amp;gt;(pLocal)
+    MERGE (con)-[:TARGET]-&amp;gt;(pRemote)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:HAS_CONNECTION]-&amp;gt;(con)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;on-ipv6-2&quot;&gt;On Ipv6&lt;/h6&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;LOAD CSV WITH HEADERS FROM &quot;file:///&quot; + $fqdn + &quot;/network_connections.csv&quot; AS row
+  WITH
+    row,
+    toInteger(last(split(row.local, ':'))) AS local_port,
+    toInteger(last(split(row.remote, ':'))) AS remote_port,
+    toInteger(split(row.pid,'/')[0]) AS pid
+  WHERE
+    row.state = 'ESTABLISHED' AND
+    size(split(row.local, '.')) = 0
+  WITH
+    row,
+    replace(row.local, ':'+ local_port, '') AS local_ip,
+    local_port,
+    replace(row.remote, ':'+ remote_port, '') AS remote_ip,
+    remote_port,
+    pid,
+    CASE WHEN pid IS NULL THEN [] ELSE [1] END AS ifPid
+
+    MATCH (s:Server {fqdn:$fqdn})
+
+    MATCH (iLocal:Interface {ipv6: local_ip, fqdn:$fqdn })
+    MERGE (iLocal)-[:USES_PORT]-&amp;gt;(pLocal:Port { number: local_port})
+    SET pLocal.ip = iLocal.ip,
+        pLocal.ipv6 = iLocal.ipv6
+
+    MERGE (pRemote:Port { number: remote_port, ip:remote_ip })
+
+    MERGE (con:Connection { fqdn:$fqdn, pid:coalesce(pid,'-'), local:row.local, remote:row.remote})
+    MERGE (con)-[:SOURCE]-&amp;gt;(pLocal)
+    MERGE (con)-[:TARGET]-&amp;gt;(pRemote)
+
+    FOREACH( x IN ifPid |
+      MERGE (process:Process {pid:pid, fqdn:$fqdn})
+      MERGE (process)-[:HAS_CONNECTION]-&amp;gt;(con)
+    );&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect5&quot;&gt;
+&lt;h6 id=&quot;graph-example-2&quot;&gt;Graph example&lt;/h6&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;And the result is :&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;highlight&quot;&gt;&lt;code class=&quot;language-cypher&quot; data-lang=&quot;cypher&quot;&gt;MATCH path=(n:Server {fqdn:'pythagore.logisima'})-[:HAS_INTERFACE]-&amp;gt;(i:Interface)-[:USES_PORT]-&amp;gt;(:Port)&amp;lt;-[:SOURCE]-(:Connection)-[:TARGET]-&amp;gt;(p:Port)
+OPTIONAL MATCH path2=(p)&amp;lt;-[:USES_PORT]-(:Interface)&amp;lt;-[:HAS_INTERFACE]-(:Server)
+RETURN path, path2&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;imageblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;img src=&quot;/public/images/computer-as-a-graph/network-connections.svg&quot; alt=&quot;network connections&quot; width=&quot;70%&quot;&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;It&amp;#8217;s really cool to see all the components of a computer as a graph,
+and if we do that on every computer of a network (hey &lt;code&gt;nmap&lt;/code&gt;), we can have a complete vision of it, just with a discovery process.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;In a next article, I will show you what we can do with those data, stay tune !&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;/div&gt;</description>
-        <pubDate>Fri, 19 Jul 2019 00:00:00 +0200</pubDate>
-        <link>http://www.bsimard.com/2019/07/19/computer-as-a-graph-part2.html</link>
-        <guid isPermaLink="true">http://www.bsimard.com/2019/07/19/computer-as-a-graph-part2.html</guid>
+        <pubDate>Sat, 29 Jun 2019 00:00:00 +0200</pubDate>
+        <link>http://www.bsimard.com/2019/06/29/computer-as-a-graph.html</link>
+        <guid isPermaLink="true">http://www.bsimard.com/2019/06/29/computer-as-a-graph.html</guid>
         
         
         <category>graph</category>
@@ -35,8 +990,6 @@
         
       </item>
       
-    
-     
     
      
     
